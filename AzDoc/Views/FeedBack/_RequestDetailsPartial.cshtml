@@ -1,0 +1,286 @@
+﻿@model Model.Models.FeedBack.FeedBackViewModel
+@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+<head>
+    <link href="~/Content/feedback/ChatForm.css" rel="stylesheet" />
+</head>
+
+<div class="">
+    <div id="panel" class="card-body panelChatBody">
+        <ul class="chat">
+            @foreach (var message in Model.Messages)
+            {
+                if (message.IsOperator)
+                {
+                    if (Model.UserIsHelper)
+                    {
+                        <li class="padLeft clearfix">
+                            <span class="chat-img float-right">
+                                <img src="~/Content/images/FeedOperator.jpg" class="imageStyle img-circle" alt="User Avatar" />
+                            </span>
+                            <div class="right chat-body clearfix wrapping">
+                                <div>
+                                    <small class="text-muted">
+                                        @message.MessageDate.ToString("hh:mm | dd.MM.yyyy")
+                                        @if (message.IsSeen)
+                                        {
+                                            <span title="Baxilib" class="glyphicon glyphicon-eye-open"></span>
+                                        }
+                                        else
+                                        {
+                                            <span title="Göndərilib" class="glyphicon glyphicon-send"></span>
+                                        }
+                                        <strong class="pull-right text-muted">@message.PersonName</strong>
+                                    </small>
+
+                                    @if (message.MessageFiles != null)
+                                    {
+                                        <ul class="fileList">
+                                            @foreach (var file in message.MessageFiles)
+                                            {
+                                                <li>
+                                                    @Html.ActionLink(file.FileInfoName, "DownloadFile", "File", new
+                                               {
+                                                   fileInfoId = file.FileId,
+                                                   area = ""
+                                               },
+                                                        null)
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                                <bold class="largeFont">@message.MessageText</bold>
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="clearfix padRight">
+                            <span class="chat-img float-left">
+                                <img src="~/Content/images/FeedOperator.jpg" class="imageStyle img-circle" alt="User Avatar" />
+                            </span>
+                            <div class="left chat-body clearfix wrapping">
+                                <div>
+                                    <small class="text-muted">@message.PersonName</small>
+                                    <small class="pull-right text-muted">
+                                        @message.MessageDate.ToString("hh:mm | dd.MM.yyyy")
+                                    </small>
+                                    @if (message.MessageFiles != null)
+                                    {
+                                        <ul class="fileList">
+                                            @foreach (var file in message.MessageFiles)
+                                            {
+                                                <li>
+                                                    @Html.ActionLink(file.FileInfoName, "DownloadFile", "File", new
+                                               {
+                                                   fileInfoId = file.FileId,
+                                                   area = ""
+                                               },
+                                                        null)
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                                <bold class="largeFont">@message.MessageText</bold>
+                            </div>
+                        </li>
+                    }
+                }
+
+                if (!message.IsOperator)
+                {
+                    if (Model.UserIsHelper)
+                    {
+                        <li class="padRight clearfix">
+                            <span class="chat-img float-left">
+                                <img src="~/Content/images/Person.png" class="img-circle" alt="User Avatar" />
+                            </span>
+                            <div class="left chat-body clearfix wrapping">
+                                <div>
+                                    <small class="text-muted">@message.PersonName</small>
+                                    <small class="pull-right text-muted">
+                                        @message.MessageDate.ToString("hh:mm | dd.MM.yyyy")
+                                    </small>
+                                    @if (message.MessageFiles != null)
+                                    {
+                                        <ul class="fileList">
+                                            @foreach (var file in message.MessageFiles)
+                                            {
+                                                <li>
+                                                    @Html.ActionLink(file.FileInfoName, "DownloadFile", "File", new
+                                               {
+                                                   fileInfoId = file.FileId,
+                                                   area = ""
+                                               },
+                                                        null)
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                                <bold class="largeFont">@message.MessageText</bold>
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="padLeft clearfix">
+                            <span class="chat-img float-right">
+                                <img src="~/Content/images/Person.png" class=" img-circle" alt="User Avatar" />
+                            </span>
+                            <div class=" right chat-body clearfix wrapping">
+                                <div>
+                                    <small class="text-muted">
+                                        @message.MessageDate.ToString("hh:mm | dd.MM.yyyy")
+                                        @if (message.IsSeen)
+                                        {
+                                            <span title="Baxilib" class="glyphicon glyphicon-eye-open"></span>
+                                        }
+                                        else
+                                        {
+                                            <span title="Göndərilib" class="glyphicon glyphicon-send"></span>
+                                        }
+                                        <strong class="pull-right primary-font">@message.PersonName</strong>
+                                    </small>
+
+                                    @if (message.MessageFiles != null)
+                                    {
+                                        <ul class="fileList">
+                                            @foreach (var file in message.MessageFiles)
+                                            {
+                                                <li>
+                                                    @Html.ActionLink(file.FileInfoName, "DownloadFile", "File", new
+                                               {
+                                                   fileInfoId = file.FileId,
+                                                   area =""
+                                               },
+                                                        null)
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                                <bold class="largeFont">@message.MessageText</bold>
+                            </div>
+                        </li>
+                    }
+                }
+            }
+        </ul>
+    </div>
+
+    <div class="card-footer">
+        @using (Html.BeginForm("Answer", "Feedback", FormMethod.Post, new { id = "chatForm", enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="RequestId" value="@Model.RequestId" />
+            <input type="hidden" name="LastMessageId" value="@Model.LastMessageId" />
+
+            <div class="input-group">
+                @if (Model.WorkPlaceId != SessionHelper.WorkPlaceId && !Model.UserIsHelper)
+                {
+                    @Html.TextBoxFor(m => m.AnswerText, new
+                    {
+                        @id="AnswerText",
+                        @placeholder = @RLang.RequestAnswer,
+                        @type = "text",
+                        @class = "form-control",
+                        @readonly="readonly"
+                    })
+                }
+                else
+                {
+                    @Html.TextBoxFor(m => m.AnswerText, new
+                    {
+                        @id = "AnswerText",
+                        @placeholder = "Mesaj",
+                        @type = "text",
+                        @class = "form-control"
+                    })
+                }
+                <span class="input-group-btn">
+                    <button id="formSubmit" class="btn btn-success ld-ext-right" disabled type="submit">
+                        Göndər
+                        <div class="ld ld-ring ld-spin-fast" style="font-size:1.5em"></div>
+                    </button>
+                </span>
+            </div>
+
+            <div class="input-group padTop">
+                <input id="fileNames" type="text" value="..." class="form-control" disabled="disabled">
+                <span class="input-group-btn">
+                    <button id="fileClear" type="button" class="btn btn-danger" style="display: none;">
+                        <i class="fa fa-times " aria-hidden="true"></i> Sil
+                    </button>
+                    <div class="btn btn-default image-preview-input">
+                        <i class="fa fa-folder-open folderColor" aria-hidden="true"></i>
+                        <span id="imageTitle">Faylı seçin</span>
+                        <input type="file" accept=".jpg,.png,.doc,.docx,.xlsx,.xls,.pdf" multiple name="files" id="file" />
+                    </div>
+                </span>
+            </div>
+            <div class="padTop" id="name"></div>
+        }
+    </div>
+</div>
+
+<script async src="~/Scripts/feedback/InputFile.js"></script>
+<script>
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("PingFtp","FeedBack")',
+        success: function (data) {
+            if (!data) {
+                $('#fileNames').val('Fayl serveri işləmir, fayl əlavə etməyə alınmayacaq');
+                $('#file').remove();
+                $('#imageTitle').addClass("glyphicon glyphicon-remove");
+                $('#imageTitle').css('color', 'red');
+                $('#imageTitle').addClass("glyphicon glyphicon-remove");
+                $('#imageTitle').text('');
+            }
+        },
+        error: function (e) {
+            toastr.error(e.responseText);
+        }
+    });
+
+    $("#panel").animate({
+         scrollTop:10000// $('.chat').height()
+    }, "fast");
+
+    $('#AnswerText').on('input',
+        function () {
+            if (this.value === '') {
+                $('#formSubmit').attr('disabled', '');
+            } else {
+                $('#formSubmit').removeAttr('disabled', '');
+            }
+        });
+
+    $('#chatForm').submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: new FormData(this),
+            contentType: false,
+            cache: false,
+            processData: false,
+            beforeSend: function () {
+                $('#formSubmit').addClass('running');
+            },
+            success: function (data) {
+                $('#chatBody').html(data);
+            },
+            error: function (e) {
+                toastr.error(e.responseText);
+            },
+            complete: function () {
+                $('#formSubmit').removeClass('running');
+            }
+        });
+    });
+</script>

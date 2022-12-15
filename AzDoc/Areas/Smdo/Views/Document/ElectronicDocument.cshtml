@@ -1,0 +1,660 @@
+﻿@using Smdo.Enums
+@model Smdo.AzDoc.Models.GridViewDoc
+@{
+    Layout = null;
+
+    bool isSigned = Model.DocStatus == 2;
+
+}
+
+<style>
+    .col-md-1 {
+        flex: 0 0 4.333333% !important;
+        width: 3.5% !important;
+    }
+
+    .accept-modal-dialog {
+        width: 30%;
+        /* margin: 48px auto; */
+        margin: 15% auto;
+    }
+
+    .signature-modal-dialog {
+        width: 20%;
+        /* margin: 48px auto; */
+        margin: 20% auto;
+    }
+
+    .operation-history-modal-dialog {
+        width: 50%;
+        /* margin: 48px auto; */
+        margin: 10% auto;
+    }
+
+    .operationIcons {
+        font-size: 1.7em;
+    }
+</style>
+
+<div style="height: 100%">
+    <div class="col-12">
+        <div class="form-group">
+            <div class="input-group input-group-sm">
+                <div class="col-md-1">
+                    <button type="button" id="DocInfoButton" class="btn  btn-sm">
+                        <i class="fas fa-chevron-circle-down operationIcons" style="color: #005487"></i>
+                    </button>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" id="operationHistoryButton" class="btn  btn-sm" title="Əməliyyat tarixçəsi">
+                        <i class="fas fa-history operationIcons" style="color: #005487"></i>
+                    </button>
+                </div>
+
+                <div class="col-md-5">
+                    @Html.DropDownListFor(model => Model.Kind,
+                        new SelectList(new List<string> {Model.IsReceived ? Model.AttachName : Model.DocFilePath}), new
+                        {
+                            @class = "form-control",
+                            @id = "JsonFile"
+                        })
+                </div>
+
+                @if (!Model.IsReceived)
+                {
+                    if (Model.DocStatus == (int)DocStatus.Draft)
+                    {
+                        <div class="col-md-1.5">
+                            <button type="button" id="sign" class="btn btn-light btn-sm" title="İmzala" data-toggle="modal" data-target="#signatureDialogModal">
+                                <i class="fas fa-fingerprint operationIcons" style="color: #4e9a46"></i>
+                                <span>İmzala</span>
+                            </button>
+                        </div>
+                    }
+
+                    if (Model.DocStatus != (int)DocStatus.Sended)
+                    {
+
+                        <div class="col-md-1.5">
+                            <button type="button" id="sendButton" @(isSigned ? "" : "disabled") class="btn btn-light btn-sm" title="Göndər">
+                                <i class="fas fa-paper-plane operationIcons" style="color: #4e9a46"></i>
+                                <span>Göndər</span>
+                            </button>
+                        </div>
+                    }
+
+                    if (Model.DocStatus == (int)DocStatus.Sended || Model.DocStatus == (int)DocStatus.Signed)
+                    {
+                        <div class="col-md-1">
+                            <img src="~/Areas/Smdo/Scripts/certificateAz.svg" height="35" width="35" title="Azerbaijan" />
+                        </div>
+                    }
+
+
+                    <div class="col-md-1" style="display:none" id="hiddenSignAz">
+                        <img src="~/Areas/Smdo/Scripts/certificateAz.svg" height="35" width="35" title="Azerbaijan" />
+                    </div>
+
+                }
+
+                @if (Model.IsReceived)
+                {
+                    <div class="col-md-2">
+                        <button type="button" onclick="ShowDvcs();" class="btn btn-light btn-sm" title="Baxış">
+                            <img src="~/Areas/Smdo/Scripts/certifiedDoc.svg" width="25" height="25" />
+                            <span>Kvitansiya baxışı</span>
+                        </button>
+                    </div>
+
+                    if (Model.DocStatus != (int)DocStatus.ConfirmedDts)
+                    {
+                        <div class="col-md-2">
+                            <button type="button" id="confirmDts" class="btn btn-light btn-sm" title="Yoxla(DTS)">
+                                <i class="fas fa-check operationIcons" style="color: #4e9a46"></i>
+                                <span>Sənədi yoxla (DTS)</span>
+                            </button>
+                        </div>
+                    }
+
+                    <div class="col-md-1">
+                        <img src="~/Areas/Smdo/Scripts/certificateAz.svg" height="35" width="35" title="Azerbaijan" />
+                    </div>
+
+                    <div class="col-md-1">
+                        <img src="~/Areas/Smdo/Scripts/certificateBel.svg" height="35" width="35" title="Belorusiya" />
+                    </div>
+
+                }
+
+            </div>
+
+            <div class="col-12">
+                <div class="form-group">
+                    <div class="alert alert-light alert-dismissible" id="alertInfo">
+                        <table class="table table-hover table-sm mTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Sənədin nömrəsi</th>
+                                    <th scope="col">Sənədin tarixi</th>
+                                    <th scope="col">Sənədin qısa məzmunu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@Model.DocEnterNo</td>
+                                    <td>@Model.DocEnterDate.ToShortDateString()</td>
+                                    <td>@Model.Note</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <br />
+                    @if (!string.IsNullOrEmpty(Model.RelatedDocName))
+                    {
+                        <div>
+                            <table class="table table-hover table-sm mTable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">@(Model.IsReceived ? "Göndərilən" : "Cavab") sənədin nömrəsi</th>
+                                        <th scope="col">Sənədin Tarixi</th>
+                                        <th scope="col">Sənədin qısa məzmunu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>@Model.RelatedDocName</td>
+                                        <td>@Model.DocEnterDate.ToShortDateString()</td>
+                                        <td>@Model.Note</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+
+
+                    <div class="alert alert-light alert-dismissible col-12" style="font-size: smaller" id="alertOperationHistory">
+
+                        <table class="table table-hover table-sm mTable" id="tblOperationHistory">
+                            <thead>
+                                <tr>
+                                    <th scope="col">№</th>
+                                    <th scope="col">Ölkə</th>
+                                    <th scope="col">Kimdən</th>
+                                    <th scope="col">Kimə</th>
+                                    <th scope="col">Əməliyyatın növü</th>
+                                    <th scope="col">Əməliyyatın Statusu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @if (!Model.IsReceived)
+                                {
+                                    <tr>
+                                        <td>1</td>
+                                        <td style="text-align:center"> <img src="~/Areas/Smdo/Scripts/azerbaijan.svg" height="25" width="25" /></td>
+                                        <td>Ramin Quluzadə</td>
+                                        <td></td>
+                                        <td>Yeni sənəd</td>
+                                        <td>Qaralama</td>
+                                    </tr>
+
+                                    if (Model.DocStatus == (int)DocStatus.Signed || Model.DocStatus == (int)DocStatus.Sended)
+                                    {
+                                        <tr>
+                                            <td>2</td>
+                                            <td style="text-align:center"> <img src="~/Areas/Smdo/Scripts/azerbaijan.svg" height="25" width="25" /></td>
+                                            <td>Ramin Quluzadə</td>
+                                            <td>Ramin Quluzadə</td>
+                                            <td>E-İmza</td>
+                                            <td><i class="fas fa-fingerprint operationIcons" style="color: #4e9a46"></i>&nbsp; İmzalanıb</td>
+                                        </tr>
+                                    }
+
+                                    if (Model.DocStatus == (int)DocStatus.Signed)
+                                    {
+                                        <tr>
+                                            <td>3</td>
+                                            <td style="text-align:center"> <img src="~/Areas/Smdo/Scripts/azerbaijan.svg" height="25" width="25" /></td>
+                                            <td>Ramin Quluzadə</td>
+                                            <td>Шульган Константин Константинович</td>
+                                            <td>Göndərmə</td>
+                                            <td></td>
+                                        </tr>
+                                    }
+
+
+                                    if (Model.DocStatus == (int)DocStatus.Sended)
+                                    {
+                                        <tr>
+                                            <td>3</td>
+                                            <td style="text-align:center"> <img src="~/Areas/Smdo/Scripts/azerbaijan.svg" height="25" width="25" /></td>
+                                            <td>Ramin Quluzadə</td>
+                                            <td>Шульган Константин Константинович</td>
+                                            <td>Göndərmə</td>
+                                            <td><i class="fas fa-paper-plane operationIcons" style="color: #4e9a46"></i>&nbsp;Göndərlib</td>
+                                        </tr>
+                                    }
+                                }
+
+
+                                @if (Model.IsReceived)
+                                {
+                                    <tr>
+                                        <td>1</td>
+                                        <td style="text-align:center"> <img src="~/Areas/Smdo/Scripts/azerbaijan.svg" height="25" width="25" /></td>
+                                        <td>Ramin Quluzadə</td>
+                                        <td></td>
+                                        <td>Yeni sənəd</td>
+                                        <td>Qaralama</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td style="text-align:center"> <img src="~/Areas/Smdo/Scripts/azerbaijan.svg" height="25" width="25" /></td>
+                                        <td>Ramin Quluzadə</td>
+                                        <td>Ramin Quluzadə</td>
+                                        <td>E-İmza</td>
+                                        <td><i class="fas fa-fingerprint operationIcons" style="color: #4e9a46"></i>&nbsp;İmzalanıb</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>3</td>
+                                        <td style="text-align:center"> <img src="~/Areas/Smdo/Scripts/azerbaijan.svg" height="25" width="25" /></td>
+                                        <td>Ramin Quluzadə</td>
+                                        <td>Шульган Константин Константинович</td>
+                                        <td>Göndər</td>
+                                        <td><i class="fas fa-paper-plane operationIcons" style="color: #4e9a46"></i>&nbsp;Göndərlib </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>4</td>
+                                        <td style="text-align:center"> <img src="~/Areas/Smdo/Scripts/belarus.svg" height="25" width="25" /></td>
+                                        <td>Ramin Quluzadə</td>
+                                        <td>Шульган Константин Константинович</td>
+                                        <td>Daxil olan sənəd</td>
+                                        <td><i class="fas fa-check operationIcons" style="color: #005487"></i>&nbsp;Qəbul olunub </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>5</td>
+                                        <td style="text-align:center"> <img src="~/Areas/Smdo/Scripts/belarus.svg" height="25" width="25" /></td>
+                                        <td>Шульган Константин Константинович</td>
+                                        <td>Шульган Константин Константинович</td>
+                                        <td>E-İmza</td>
+                                        <td><i class="fas fa-fingerprint operationIcons" style="color: #005487"></i>&nbsp;İmzalanıb</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>6</td>
+                                        <td style="text-align:center"> <img src="~/Areas/Smdo/Scripts/belarus.svg" height="25" width="25" /></td>
+                                        <td>Шульган Константин Константинович</td>
+                                        <td>Ramin Quluzadə</td>
+                                        <td>Cavab sənədi göndər</td>
+                                        <td><i class="fas fa-paper-plane operationIcons" style="color: #005487"></i> &nbsp;Göndərlib </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>7</td>
+                                        <td style="text-align:center"> <img src="~/Areas/Smdo/Scripts/azerbaijan.svg" height="25" width="25" /></td>
+                                        <td>Шульган Константин Константинович</td>
+                                        <td>Ramin Quluzadə</td>
+                                        <td>Daxil olan sənəd</td>
+                                        <td><i class="fas fa-check operationIcons" style="color: #4e9a46"></i>&nbsp; Qəbul olunub</td>
+                                    </tr>
+
+                                    if (Model.DocStatus == (int)DocStatus.ConfirmedDts)
+                                    {
+                                        <tr>
+                                            <td>8</td>
+                                            <td style="text-align:center"> <img src="~/Areas/Smdo/Scripts/azerbaijan.svg" height="25" width="25" /></td>
+                                            <td>Шульган Константин Константинович</td>
+                                            <td>Ramin Quluzadə</td>
+                                            <td>Cavab sənədi</td>
+                                            <td onclick="ShowDvcs();"><i class="fas fa-calendar-check operationIcons" style="color: #4e9a46"></i>&nbsp;Təsdiqlənib (DTS)</td>
+                                        </tr>
+                                    }
+                                }
+
+
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12" id="DocViewer">
+        <div class="form-group">
+            @Html.Partial("DocumentDisplay")
+        </div>
+    </div>
+</div>
+
+
+<div class="mModal">
+    <div class="modal fade modalBtn" id="signatureDialogModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>İmzalama paneli</span>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group" style="text-align: left!important">
+                                <label for="ctlCertificates">Pin kod daxil edin:</label>
+                                <input type="password" maxlength="8" class="form-control" name="" id="certPassword" />
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="row">
+                            <div class="col-12">
+                                <div id="progressBarContainer" class="container">
+                                    <p id="progressStatus"></p>
+                                    <div class="progress">
+                                        <div id="progressBar"
+                                             class="progress-bar progress-bar-striped active"
+                                             role="progressbar"
+                                             aria-valuenow="0"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100"
+                                             style="width:0%">
+                                            0
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>*@
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" id="signnn" @*id="signFile"*@ class="mBtn mBtn-pr defaultBtn" style="width: 100%">Təsdiq</button>
+                        <button type="button" class="btn btn-secondary" id="getCerts" hidden></button>
+                        <input type="file" class="custom-file-input" id="files" multiple hidden>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" style="width: 100%">İmtina</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="mModal">
+    <div class="modal fade modalBtn" id="confirmDtsDialogModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group" style="text-align: left!important">
+                                <label for="ctlCertificates">DTS yoxlama paneli</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="progressBarContainer1" class="container">
+                                <p id="progressStatus1"></p>
+                                <div class="progress">
+                                    <div id="progressBar1"
+                                         class="progress-bar progress-bar-striped active"
+                                         role="progressbar"
+                                         aria-valuenow="0"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100"
+                                         style="width: 0%">
+                                        0
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" id="checkDts" class="mBtn mBtn-pr defaultBtn" style="width: 100%">Yoxla</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" style="width: 100%">İmtina</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="KvitansiyaView"></div>
+
+<script src="~/Areas/Smdo/Scripts/EsignSmdo.js"></script>
+
+<script>
+
+    $('#fakeButton').click();
+
+    $("#sendButton").click(function () {
+
+        $.ajax({
+            type: 'POST',
+            url: '/az/Smdo/Mail/SendDocumentToSmdo',
+            beforeSend: function () {
+                window.ShowLoading();
+            },
+            success: function (res) {
+                if (res) {
+                    addSendedRow();
+                    $("#sendButton").hide();
+                    toastr.success('Sened uğurla göndərildi');
+                }
+                //setTimeout(function () {
+                //    $("#sendButton").hide();
+                //    addSendedRow();
+                //    window.CloseLoading();
+                //}, 2000);
+            },
+            complete: function () {
+                window.CloseLoading();
+            }
+        });
+        //$.ajax({
+        //    type: 'POST',
+        //    url: '/az/Smdo/Operation/SendDocument',
+        //    beforeSend: function () {
+        //        window.ShowLoading();
+        //    },
+        //    success: function () {
+        //        setTimeout(function () {
+        //            $("#sendButton").hide();
+        //            addSendedRow();
+        //            window.CloseLoading();
+        //        }, 2000);
+        //    }
+        //});
+    });
+
+    $("#confirmDts").click(function () {
+
+        $.ajax({
+            type: 'POST',
+            url: '/az/Smdo/Mail/VerifyReceivedDoc',
+            beforeSend: function () {
+                window.ShowLoading();
+            },
+            success: function (res) {
+                if (res) {
+                    addDtsRow();
+                    $("#confirmDts").hide();
+                }
+                ShowDvcs();
+            }
+        });
+
+        //$('#confirmDtsDialogModal').modal('show');
+    });
+
+    $('#checkDts').click(DtsProgress);
+
+    $('#signnn').click(function () {
+
+        var pin = $('#certPassword').val();
+
+        if (pin == '' || pin.length < 8) {
+            toastr.warning('Pin 8 simvoldan ibarət olmalıdır');
+            return;
+        }
+
+        var fileBase64, fileName;
+        window.ShowLoading();
+
+        $.ajax({
+            url: '/az/Smdo/Document/GetFileBase64',
+            success: function (res) {
+                fileBase64 = res.base64;
+                fileName = res.fileName;
+                console.log('1.1)fileBase64:' + fileBase64);
+                console.log('1.1)fileName:' + fileName);
+
+                if (fileBase64) {
+                    console.log('goto 2');
+
+                    var df = Base64ToArrayBuffer(fileBase64);
+
+                    console.log(df);
+
+                    console.log(Array.from(df));
+                    $.ajax({
+                        type: 'POST',
+                        url: 'https://localhost:10288/api/sign/sign',
+                        beforeSend: function () {
+                            window.ShowLoading();
+                        },
+                        data: {
+                            pin: pin,
+                            fileName: fileName,
+                            rawData: Array.from(df),
+                            isDetached: true
+                        },
+                        success: function (res) {
+                            console.log('2.1)statusCode:' + res.statusCode);
+                            console.log('2.1)Message:' + res.message);
+                            if (res.statusCode == 0) {
+                                p7s = res.signedFile.rawData;
+                                console.log('2.2)p7s:' + p7s);
+                                $.ajax({
+                                    type: 'POST',
+                                    url: '/az/Smdo/Document/WriteP7S',
+                                    beforeSend: function () {
+                                        window.ShowLoading();
+                                    },
+                                    data: { p7SBase64: p7s },
+                                    success: function (response) {
+
+                                        console.log('3)response:' + response);
+                                        if (response) {
+                                            EsignSuccess();
+                                            toastr.success('Imzalanma uğurla tamamlandı');
+                                        }
+                                    },
+                                    complete: function () {
+                                        window.CloseLoading();
+                                    }
+                                });
+                            } else {
+                                window.CloseLoading();
+                                toastr.error(res.message);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+    });
+
+
+    function Base64ToArrayBuffer(base64) {
+        var binary_string = window.atob(base64);
+        var len = binary_string.length;
+        var bytes = new Uint8Array(len);
+        for (var i = 0; i < len; i++) {
+            bytes[i] = binary_string.charCodeAt(i);
+        }
+        return bytes;
+    }
+
+    function base64ToArrayBuffer(base64) {
+        var binaryString = window.atob(base64);
+        var binaryLen = binaryString.length;
+        var bytes = new Uint8Array(binaryLen);
+        for (var i = 0; i < binaryLen; i++) {
+            var ascii = binaryString.charCodeAt(i);
+            bytes[i] = ascii;
+        }
+        return bytes;
+    }
+
+
+
+
+    $(".closeBtn").click(function () {
+        $(".modalBtn").modal("hide");
+
+    });
+
+    $("#signatureCloseButton").click(function () {
+        $("#signatureDialogModal").modal("hide");
+    });
+
+    $("#acceptCloseButton").click(function () {
+        $("#acceptModal").modal("hide");
+
+    });
+
+    $("#HistoryCloseButton").click(function () {
+        $("#operationHistoryDialogModal").modal("hide");
+
+    });
+
+    $(document).ready(function () {
+        $(".alert").hide();
+
+        $('#DocInfoButton').on("click", function () {
+            $("#alertOperationHistory").hide();
+            $("#alertTask").hide();
+            if ($("#alertInfo").css("display") == "none") {
+                $("#alertInfo").show('medium');
+            }
+            else {
+                $("#alertInfo").hide();
+            }
+        });
+
+        $('#operationHistoryButton').on("click", function () {
+            $("#alertInfo").hide();
+            $("#alertTask").hide();
+            if ($("#alertOperationHistory").css("display") == "none") {
+                $("#alertOperationHistory").show('medium');
+            }
+            else {
+                $("#alertOperationHistory").hide();
+            }
+        });
+
+        $('#operationHistoryButton').click();
+
+        $(".close").click(function () {
+            $(".alert").hide();
+        });
+
+    });
+</script>

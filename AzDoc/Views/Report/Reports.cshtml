@@ -1,0 +1,238 @@
+﻿@using BLL.Models.Report
+@model BLL.Models.Report.ReportsViewModel
+@{
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<div class="row align-items-end" id="report">
+    <div class="col-10 mb-3">
+        <div class="row">
+
+            <div class="col-6">
+                <label>Hesabatın növü</label>
+
+                <select class=" form-control selectpicker" id="reportType">
+                    <option value="2">Daxil olmuş vətəndaş müraciətlərinə baxılması barədə məlumat (forma 1)</option>
+                    <option value="3">Daxil olmuş vətəndaş müraciətlərinə baxılması barədə məlumat (forma 2)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="col-10">
+        <div class="row">
+            <div class="col-2 mb-3">
+                <label>Sənədin tarixi</label>
+                <input type="text" id="intervalDateForForm" class="form-control" daterange placeholder="mm.dd.yyyy">
+            </div>
+        </div>
+    </div>
+
+    <div id="reportGridForm1" style="display: none"></div>
+    <div id="reportGridForm2" style="display: none"></div>
+
+</div>
+
+
+<div class="row">
+    <div class="col-6 text-left mt-2">
+        <div class="mBtnGroup" style="margin-bottom: 6px">
+            <button type="button" class="mBtn mBtn-pr" id="csv">Excel-ə çevir</button>
+            <button type="button" class="mBtn mBtn-pr" id="pdf">PDF-ə çevir</button>
+        </div>
+    </div>
+    <div class="col-6 text-right mt-2 displayNone">
+        <span id="docsCount" style="color: #7fa8b6"></span>
+    </div>
+</div>
+<script src="~/Scripts/report/jquery.table2excel.js"></script>
+<script src="~/Scripts/common/printThis.min.js"></script>
+<script src="~/Scripts/common/tableHTMLExport.js"></script>
+<script>
+    $(document).ready(function () {
+        console.log("test2");
+        callForm1OnloadPage();
+    });
+
+
+    // #region Client Side print and excell
+    $('#csv').on('click',
+        function () {
+            var intervalDate = $('#intervalDate').val();
+            var reportSelectId = $("#reportType option:selected").val();
+            //if (reportSelectId == 1) {
+            //    $("#tbReport").tableHTMLExport({ type: 'csv', filename: 'Ümumi hesabat ' + intervalDate + '.csv' });
+            //}
+            if (reportSelectId == 2) {
+                $("#tbForm1").table2excel({
+                    exclude: ".noExl",
+                    name: "Worksheet Name",
+                    filename: "Hesabat Forma 1",
+                    fileext: ".xls" 
+                });
+
+                //$("#tbForm1").tableHTMLExport({
+                //    consoleLog: true,
+                //    htmlContent: true,
+                //    quoteFields: true,
+                //    type: 'csv',
+                //    filename: 'Ümumi hesabat ' + intervalDate + '.xls'
+                //});
+            }
+            if (reportSelectId == 3) {
+                $("#tbForm2").table2excel({
+                    exclude: ".noExl",
+                    name: "Worksheet Name",
+                    filename: "Hesabat Forma 2",
+                    fileext: ".xls"
+                });
+
+                //$("#tbForm2").tableHTMLExport({
+                //    type: 'csv',
+                //    consoleLog: true,
+                //    htmlContent: true,
+                //    quoteFields: true,
+                //    filename: 'Ümumi hesabat ' + intervalDate + '.xls'
+                //});
+            }
+        });
+
+    $('#pdf').on('click',
+        function () {
+            var reportSelectId = $("#reportType option:selected").val();
+            //if (reportSelectId == 1) {
+            //    $('#tbReport').printThis();
+            //}
+            if (reportSelectId == 2) {
+                $('#tbForm1').printThis();
+            }
+            if (reportSelectId == 3) {
+                $('#tbForm2').printThis();
+            }
+
+        });
+    //#endregion
+
+    // #region Date time picker realise
+    $('#intervalDateForForm').daterangepicker(datePickerParameters);
+    //#endregion
+
+    $('#reportType').change(function () {
+        var intervalDate = $('#intervalDate').val();
+        var reportId = $(this).val();
+
+        var data =
+        {
+            interval: intervalDate,
+            reportId: reportId
+        }
+        switch (parseInt(reportId)) {
+            //case 1:
+            //    refreshMainGrid();
+            //    break;
+            case 2:
+                callForm1(data);
+                break;
+            case 3:
+                callForm2(data);
+                break;
+            default:
+                alert("Ele shey yoxdu");
+        }
+
+    });
+
+    $("#intervalDateForForm").change(function () {
+        var reportId = $('#reportType').val();
+        var intervalDate = $(this).val();
+
+        var data =
+        {
+            interval: intervalDate,
+            reportId: reportId
+        }
+        switch (parseInt(reportId)) {
+
+            case 2:
+                callForm1(data);
+                break;
+            case 3:
+                callForm2(data);
+                break;
+            default:
+                break;
+        }
+    });
+
+
+    function callForm1OnloadPage() {
+        var reportId = $('#reportType').val();
+        var intervalDate = $('#intervalDate').val();
+
+        var data =
+        {
+            interval: intervalDate,
+            reportId: reportId
+        }
+        callForm1(data);
+
+
+    }
+
+    function callForm1(data) {
+        $.ajax({
+            type: 'GET',
+            url: '/az/Report/ReportsForm/',
+            dataType: 'html',
+            data: data,
+            beforeSend: function () {
+                window.ShowLoading();
+            },
+            success: function (response) {
+                $('#reportGridForm1').html(response);
+                $('.selectpicker').selectpicker('refresh');
+
+
+                //$("#reportGrid").css('display', 'none');
+                $("#reportGridForm1").removeAttr('style');
+                $("#reportGridForm2").css('display', 'none');
+                $(".displayNone").css('display', 'none');
+
+            },
+            complete: function () {
+                window.CloseLoading();
+            }
+        });
+
+    }
+    function callForm2(data) {
+        $.ajax({
+            type: 'GET',
+            url: '/az/Report/ReportsForm/',
+            dataType: 'html',
+            data: data,
+            beforeSend: function () {
+                window.ShowLoading();
+            },
+            success: function (response) {
+                $('#reportGridForm2').html(response);
+                $('.selectpicker').selectpicker('refresh');
+
+
+                //$("#reportGrid").css('display', 'none');
+                $("#reportGridForm1").css('display', 'none');
+                $("#reportGridForm2").removeAttr('style');
+                $(".displayNone").css('display', 'none');
+
+            },
+            complete: function () {
+                window.CloseLoading();
+            }
+
+        });
+    }
+    //#endregion
+</script>

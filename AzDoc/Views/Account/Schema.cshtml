@@ -1,0 +1,169 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@model AzDoc.Models.Account.LoginViewModel
+
+@{
+    Layout = "";
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="~/Content/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-select/bootstrap-select.min.css" rel="stylesheet" />
+    <link href="~/Content/common/style.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet">
+
+    <title>E-Sənəd Dövriyyəsi</title>
+</head>
+<body id="login2">
+    <div id="loader">
+        <div class="loaderContent">
+            <ul class="books_list">
+                <li class="book_item first"></li>
+                <li class="book_item second"></li>
+                <li class="book_item third"></li>
+                <li class="book_item fourth"></li>
+                <li class="book_item fifth"></li>
+                <li class="book_item sixth"></li>
+            </ul>
+            <div class="shelf"></div>
+        </div>
+    </div>
+
+    <main>
+        <canvas id=c></canvas>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="row justify-content-center signRow">
+                        <div class="col-lg-6 sign">
+                            <div class="content">
+                                <div class="secondForm">
+                                    @{
+                                        Html.EnableClientValidation();
+                                        Html.EnableUnobtrusiveJavaScript();
+                                    }
+
+                                    @using(Html.BeginForm("Schema", "Account", FormMethod.Post, new { id = "schemaForm", @class = "login100-form validate-form flex-sb flex-w" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+
+                                        @Html.DropDownListFor(model => Model.WorkPlaceValue, Model.WorkPlaces, new
+                                        {
+                                            @class = "@*form-control lang selectpicker d-block*@"
+                                        })
+
+                                        <button type="submit" id="acceptButton" class="btn-lg">
+                                            @RLang.Login
+                                        </button>
+                                        <button type="button" onclick="window.location = '/LogOut';" id="cancelButton" class="btn-lg btn-lg-cancel">
+                                            Imtina
+                                        </button>
+
+                                        if(ViewData.ModelState.Values.Any(x => x.Errors.Count >= 1))
+                                        {
+                                            <div class="form-group"  style="padding-top: 15px; color: red">
+                                                <span>@ViewData.ModelState["ErrorMessage"].Errors[0].ErrorMessage</span>
+                                            </div>
+                                        }
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*<div class="rabitaLogo">
+                <img src="~/Content/images/whiteLogo.png" alt="">
+            </div>*@
+        <div class="azdocLogo">
+            <img src="~/Content/images/azdoc.png" alt="">
+        </div>
+    </main>
+    <script src="~/Scripts/jquery/jquery-3.3.1.min.js"></script>
+    <script src="~/Scripts/popper/popper.min.js"></script>
+    <script src="~/Scripts/bootstrap/bootstrap.min.js"></script>
+    <script src="~/Scripts/bootstrap-select/bootstrap-select.min.js"></script>
+    <script src="~/Scripts/account/bg.js"></script>
+    <script src="~/Scripts/account/main.js?v=@AppVersion.Version"></script>
+    <script>
+        $('#loader').fadeOut('slow');
+
+        $('#acceptButton').on('click', function () {
+            $(this).attr("disabled", true);
+            $('#schemaForm').submit();
+        });
+    </script>
+</body>
+
+@*<body id="login2">
+        <div class="row-large-logo">
+            <img src="/Content/images/logo-large.png" alt="Logo" class="logo-large">
+        </div>
+
+        <div class="limiter">
+            <div class="container-login100">
+                <table class="table-login schema">
+                    <tr>
+                        <td>
+                            <div class="txt1">
+                                @RLang.LoginText
+                            </div>
+                            <hr />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="wrap-schema100 p-t-50 p-b-90">
+                                @{
+                                    Html.EnableClientValidation();
+                                    Html.EnableUnobtrusiveJavaScript();
+                                }
+                                @using (Html.BeginForm("Schema", "Account", FormMethod.Post, new { id = "schemaForm", @class = "login100-form validate-form flex-sb flex-w" }))
+                                {
+                                    @Html.AntiForgeryToken()
+
+                                    <div class="input-group wrap-input100 validate-input m-b-8">
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                        @Html.DropDownListFor(model => Model.WorkPlaceId, Model.WorkPlaces, new
+                                        {
+                                            @class = "input-schema"
+                                        })
+                                    </div>
+                                    <div class="form-group">
+
+                                        @if (ViewData.ModelState.Values.Any(x => x.Errors.Count >= 1))
+                                        {
+                                            <span>@ViewData.ModelState["ErrorMessage"].Errors[0].ErrorMessage</span>
+                                        }
+                                    </div>
+                                    <div class="error-list" style="padding: 15px; color: red"></div>
+
+                                    <div class="container-login100-form-btn m-t-17">
+                                        <button id="acceptButton" class="btn btn-info btn-block btn-lg">
+                                            @RLang.Login
+                                        </button>
+                                        <button type="button" onclick="window.location = '/LogOut';" id="cancelButton" class="btn btn-danger btn-block btn-lg">
+                                            Imtina
+                                        </button>
+                                    </div>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <script src="~/Scripts/jquery/jquery-3.3.1.min.js"></script>
+        <script src="~/Scripts/account/main.js"></script>
+
+    </body>*@
+</html>

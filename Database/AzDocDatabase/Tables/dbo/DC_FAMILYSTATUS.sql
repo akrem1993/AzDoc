@@ -1,0 +1,6 @@
+CREATE TABLE [dbo].[DC_FAMILYSTATUS](
+	[FamilyId] int identity NOT NULL,
+	[FamilyName] nvarchar(100) NULL,
+	[FamilyStatus] bit NOT NULL CONSTRAINT [DF__DC_FAMILY__Famil__59E54FE7]  DEFAULT 1,
+ CONSTRAINT [PK_DC_FAMILYSTATUS] PRIMARY KEY ([FamilyId])
+ )

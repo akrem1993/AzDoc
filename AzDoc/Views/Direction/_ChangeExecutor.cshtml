@@ -1,0 +1,95 @@
+﻿@using AzDoc.App_LocalResources
+@model BLL.Models.Direction.Direction.DirectionModel
+@{
+    ViewBag.Title = "_ChangeExecutor";
+    Layout = null;
+}
+
+<div class="mModal">
+    <div class="modal fade" id="changeExecutor" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="background: #ffffff">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>İcraçının dəyişdirilməsi</span>
+                </div>
+
+                <div class="modal-body">
+                    @using(Html.BeginForm("ChangeMainExecutor", "Direction", new { t = Request["t"] }, FormMethod.Post, new { id = "changeExecutorForm" }))
+                    {
+                        <div class="container-fluid">
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <label for="RequestTypeId">Əsas icraçı:<span style="color:red;font-weight:bold">*</span></label>
+                                    @Html.DropDownList("DirectionWorkplaceId",
+                                        new SelectList(Model.Executors.Select(k => new { Id = k.ExecutorWorkplaceId, Text = k.ExecutorFullName + ' ' + k.DepartmentPositionName }), dataValueField: "Id", dataTextField: "Text"),
+                                        "Seç",
+                                        new
+                                             {
+                                            @class = "selectpicker",
+                                            @id = "DirectionWorkplaceId",
+                                            @name = "DirectionWorkplaceId",
+                                            @data_live_search = "true",
+                                            @data_width = "100%"
+                                        })
+                                </div>
+                                <div class="col-md-4 align-self-center">                                  
+                                    <div class="checkboxInput">                                       
+                                        <input name="JointExecutor" type="checkbox" id="JointExecutor" value="true" checked/>
+                                        <span>Müştərək icraçı</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="comment">Qeyd:<span style="color:red;font-weight:bold">*</span></label>
+                                        @Html.TextArea(("ExecutorResolutionNote"), new
+                    {
+                        @placeholder = "",
+                        @type = "text",
+                        @class = "form-control",
+                        @id = "ShortContent",
+                        @data_required = "Qıza məzmunu daxil edin"
+                    })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Ləğv et</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" name="DirectionSave" onclick="saveChange(this)" class="mBtn mBtn-pr defaultBtn" style="width: 100%">@RLang.Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+      var configChangeExecutor = {
+          saveChange: {
+            url:'@Url.Action("ChangeMainExecutor", "Direction")',
+        },
+       } 
+
+    $(document).ready(function () {
+     
+
+        $("#changeExecutor").modal();
+        $("#changeExecutor").draggable({
+            handle: ".modal-header"
+        });
+        $('.selectpicker').selectpicker('refresh');
+    });
+
+    
+</script>
+<script src="~/Scripts/direction/direction.js"></script>

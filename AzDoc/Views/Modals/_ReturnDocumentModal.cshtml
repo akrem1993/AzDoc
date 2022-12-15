@@ -1,0 +1,69 @@
+﻿<div class="mModal">
+    <div class="modal fade modalBtn" id="returnDialogModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Geri qaytarmağa əminsiniz?</span>
+                </div>
+
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+                    <div class="row">
+                        <div class="col-12">
+                            <textarea class="form-control" id="returnNote"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" style="width: 100%">Xeyr</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="returnButton" class="mBtn mBtn-pr defaultBtn" style="width: 100%">Bəli</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#returnButton").click(function () {
+        var note = $("#returnNote").val();
+
+        if (note == '') {
+            toastr.warning('Qeydinizi daxil edin');
+            return;
+        }
+
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        var requestToken = $("#spanToken").html();;
+
+        $.ajax({
+            type: 'POST',
+            url: `/az/DocOperation/ReturnDocument?token=${requestToken}`,
+            beforeSend: function () {
+                window.ShowLoading();
+            },
+            dataType: 'json',
+            data: { __RequestVerificationToken: token, note: note },
+            success: function () {
+                var pageIndex = $('.jqx-grid').CachedGrid().config.params.pageIndex;
+                $('.jqx-grid').bindgrid(pageIndex, undefined);
+                $('#returnDialogModal').modal('hide');
+                $('#doubleClickModal').modal('hide');
+            },
+            complete: function () {
+                window.CloseLoading();
+            }
+        });
+    });
+
+    $("#returnNote").on("input", function (event) {
+        if (!(/^[\p{L}0-9-]/u.test(this.value)) || this.value == '-') {
+            $(this).val("");
+            toastr.warning("Düzgün səbəb daxil edin.");
+        }
+    });
+</script>

@@ -1,0 +1,302 @@
+﻿@using AzDoc.App_LocalResources
+@using CustomHelpers.Classes
+@using ServiceLetters.Common.Enums
+@using ServiceLetters.Model.ViewModel
+@model ServiceLetters.Model.ViewModel.DocumentInfoViewModel
+@{
+    var docStatus = new[] {(int)DocumentStatus.Draft,
+(int)DocumentStatus.IsViza,
+(int)DocumentStatus.Signing};
+}
+<head>
+    <title>Qeydiyyat vərəqəsi @(Model.DocEnterNo) </title>
+</head>
+@if(!Request.IsAjaxRequest())
+{
+    <link href="~/Content/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/fontawesome/css/all.min.css" rel="stylesheet" />
+    <link href="~/Content/common/style.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery/jquery-3.3.1.min.js"></script>
+}
+
+
+<div id="view">
+    <div class="container-fluid" style="padding-left: 15px!important">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-12">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="headingRow">
+                            <h3>@Model.OrgName</h3>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="mainView">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="viewHeading">
+                                <h3>Qeydiyyat nəzarət vərəqəsi</h3>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="docContent" class="viewGroup appealing">
+                                <div class="col-12">
+                                    <h4>@Model.DocTypeName</h4>
+                                </div>
+                                <div class="col-12">
+
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Qeydiyyat nömrəsi</th>
+                                                <td class="custom-table-cell">@Model.DocEnterNo</td>
+                                                <th scope="col">Qeydiyyat tarixi</th>
+                                                @if(Model.DocEnterDate != null)
+                                                {
+                                                    <td class="custom-table-cell">@Model.DocEnterDate.Value.ToString("d")</td>
+                                                }
+                                                else
+                                                {
+                                                    <td class="custom-table-cell">@Model.DocEnterDate</td>
+                                                }
+                                            </tr>
+
+
+
+                                            @if(@Model.ConfirmPerson != null)
+                                            {
+                                                <tr>
+                                                    <th scope="col">Hardan və kimdən daxil olub</th>
+                                                    <td class="custom-table-cell" colspan="3">
+                                                        @if(!docStatus.Contains(Model.DocDocumentStatusId) && Model.DocDocumentStatusId == (int)DocumentStatus.Execution)
+                                                        {
+                                                            @Model.ConfirmPerson
+                                                        }
+                                                    </td>
+                                                </tr>
+
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <th scope="col">Hardan və kimdən daxil olub</th>
+                                                    <td class="custom-table-cell" colspan="3">
+                                                        @if(!docStatus.Contains(Model.DocDocumentStatusId))
+                                                        {
+                                                            @Model.SignatoryPerson
+
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+
+
+                                            @if(@Model.ToWhomAddress != null)
+                                            {
+                                                <tr>
+                                                    <th scope="col">Kimə ünvanlanıb</th>
+                                                    <td class="custom-table-cell" colspan="3">
+                                                        @Model.ToWhomAddress
+                                                    </td>
+                                                </tr>
+
+                                            }
+
+                                            <tr>
+                                                <th scope="col">İcra müddəti</th>
+                                                <td class="custom-table-cell">
+                                                    @if(Model.DocPlannedDate != null)
+                                                    {
+                                                        @Model.DocPlannedDate.Value.ToString("d")
+                                                    }
+                                                </td>
+                                                <th scope="col">Sənədin statusu</th>
+                                                <td class="custom-table-cell">@Model.DocumentStatusName</td>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                                @if(@Model.Description != null)
+                                {
+                                    <div class="col-12">
+                                        <h4 class="text-center">Sənədin qısa məzmunu</h4>
+                                        <table class="table table-bordered">
+                                            <tbody>
+                                                <tr>
+                                                    <td>@Model.Description</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+
+                                <div class="col-md-12">
+                                    <h4 class="text-center">
+                                        Qoşma sənəd
+                                    </h4>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="thead">Faylın adı</th>
+                                                <th scope="col" class="thead">Əsas sənəd</th>
+                                                <th scope="col" class="thead">Nüsxə</th>
+                                                <th scope="col" class="thead">Vərəq</th>
+                                                <th scope="col" class="thead">Tarix</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach(var item in Model.JsonFileInfo ?? new List<AttachmentFile>())
+                                            {
+                                                <tr>
+                                                    <td><a href="/az/File/DownloadFile?fileInfoId=@item.FileInfoId"> <img title='" + @RLang.Download + "' class='imgFile' src='/Content/images/download.png'>@item.FileInfoName</a></td>
+                                                    <td align='center'>@item.FileIsMain</td>
+                                                    <td align='center'>@item.FileInfoCopiesCount</td>
+                                                    <td align='center'>@item.FileInfoPageCount</td>
+                                                    <td align='center'>@item.FileInfoDate</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                @if(Model.JsonRelatedDocumentInfo != null)
+                                {
+                                    <div class="col-md-12">
+                                        <h4 class="text-center">Əlaqəli sənəd</h4>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col" class="thead">Qeydiyyat nömrəsi</th>
+                                                    <th scope="col" class="thead">Qeydiyyat tarixi	</th>
+                                                    <th scope="col" class="thead">Haradan daxil olub</th>
+                                                    <th scope="col" class="thead">Sənədin məzmunu</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach(var item in Model.JsonRelatedDocumentInfo ?? Enumerable.Empty<RelatedDocumentInfo>())
+                                                {
+                                                    <tr>
+                                                        <td> <a href="/az/Document/GetDocView?docId=@item.DocId" target="_blank">@item.DocEnterno </a></td>
+                                                        <td align='center'>@item.DocEnterdate</td>
+                                                        <td align='center'>@item.DocumentInfo</td>
+                                                        <td align='center'>@item.DocDescription</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                }
+
+                                @if(Model.JsonAnswerDocumentInfo != null)
+                                {
+                                    <div class="col-md-12">
+                                        @if(Model.AnswerRowNumber == 1)
+                                        {
+                                            <h4 class="text-center">Cavab sənəd</h4>
+                                        }
+                                        else
+                                        {
+                                            <h4 class="text-center">Daxil olan sənəd</h4>
+                                        }
+
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col" class="thead">Qeydiyyat nömrəsi</th>
+                                                    <th scope="col" class="thead">Qeydiyyat tarixi </th>
+                                                    <th scope="col" class="thead">
+                                                        @(Model.DocResultId == null ? "Hara ünvanlanıb" : "Haradan daxil olub")
+                                                    </th>
+                                                    @if (Model.CitizenResultCount > 0)
+                                                    {
+                                                        <th scope="col" class="thead">Nəticə</th>
+
+                                                    }
+                                                    <th scope="col" class="thead">Sənədin məzmunu</th>
+                                                    <th scope="col">Sənədin statusu</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach(var item in Model.JsonAnswerDocumentInfo ?? Enumerable.Empty<AnswerDocumentInfo>())
+                                                {
+                                                    <tr>
+                                                        <td><a href="/az/Document/GetDocView?docId=@item.DocId" target="_blank">@item.DocEnterno </a></td>
+                                                        <td align='center'>@item.DocEnterdate.ToString()</td>
+                                                        <td align='center'>@item.DocumentInfo</td>
+                                                        @if (Model.CitizenResultCount > 0)
+                                                        {
+                                                            <td align='center'>@item.ResultName</td>
+
+                                                        }
+                                                        <td align='center'>@item.DocDescription</td>
+                                                        <td align='center'>@item.DocumentstatusName</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                }
+
+                                <div class="col-md-12">
+                                    <h4 class="text-center">Əməliyyat tarixçəsi</h4>
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="thead">Kimdən</th>
+                                                <th scope="col" class="thead">Kimə</th>
+                                                <th scope="col" class="thead">Əməliyyatın növü</th>
+                                                <th scope="col" class="thead">Əməliyyatın statusu</th>
+                                                <th scope="col" class="thead">Qeyd</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach(var item in Model.JsonOperationHistory)
+                                            {
+                                                if(item.SendStatusId != 1)
+                                                {
+                                                    <tr>
+                                                        <td>@item.PersonFrom</td>
+                                                        <td>@item.PersonTo</td>
+                                                        <td>@item.ExecutorMain <br /><font size="2">@item.DirectionDate</font></td>
+                                                        <td>@item.Status <br /><font size="2">@item.StatusDate</font></td>
+                                                        <td>@item.ExecutorResolutionNote</td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+                                                    <tr style="font-weight: bold">
+                                                        <td>@item.PersonFrom</td>
+                                                        <td>@item.PersonTo</td>
+                                                        <td>@item.ExecutorMain <br /><font size="2">@item.DirectionDate</font></td>
+                                                        <td>@item.Status <br /><font size="2">@item.StatusDate</font></td>
+                                                        <td>@item.ExecutorResolutionNote</td>
+                                                    </tr>
+                                                }
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="circleBtn" style="position: fixed; top: 40px; right: 5%;" id="print"><i class="fas fa-print"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/common/printThis.min.js"></script>
+<script>
+    $('#print').click(function () {
+        $('#view').printThis();
+    });
+</script>
+

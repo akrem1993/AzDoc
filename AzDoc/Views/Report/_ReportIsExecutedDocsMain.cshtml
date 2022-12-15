@@ -1,0 +1,598 @@
+﻿
+@using AzDoc.Helpers
+
+<div id="reportDiv">
+    <div style="border:1px solid #18191b">
+        <div class="row" style="margin:10px;text-align:center;">
+            <div class="input-group mb-3">
+                <div class="col-lg-1 col-md-3 d-flex align-items-center">
+                    <a href="#" class="squareBtn mt-3" style="color: white" data-toggle="modal" data-target="#reportFormModal">
+                        Forma
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label>Sənəd növü</label>
+                    <select class="selectpicker" data-width="100%" id="docType" style="">
+                        <option value="-1">Ümumi</option>
+                        <option value="2">Vətəndaş müraciətləri</option>
+                        <option value="1">Təşkilat müraciətləri</option>
+                        <option value="18">Xidməti məktublar</option>
+                        @* <option value="4">Xaric olan sənədlər</option> *@
+                        <option value="3">Sərəncamverici sənədlər</option>
+                        <option value="27">Əməkdaş müraciətləri</option>
+                    </select>
+                </div>
+                @if ((SessionHelper.OrganizationId == 1 && SessionHelper.DepartmentTopDepartmentId == -1)
+                    || SessionHelper.WorkPlaceId == 24 || SessionHelper.WorkPlaceId == 43 || SessionHelper.WorkPlaceId == 44
+                    || SessionHelper.WorkPlaceId == 47 || SessionHelper.WorkPlaceId == 5018
+                    || SessionHelper.WorkPlaceId == 7698 || SessionHelper.WorkPlaceId == 8638 || SessionHelper.WorkPlaceId == 8660 || SessionHelper.WorkPlaceId == 9266)
+                {
+                    <div class="col-lg-2 col-md-5">
+                        <label>Hara daxil olub</label>
+                        <select class="selectpicker" data-width="100%" id="executorOrganizationType">
+                            <option value="-1">Ümumi</option>
+                            <option value="1">Nazirlik strukturu</option>
+                            <option value="0">Qurumlar</option>
+                        </select>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" id="executorOrganizationType" value="1" />//Bashqa qurumun strukturu
+                }
+                <div class="col-lg-4 col-md-7">
+                    <label>Bölmə və ya şöbələr</label>
+                    <div class="searchSelectTree mb-3">
+                        <div class="form-control">
+                            <div class="span" id="dropDownDepartment">Seç</div>
+                        </div>
+                        <div class="downContent treeListContent">
+                            <div class="down">
+                                <ul id="mainContentForDepartment"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <label>Tarix</label>
+                    <input style="" type="text" id="intervalDateForExecutedDocs" daterange class="form-control " placeholder="mm.dd.yyyy">
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <div class="col-lg-3 col-md-6">
+                    <label>İcra olunma qaydası</label>
+                    <select class="selectpicker" data-width="100%" id="isExecutedStatus" style="">
+                        <option value="-1">Ümumi</option>
+                        <option value="1">Vaxtında icra olunmuş</option>
+                        <option value="2">Gecikmə ilə icra olunmuş </option>
+                    </select>
+                </div>
+                <div class="col-3 citizenDiv">
+                    <div class="">
+                        <label>Müraciətlərə baxılmanın vəziyyəti</label>
+                        <select class="selectpicker " data-width="100%" id="docResult" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenEmployeeDiv" @*style="display:none;"*@>
+                    <div class="">
+                        <label>Müraciətin növü</label><br />
+                        <select class="selectpicker " data-width="100%" id="docApplyType" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenEmployeeDiv" @*style="display:none;"*@>
+                    <div class="">
+                        <label>Müraciətin forması</label><br />
+                        <select class="selectpicker " data-width="100%" id="docForm" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenEmployeeDiv" @*style="display:none;"*@>
+                    <div class="">
+                        <label>Şikayət olunan qurum</label><br />
+                        <select class="selectpicker " data-width="100%" id="docStructure" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenEmployeeDiv" @*style="display:none;"*@>
+                    <div class="">
+                        <label>Şikayət olunan alt qurum</label><br />
+                        <select class="selectpicker " data-width="100%" id="docSubStructure" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenTopicDiv" @*style="display:none;"*@>
+                    <div class="">
+                        <label>Mövzu</label><br />
+                        <select class="selectpicker " data-width="100%" id="citizenTopicType" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 employeeTopicBox notShowColumn">
+                    <div class="">
+                        <label>Mövzu</label><br />
+                        <select class="selectpicker" data-width="100%" id="employeeAppealsTopicType" data-live-search="true">
+                            <option value="">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenEmployeeDiv" @*style="display:none;"*@>
+                    <div class="">
+                        <label>Alt Mövzu</label><br />
+                        <select class="selectpicker " data-width="100%" id="citizenTopics" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenEmployeeDiv" @*style="display:none;"*@>
+                    <div class="">
+                        <label>Sosial status</label><br />
+                        <select class="selectpicker " data-width="100%" id="socialStatus" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenOrgEmployeeDiv" @*style="display:none;"*@>
+                    <div class="">
+                        <label>Hardan daxil olub</label>
+                        <select class="selectpicker " data-width="100%" id="entryFromWhere" data-live-search="true">
+                            <option value="-1">Ümumi</option>
+                            <option value="1">Azərbaycan Respublikası Prezidentinin Administrasiyası </option>
+                            <option value="2">Azərbaycan Respublikasının Milli Məclisi</option>
+                            <option value="3">Azərbaycan Respublikasının Nazirlər Kabineti </option>
+                            <option value="4">Azərbaycan Respublikasının İnsan Hüquqları üzrə Müvəkkili (Ombudsman) </option>
+                            <option value="5">Azərbaycan Respublikasının Baş Prokurorluğu </option>
+                            <option value="-2">Digər</option>    Yuxarida goturulen qurumlar xaric digerleri hansi ki nazirilik daxili nezere alinmayib
+                            <option value="-3">Daxili (NRYTN rəhbərlik )</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="controlDiv" @*style="display:none;"*@>
+                        <label>Nəzarət</label>
+                        <select class="selectpicker " data-width="100%" id="docControlStatus">
+                            <option value="-1">Ümumi</option>
+                            <option value="1">Nəzarətdədir</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="controlStructureDiv notShowColumn">
+                        <label>Nəzarətə götürən</label>
+                        <select class="selectpicker " data-width="100%" id="docControlStatusStructures">
+                            <option value="-1">Ümumi</option>
+                            <option value="1">Azərbaycan Respublikası Prezidentinin Administrasiyası </option>
+                            <option value="2">Azərbaycan Respublikasının Milli Məclisi</option>
+                            <option value="3">Azərbaycan Respublikasının Nazirlər Kabineti </option>
+                            <option value="4">Azərbaycan Respublikasının İnsan Hüquqları üzrə Müvəkkili (Ombudsman) </option>
+                            <option value="5">Azərbaycan Respublikasının Baş Prokurorluğu </option>
+                            <option value="-2">Digər</option>
+                            <option value="-3">Daxili (NRYTN rəhbərlik )</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenDiv" @*style="display:none;"*@>
+                    <div class="">
+                        <label>Rayon</label><br />
+                        <select class="selectpicker " data-width="100%" id="citizenRegion" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3  citizenDiv" @*style="display:none;"*@>
+                    <div class="">
+                        <label>Kənd</label><br />
+                        <select class="selectpicker " data-width="100%" id="citizenVillage" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+
+            </div>
+            <div class="input-group mb-3">
+                <div class="col-9">
+                </div>
+                <div class="col-3 text-right">
+                    <button type="button" class="mBtn mBtn-pr" style="" id="submitFilter">
+                        Axtar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="reportBodyPartial" style="display:block !important;">
+    </div>
+    <div class="col-6 text-left mt-2">
+        <div class="mBtnGroup" style="margin-bottom: 6px">
+            <button type="button" class="mBtn mBtn-pr" id="excellServerSide">Excel-ə çevir @*server side*@</button>
+            <button type="button" class="mBtn mBtn-pr" id="pdfServerSide">PDF-ə çevir @*server side*@</button>
+            @*<button type="button" class="mBtn mBtn-pr" id="pdfexe">PDF-ə çevir</button>*@
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var columns = ["citizenNameColumn", "topicTypeColumn", "topicColumn", "docResultColumn", "complainedOfDocStructure", "complainedOfDocSubStructure"];
+
+
+    //getting all data from server and setting to global variables
+    function getInputValuesSetToData(page = null) {
+
+        let data;
+        let docType = parseInt($("#docType option:selected").val());
+        let intervalDate = $('#intervalDateForExecutedDocs').val();
+
+        let executorOrganizationType = parseInt($("#executorOrganizationType option:selected").val()); //required
+        if (Object.is(executorOrganizationType, NaN))
+            executorOrganizationType = parseInt($("#executorOrganizationType").val());
+
+        let organizationDepartmentOrOrganizations = parseInt($("#dropDownDepartment").attr("data-id")); //required
+        let isExecutedStatus = parseInt($("#isExecutedStatus option:selected").val()); //required
+        let topicType = parseInt($("#citizenTopicType option:selected").val());
+        let topicTypeEmployee = parseInt($("#employeeAppealsTopicType option:selected").val());
+
+        let topic = parseInt($("#citizenTopics option:selected").val());
+        let regions = parseInt($("#citizenRegion option:selected").val());//citizenRegion
+        let villages = parseInt($("#citizenVillage option:selected").val());//citizenVillage
+        let socialStatusId = parseInt($("#socialStatus option:selected").val());
+        let docFormId = parseInt($("#docForm option:selected").val());
+        let docApplyType = parseInt($("#docApplyType option:selected").val());
+
+        let complainedOfDocStructure = parseInt($("#docStructure option:selected").val());
+        let complainedOfDocSubStructure = parseInt($("#docSubStructure option:selected").val());
+        let entryFromWhere = parseInt($("#entryFromWhere option:selected").val());
+        let docResult = parseInt($("#docResult option:selected").val());
+        let docControlStatus = parseInt($("#docControlStatus option:selected").val());
+        let docControlStatusStructures = parseInt($("#docControlStatusStructures option:selected").val());
+        if (page) {
+
+            if (localStorage.getItem("isExecutedReport")) {
+                data = JSON.parse(localStorage.getItem("isExecutedReport"));
+                data.page = page;
+            }
+            else {
+                data = {
+                    page: page,
+                    "docTypeId": docType,
+                    "organizationDepartmentOrOrganizations": organizationDepartmentOrOrganizations,
+                    "executorOrganizationType": executorOrganizationType,
+                    "intervalDate": intervalDate,
+                    "isExecutedStatus": isExecutedStatus,
+                    "topicType": topicType,
+                    "topicTypeEmployee": topicTypeEmployee,
+                    "topic": topic,
+                    "regions": regions,
+                    "villages": villages,
+                    "socialStatusId": socialStatusId,
+                    "docFormId": docFormId,
+                    "docApplyType": docApplyType,
+                    "complainedOfDocStructure": complainedOfDocStructure,
+                    "complainedOfDocSubStructure": complainedOfDocSubStructure,
+                    "docResult": docResult,
+                    "docControlStatus": docControlStatus,
+                    "docControlStatusStructures": docControlStatusStructures,
+                    "entryFromWhere": entryFromWhere
+                }
+                let dataForStorage = JSON.stringify(data);
+                localStorage.setItem("isExecutedReport", dataForStorage);
+            }
+        }
+        else {
+
+            let objHeaders = [];
+            let headers = $('#tableReportExecution th');
+            for (var i = 0; i <= headers.length; i++) {
+                let current = $(`#tableReportExecution th:nth-child(${i})`)[0];
+                if (current != undefined && $(current).css('display') !== 'none') {
+                    objHeaders.push($(`#tableReportExecution th:nth-child(${i})`).text());
+                }
+            }
+            if (localStorage.getItem("isExecutedReport")) {
+                data = JSON.parse(localStorage.getItem("isExecutedReport"));
+                data.page = page;
+                data["objHeaders"] = objHeaders;
+            }
+            else {
+                data = {
+                    //page: page,
+                    "docTypeId": docType,
+                    "objHeaders": objHeaders,
+                    "organizationDepartmentOrOrganizations": organizationDepartmentOrOrganizations,
+                    "executorOrganizationType": executorOrganizationType,
+                    "intervalDate": intervalDate,
+                    "isExecutedStatus": isExecutedStatus,
+                    "topicType": topicType,
+                    "topicTypeEmployee": topicTypeEmployee,
+                    "topic": topic,
+                    "regions": regions,
+                    "villages": villages,
+                    "socialStatusId": socialStatusId,
+                    "docFormId": docFormId,
+                    "docApplyType": docApplyType,
+                    "complainedOfDocStructure": complainedOfDocStructure,
+                    "complainedOfDocSubStructure": complainedOfDocSubStructure,
+                    "docResult": docResult,
+                    "docControlStatus": docControlStatus,
+                    "docControlStatusStructures": docControlStatusStructures,
+                    "entryFromWhere": entryFromWhere
+                }
+            }
+        }
+
+        return data;
+    }   //getting data from view
+    function refreshTable(page = 1) {
+        if (page) {
+            var data = getInputValuesSetToData(page);
+            $.ajax({
+                type: "GET",
+                url: urlForIsExecutedDocs,
+                data: data,
+                global: false,
+                cache: false,
+                beforeSend: function (e) {
+                    window.ShowLoading();
+                },
+                complete: function () {
+                    window.CloseLoading();
+                },
+                success: function (response) {
+                    $('#reportBodyPartial').html(response);
+                    HideOrShowCitizenRequestColumns();
+                    $('.selectpicker').selectpicker('refresh');
+                }
+            });
+        }
+    }  //request for fill grid
+
+
+    $('#intervalDateForExecutedDocs').daterangepicker(datePickerParameters);
+    $('#employeeAppealsTopicType').change(employeeAppealsTopicTypeChangeEvent);
+    $('#executorOrganizationType').change(executorOrganizationChangeEvent);   //fill dropdown for organizations
+    $(".searchSelectTree .form-control").click(selectTreeEvent);
+
+    $(document).on('click', '.btnPaging', btnPagingEvent);
+
+    $('#submitFilter').click(function() {
+        localStorage.removeItem("isExecutedReport");
+        refreshTable();
+    });  //search
+
+    function HideOrShowCitizenRequestColumns() {
+        if (docType == docTypeEnum.OrganizationRequest) {
+            columns.forEach((item) => {
+                var column = $(`.${item}`);
+                column.addClass("notShowColumn");
+            })
+        }
+        else {
+            columns.forEach((item) => {
+                var column = $(`.${item}`);
+                if (column.hasClass("notShowColumn")) {
+                    column.removeClass("notShowColumn");
+                }
+            })
+        }
+    }
+
+    $(document).ready(function() {
+        localStorage.removeItem("isExecutedReport");
+        getDropDownModel(reportTypeEnum.IsExecutedDocs);
+    });
+
+    //Vetendasa aid olan filtrler
+    function ShowCitizenDropDowns() {
+        $('.citizenEmployeeDiv').css("display", "block");
+        $('.controlDiv').css("display", "block");
+        $('.citizenOrgEmployeeDiv').css("display", "block");
+        $('.citizenTopicDiv').css("display", "block");
+        $('.employeeTopicBox').css("display", "none");
+    }
+
+    //Teskilata aid filtrler
+    function ShowOrganizationDropDowns() {
+        $('.controlDiv').css("display", "block");
+        $('.citizenOrgEmployeeDiv').css("display", "block");
+    }
+
+    //Emekdasa aid filtrler
+    function ShowEmployeeAppealsDropDowns() {
+        $('.citizenEmployeeDiv').css("display", "block");
+        $('.employeeTopicBox').css("display", "block");
+        SetCitizenDropDownsDefault();
+        FillDropDownsForInExecution();
+    }
+
+    //Vetendasla Emekdasda olub teskilatda olmayan filtrler
+    function RemoveCitizenEmployeeDropDowns() {
+        $('.citizenEmployeeDiv').css("display", "none");
+        $('.citizenDiv').css("display", "none");
+        $('.citizenTopicDiv').css("display", "none");
+        $('.employeeTopicBox').css("display", "none");
+        SetControlDropDownsDefault();
+        FillDropDownsForInExecution();
+    }
+
+    //Vetendasda olan filtrlerin cixarilmasi
+    function RemoveCitizenRequestDropDowns() {
+        $('.controlDiv').css("display", "none");
+        $('.citizenDiv').css("display", "none");
+        $('.citizenTopicDiv').css("display", "none");
+        SetControlDropDownsDefault();
+    }
+
+    //Teskilatda olan filtrlerin cixarilmasi
+    function RemoveOrganizationRequestDropDowns() {
+        $('.citizenDiv').css("display", "block");
+        $('.controlDiv').css("display", "block");
+        SetControlDropDownsDefault();
+        FillDropDownsForInExecution();
+    }
+
+    function SetCitizenDropDownsDefault() {
+        $('#citizenTopicType').html('');
+        $('#citizenTopics').html('');
+        $('#citizenRegion').html('');
+        $('#citizenVillage').html('');
+        $('#socialStatus').html('');
+        $('#docForm').html('');
+        $('#docStructure').html('');
+        $('#docSubStructure').html('');
+    }
+    function SetControlDropDownsDefault() {
+        $('.controlStructureDiv').addClass("notShowColumn");
+        document.getElementById("isExecutedStatus").selectedIndex = "Ümumi";
+        document.getElementById("entryFromWhere").selectedIndex = "Ümumi";
+        document.getElementById("docControlStatus").selectedIndex = "Ümumi";
+        document.getElementById("docControlStatusStructures").selectedIndex = "Ümumi";
+    }
+
+    $('#docType').change(function () {
+        let docType = parseInt($(this).val());
+        switch (docType) {
+            //Teskilat
+            case docTypeEnum.OrganizationRequest:
+                RemoveCitizenEmployeeDropDowns();
+                ShowOrganizationDropDowns();
+                break;
+
+            //Vetendas
+            case docTypeEnum.CitizenRequest:
+                ShowCitizenDropDowns();
+                RemoveOrganizationRequestDropDowns();
+                break;
+
+            //Emekdas
+            case docTypeEnum.EmployeeAppeals:
+                ShowEmployeeAppealsDropDowns();
+                RemoveCitizenRequestDropDowns();
+                break;
+
+            //Diger
+            default:
+                //$('.citizenDiv').css("display", "none");
+                //$('.citizenEmployeeDiv').css("display", "none");
+                //$('.controlDiv').css("display", "none");
+                RemoveOrganizationRequestDropDowns();
+                ShowCitizenDropDowns();
+                //SetCitizenDropDownsDefault();
+                //SetControlDropDownsDefault();
+                break;
+        }
+        $('.selectpicker').selectpicker('refresh');
+    });
+
+
+    //$('#docType').change(function () {
+    //    let docType = parseInt($("#docType option:selected").val());
+
+    //    switch (docType) {
+    //        case docTypeEnum.CitizenRequest:
+    //            {
+    //                if ($('.citizenBox').hasClass("notShowColumn")) {
+    //                    $('.citizenBox').removeClass("notShowColumn");
+    //                    FillDropDownsForIsExecuted();
+    //                }
+    //                if ($('.orgcitizenBox').hasClass("notShowColumn")) {
+    //                    $('.orgcitizenBox').removeClass("notShowColumn");
+    //                }
+    //                break;
+    //            }
+    //        case docTypeEnum.OrganizationRequest:
+    //            {
+    //                if ($('.orgcitizenBox').hasClass("notShowColumn")) {
+    //                    $('.orgcitizenBox').removeClass("notShowColumn");
+
+    //                }
+    //                $("#docControlStatus").val(-1);
+    //                $("#docControlStatusStructures").val(-1);
+    //                $('#citizenTopicType').html('');
+    //                $('#citizenTopics').html('');
+    //                $('#socialStatus').html('');
+    //                $('#docResult').html('');
+    //                $('.citizenBox').addClass("notShowColumn");
+    //                $('.controlBox').addClass("notShowColumn");
+    //                break;
+    //            }
+    //        case docTypeEnum.EmployeeAppeals:
+    //            {
+    //                if ($('.citizenBox').hasClass("notShowColumn")) {
+    //                    $('.citizenBox').removeClass("notShowColumn");
+    //                    FillDropDownsForIsExecuted();
+    //                }
+    //                $('.orgcitizenBox').addClass("notShowColumn");
+    //            }
+    //        default:
+    //            {
+
+    //                $("#docControlStatus").val(-1);
+    //                $("#docControlStatusStructures").val(-1);
+    //                $('#citizenTopicType').html('');
+    //                $('#citizenTopics').html('');
+    //                $('#socialStatus').html('');
+    //                $('#docResult').html('');
+    //                $('.citizenBox').addClass("notShowColumn");
+    //                $('.orgcitizenBox').addClass("notShowColumn");
+    //                $('.controlBox').addClass("notShowColumn");
+    //                break;
+
+    //            }
+    //    }
+    //    $('.selectpicker').selectpicker("refresh");
+    //});
+    $('#citizenTopicType').change(function () { citizenTopicTypeChangeEvent(reportTypeEnum.IsExecutedDocs) });
+
+    $('#citizenRegion').change(function () { citizenRegionChangeEvent(reportTypeEnum.IsExecutedDocs) });
+
+    $('#docStructure').change(docStructureChangeEvent);
+
+    $('#docControlStatus').change(function () {
+        var changeStatus = $(this).val();
+        if (changeStatus == 1) {
+            if ($('.controlStructureDiv').hasClass("notShowColumn"))
+                $('.controlStructureDiv').removeClass("notShowColumn");
+        }
+        else {
+            $("#docControlStatusStructures").val(-1);
+            $('.controlStructureDiv').addClass("notShowColumn");
+        }
+        $('.selectpicker').selectpicker("refresh");
+    });
+
+
+    //$('#docControlStatus').change(function () {
+    //    let changeStatus = $(this).val();
+    //    if (changeStatus == 1) {
+    //        if ($('.controlBox').hasClass("notShowColumn")) {
+    //            $('.controlBox').removeClass("notShowColumn");
+    //        }
+    //    }
+    //    else {
+    //        $("#docControlStatusStructures").val(-1);
+    //        $('.controlBox').addClass("notShowColumn");
+    //    }
+    //    $('.selectpicker').selectpicker("refresh");
+    //});
+
+    // #region Server Side Pdf Excell
+    $('#excellServerSide').on('click', function () {
+        downloadFileEvent(urlForIsExecutedDocsExcell, urlDownloadExcellFile);
+    });
+    $('#pdfServerSide').on('click', function () {
+        downloadFileEvent(urlForIsExecutedDocsPdf, urlDownloadPdfFile);
+    });
+    // #endregion
+
+</script>
+

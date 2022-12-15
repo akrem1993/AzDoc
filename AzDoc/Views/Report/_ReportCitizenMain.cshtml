@@ -1,0 +1,673 @@
+﻿@using AzDoc.Helpers
+
+<link href="~/Content/TreeView/TreeView.css" rel="stylesheet" />
+<style>
+    .col-3 {
+        text-align: center;
+        margin-bottom: 1rem !important;
+    }
+
+    .disabled {
+        pointer-events: none;
+        color: #cec7c7 !important;
+    }
+
+    .notShowColumn {
+        display: none;
+    }
+</style>
+
+<div id="reportDiv">
+    <div style="border:1px solid #18191b">
+        <div class="row" style="margin:10px;text-align:center;">
+            <div class="input-group mb-3">
+                <div class="col-lg-1 col-md-3 d-flex align-items-center">
+                    <a href="#" class="squareBtn mt-3" style="color: white" data-toggle="modal" data-target="#reportFormModal">
+                        Forma
+                    </a>
+                </div>
+                @if ((SessionHelper.OrganizationId == 1 && SessionHelper.DepartmentTopDepartmentId == -1)
+                    || SessionHelper.WorkPlaceId == 24 || SessionHelper.WorkPlaceId == 7698
+                    || SessionHelper.WorkPlaceId == 47 || SessionHelper.WorkPlaceId == 8660)
+                {
+                    <div class="col-lg-2 col-md-5">
+                        <label>Hara daxil olub</label><br />
+                        <select class="selectpicker" data-width="100%" id="executorOrganizationType">
+                            <option value="-1">Ümumi</option>
+                            <option value="1">Nazirlik strukturu</option>
+                            <option value="0">Qurumlar</option>
+                        </select>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" id="executorOrganizationType" value="1" />//Bashqa qurumun strukturu
+                }
+                <div class="col-lg-4 col-md-7">
+                    <label>Bölmə və ya şöbələr</label> <br />
+                    <div class="searchSelectTree mb-3">
+                        <div class="form-control">
+                            <div class="span" id="dropDownDepartment">Seç</div>
+                        </div>
+                        <div class="downContent treeListContent">
+                            <div class="down">
+                                <ul id="mainContentForDepartment"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <label>Tarix</label>
+                    <input style="" type="text" id="intervalDateForCitizenDocs" daterange class="form-control " placeholder="mm.dd.yyyy">
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <label>Sənədin statusu</label><br />
+                    <select class="selectpicker" data-width="100%" id="docDocumentStatus" data-live-search="true" @*multiple title="Sənədin statuslarından ən azı birini seçin."*@>
+                        <option value="">Seç</option>
+                    </select>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <div class="col-3">
+                    <div class="">
+                        <label>Mövzu</label><br />
+                        <select class="selectpicker" data-width="100%" id="citizenTopicType" data-live-search="true">
+                            <option value="">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="">
+                        <label>Alt Mövzu</label><br />
+                        <select class="selectpicker" data-width="100%" id="citizenTopics" data-live-search="true">
+                            <option value="">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="">
+                        <label>Sosial status</label><br />
+                        <select class="selectpicker " data-width="100%" id="socialStatus" data-live-search="true">
+                            <option value="">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="">
+                        <label>Müraciətin forması</label><br />
+                        <select class="selectpicker " data-width="100%" id="docForm" data-live-search="true">
+                            <option value="">Seç</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <div class="col-3">
+                    <div class="">
+                        <label>İcranın nəticəsi</label><br />
+                        <select class="selectpicker" data-width="100%" id="docResult" data-live-search="true">
+                            <option value="">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3">
+                </div> 
+                <div class="col-3">
+                </div>
+                <div class="col-3">
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <div class="col-9" style="text-align:right;">
+
+                </div>
+                <div class="col-3" style="text-align:right;">
+                    <br />
+                    <button type="button" class="mBtn mBtn-pr" style="" id="submitFilter">
+                        Axtar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="reportBodyPartial" style="display:block !important;">
+    </div>
+    <div class="col-6 text-left mt-2">
+        <div class="mBtnGroup" style="margin-bottom: 6px">
+            <button type="button" class="mBtn mBtn-pr" id="excellServerSide">Excel-ə çevir @*server side*@</button>
+            <button type="button" class="mBtn mBtn-pr" id="pdfServerSide">PDF-ə çevir</button>
+        </div>
+    </div>
+</div>
+
+<iframe width="0" height="0" style="display:none;" id="downloadIframe"></iframe>
+<script src="~/Scripts/common/printThis.min.js"></script>
+<script src="~/Scripts/common/tableHTMLExport.js"></script>
+<script>
+
+    var currentUserOrganizationId=@SessionHelper.OrganizationId
+    var currentUserDepartmentId=@SessionHelper.DepartmentId
+    var currentUserTopDepartmentId=@SessionHelper.DepartmentTopDepartmentId
+    var currentUserDepartmentSectionId=@SessionHelper.DepartmentSectionId
+    var currentUserWorkplaceId =@SessionHelper.WorkPlaceId;
+
+    var urlForDocs = '/az/Report/GetReportCitizenDocs';
+    var urlForDropDowns = '/az/Report/GetReportDropDownModel';
+
+    var departments;
+    var organizations;
+    var topicTypes;
+    var topics;
+    var socialStatus;
+    var docForm;
+    var docDocumentStatus;
+    var docResult;
+
+    var counterForFirstRequest = 0;
+
+    //#region StaticWorkplaces
+    var nazirlikAdminWorkplaces = [24, 47, 7698, 8660]; //nazirlik umumi
+    var auditNazirlikAdminWorkplaces = [305];
+    var mulkiAviyasiyaAdminWorkplaces = [165];
+
+     //zamina qafarova, fuaad saadatli , rovshan aliyev
+    var BtrMmcAdminWorkplaces = [5019, 5101, 149]; // currentUserDepartmentId = 1085; department rehberlik
+
+    ///suat.pashayev //zaman.verdyiev //emil.rzayev// ilaha.ibrahimova
+    var AzTelekomMmcAdminWorkplaces = [151, 7517, 144, 4548]; // currentUserDepartmentId = 1082; //Departament Rehberlik olsun
+
+    ///aflatun.sharifov//aytan.israfilova
+    var TeleradioIbAdminWorkplaces = [499, 3517]; // currentUserDepartmentId = 1157; //Departament Rehberlik olsun
+
+    var MhmAdminWorkplaces = [2, 3498, 5010, 421, 165]; // currentUserDepartmentId = 1; //Departament Rehberlik olsun
+
+    var isNazirlikAdmin = (currentUserOrganizationId == 1 && currentUserTopDepartmentId == -1) || nazirlikAdminWorkplaces.includes(currentUserWorkplaceId);
+
+    //#endregion
+
+    async function getDropDownModel() {
+        $.ajax({
+            type: "GET",
+            url: urlForDropDowns,
+            success: function (result) {
+                var data = result.DropDownModel;
+
+                departments = data.filter(departmentItem => departmentItem.FormType == 1);
+                organizations = data.filter(organziationItem => organziationItem.FormType == 2);
+                topicTypes = data.filter(topicTypeItem => topicTypeItem.FormType == 3);
+                topics = data.filter(topicItem => topicItem.FormType == 4);
+                socialStatus = data.filter(status => status.FormType == 7);
+                docForm = data.filter(docForm => docForm.FormType == 8);
+                docDocumentStatus = data.filter(status => status.FormType == 9);
+                docResult = data.filter(result => result.FormType == 5);
+                fillDropDowns();
+
+                if (isNazirlikAdmin)
+                     fillDropDownForDepartmentAndOrganizations();
+                else
+                    fillDropDownForDepartmentAndOrganizations(departments);
+
+                if (!isNazirlikAdmin)
+                    {
+                        $('#dropDownDepartment').attr("data-id", currentUserDepartmentId)
+                        var departmentName = departments.filter(departmentItem => departmentItem.Id == currentUserDepartmentId)[0].Name
+                        $('#dropDownDepartment').text(departmentName)
+                        $('.selectpicker').selectpicker('refresh');
+                    }
+                // document onload filling department and organization
+                $('.selectpicker').selectpicker('refresh');
+
+                if (counterForFirstRequest < 1) {
+                    counterForFirstRequest++;
+                    refreshTable("1")
+                }
+            }
+        });
+    }
+
+    function getInputValuesSetToData(page = null) {
+
+        var data = [];
+        var intervalDate = $('#intervalDateForCitizenDocs').val();
+
+        var executorOrganizationType = parseInt($("#executorOrganizationType option:selected").val()); //required
+        if (Object.is(executorOrganizationType, NaN))
+            executorOrganizationType = parseInt($("#executorOrganizationType").val());
+
+        var organizationDepartmentOrOrganizations = parseInt($("#dropDownDepartment").attr("data-id")); //required
+
+        //var docType = parseInt($("#docType option:selected").val());
+        var topicType = parseInt($("#citizenTopicType option:selected").val());
+        var topic = parseInt($("#citizenTopics option:selected").val());
+        var socialStatusId = parseInt($("#socialStatus option:selected").val());
+        var docFormId = parseInt($("#docForm option:selected").val());
+
+        var docDocumentStatus = parseInt($("#docDocumentStatus option:selected").val());
+        var docResult = parseInt($("#docResult option:selected").val());
+
+        if (page) {
+            if (localStorage.getItem("citizenReport")) {
+                data = JSON.parse(localStorage.getItem("citizenReport"));
+                data.page = page;
+            }
+            else {
+                data = {
+                    page: page,
+                  //  "docTypeId": docType,
+                    "organizationDepartmentOrOrganizations": organizationDepartmentOrOrganizations,
+                    "executorOrganizationType": executorOrganizationType,
+                    "intervalDate": intervalDate,
+                  //  "remaningDay": remaningDay,
+                    "topicType": topicType,
+                    "topic": topic,
+                    "socialStatusId": socialStatusId,
+                    "docFormId": docFormId,
+                    "docDocumentStatus": docDocumentStatus,
+                    "docResult": docResult,
+                  //  "executor": executor,
+                //    "docControlStatus": docControlStatus,
+                 //   "docControlStatusStructures": docControlStatusStructures
+                }
+                var dataForStorage = JSON.stringify(data);
+                localStorage.setItem("citizenReport", dataForStorage);
+            }
+        }
+        else {
+
+            var objHeaders = [];
+            var headers = $('#tableReportExecution th');
+            for (var i = 0; i <= headers.length; i++) {
+                var current = $(`#tableReportExecution th:nth-child(${i})`)[0];
+                if (current != undefined && $(current).css('display') !== 'none') {
+                    objHeaders.push($(`#tableReportExecution th:nth-child(${i})`).text());
+                }
+            }
+            objHeaders = objHeaders.removeArraysElement("Qeydlər");
+
+            if (localStorage.getItem("citizenReport")) {
+                data = JSON.parse(localStorage.getItem("citizenReport"));
+                data.page = page;
+                data["objHeaders"] = objHeaders;
+            }
+            else {
+                data = {
+                    //page: page,
+                    "objHeaders": objHeaders,
+                 //   "docTypeId": docType,
+                    "organizationDepartmentOrOrganizations": organizationDepartmentOrOrganizations,
+                    "executorOrganizationType": executorOrganizationType,
+                    "intervalDate": intervalDate,
+                  //  "remaningDay": remaningDay,
+                    "topicType": topicType,
+                    "topic": topic,
+                    "socialStatusId": socialStatusId,
+                    "docFormId": docFormId,
+                    "docDocumentStatus": docDocumentStatus,
+                    "docResult": docResult,
+                 //   "executor": executor,
+                 //   "docControlStatus": docControlStatus,
+                 //   "docControlStatusStructures": docControlStatusStructures
+                }
+            }
+        }
+
+        return data;
+    }
+    function refreshTable(page) {
+        if (page) {
+            var data = getInputValuesSetToData(page);
+            $.ajax({
+                type: "GET",
+                url: urlForDocs,
+                data: data,
+                cache: false,
+                beforeSend: function (e) {
+                    window.ShowLoading();
+                },
+                complete: function () {
+                    window.CloseLoading();
+                },
+                success: function (response) {
+                    $('#reportBodyPartial').html(response);
+                    $('.selectpicker').selectpicker('refresh');
+                }
+            });
+        }
+    }
+
+    //#region DropDown
+
+    function createSelectList(object,selectListId) //Object with Key Value => Id,Name
+    {
+        let selectList = $(`#${selectListId}`);
+        selectList.html('');
+
+        var staticOption = document.createElement("option")
+        staticOption.value = '';
+        staticOption.text = 'Seç';
+        selectList.append(staticOption);
+
+        for (var i = 0; i < object.length; i++) {
+            var option = document.createElement("option");
+            option.value = object[i].Id;
+            option.text = object[i].Name;
+            selectList.append(option);
+        }
+        $('.selectpicker').selectpicker('refresh');
+    }
+
+    function fillDropDownForTopicType() {
+        createSelectList(this.topicTypes,"citizenTopicType");
+    }
+    function fillDropDownForTopic(selectedTopicType) {
+        var filtiredTopics = topics.filter(topicsItem => topicsItem.TopId == selectedTopicType);
+        createSelectList(filtiredTopics, "citizenTopics");
+    }
+    function fillDropDownForSocialStatus() {
+        createSelectList(socialStatus, "socialStatus");
+    }
+    function fillDropDownForDocForm() {
+        createSelectList(docForm, "docForm");
+    }
+    function fillDropDownFormDocDocumentStatus()  {
+        createSelectList(docDocumentStatus, "docDocumentStatus");
+    }
+    function fillDropDownForDocResult() {
+        createSelectList(docResult, "docResult");
+    }
+
+    function fillDropDowns()
+    {
+        fillDropDownForTopicType();
+        fillDropDownForSocialStatus();
+        fillDropDownForDocForm();
+        fillDropDownFormDocDocumentStatus();
+        fillDropDownForDocResult();
+    }
+
+    //#endregion
+
+    //#region Recursive
+    function list_to_tree(list) {
+        var map = {}, node, roots = [], i;
+        for (i = 0; i < list.length; i += 1) {
+            map[list[i].Id] = i; // initialize the map
+            list[i].children = []; // initialize the children
+        }
+        for (i = 0; i < list.length; i += 1) {
+            node = list[i];
+            if (node.TopId) {
+                // if you have dangling branches check that map[node.TopId] exists
+                list[map[node.TopId]].children.push(node);
+            } else {
+                roots.push(node);
+            }
+        }
+        return roots;
+    }
+    function recursiveFillData(rootData, mainRootElementId = null) {
+
+        for (var i = 0; i < rootData.length; i++) {
+
+            var mainDivId = $('#mainContentForDepartment');
+
+            if (mainRootElementId)  mainDivId = $('#root' + mainRootElementId);
+
+            var element = "";
+
+            mainDivId.append(element);
+
+            if (rootData[i].children.length > 0) {
+
+                element = `<li class="drop">
+                    <i class="fas fa-angle-right"></i>
+                    <a href = "#" value ="${rootData[i].Id}">${rootData[i].Name}</a>
+                    <div class="down">
+                    <ul id="root${rootData[i].Id}"></ul>
+                    </div>
+                    </li>`;
+
+                mainDivId.append(element);
+                recursiveFillData(rootData[i].children, rootData[i].Id);
+            }
+            else {
+                element = `<li class="drop">
+                    <a href = "#" value ='${rootData[i].Id}'>${rootData[i].Name}</a>
+                    </li>`;
+                mainDivId.append(element);
+            }
+        }
+    }
+    function fillDropDownForDepartmentAndOrganizations(dataForTree) {
+        $('#mainContentForDepartment').html('');
+        $('#mainContentForDepartment').append(`<li class="drop"><a href = "#" value="0">Seç</a></li>`);
+
+        var rootData = [];
+        if (dataForTree != null) {
+            var orgData = dataForTree;
+            rootData = list_to_tree(orgData);
+            recursiveFillData(rootData);
+        }
+
+        if (!isNazirlikAdmin)
+        {
+
+
+            var notDisabledDepartments= identifyDisablingDepartmentsByWorkplaceId();
+            disableDepartments(notDisabledDepartments);
+        }
+        bindEvents();
+        $('.selectpicker').selectpicker('refresh');
+    }
+    function identifyDisablingDepartmentsByWorkplaceId()
+    {
+        if (BtrMmcAdminWorkplaces.includes(currentUserWorkplaceId)) currentUserDepartmentId = 1085; // btr Departament Rehberlik olsun
+        if (AzTelekomMmcAdminWorkplaces.includes(currentUserWorkplaceId)) currentUserDepartmentId = 1082; //AzTelekom
+        if (TeleradioIbAdminWorkplaces.includes(currentUserWorkplaceId)) currentUserDepartmentId = 1157; //Teleradio IB
+        if (MhmAdminWorkplaces.includes(currentUserWorkplaceId)) currentUserDepartmentId = 1;  //Mhm
+
+
+        let notDisabledDepartments = [currentUserDepartmentId, currentUserTopDepartmentId, currentUserDepartmentSectionId]; //getting by default userDepartment and topDepartment ids
+
+        if (MhmAdminWorkplaces.includes(currentUserWorkplaceId)) notDisabledDepartments.push(0);
+        if (BtrMmcAdminWorkplaces.includes(currentUserWorkplaceId)) notDisabledDepartments.push(0);
+        if (AzTelekomMmcAdminWorkplaces.includes(currentUserWorkplaceId)) notDisabledDepartments.push(0);
+        if (TeleradioIbAdminWorkplaces.includes(currentUserWorkplaceId)) notDisabledDepartments.push(0);
+
+        return notDisabledDepartments;
+    }
+    function disableDepartments(notDisabledDepartments)
+    {
+        let obj = $('#mainContentForDepartment').find("li a");
+        console.log(obj)
+        console.log([...obj])
+        var allDepartments = []; // all departments
+
+        for (var i = 0; i < obj.length; i++) {
+            allDepartments.push(parseInt(obj[i].attributes.value.value)); //getting all departments Ids
+        }
+
+        var sectorsOnNotDisabledDepartments = departments.filter(x => x.TopId == currentUserDepartmentId); //getting userDepartment sectors ids
+
+        sectorsOnNotDisabledDepartments.forEach((item) => {
+            notDisabledDepartments.push(item.Id);
+        });  // adding not disabled sectors to not disabled departments
+
+        notDisabledDepartments.forEach((item) => {
+            allDepartments.removeArraysElement(item);
+        });   // removing not disabled departments form all departments
+
+        allDepartments.forEach((item) => {
+            var departmentForDisable = [...obj].filter(x => x.attributes.value.value == item)
+            departmentForDisable[0].classList.add("disabled")
+        })  // disabling  departments which is should be disable
+    }
+    //#endregion
+
+    $('#citizenTopicType').change(function (){               //fill dropdown for topics
+        $('#citizenTopics').html('');
+
+        var selectedTopicType = parseInt($(this).val());
+
+        fillDropDownForTopic(selectedTopicType);
+
+        $('#citizenTopics').selectpicker('refresh');
+    });
+    $('#intervalDateForCitizenDocs').daterangepicker({
+        startDate: '01/01/2021',
+        endDate: moment(),
+        "minYear": 1990,
+        "maxYear": 2030,
+        "showWeekNumbers": true,
+        "autoApply": true,
+        locale: {
+            firstDay: 1,
+            format: 'DD.MM.YYYY',
+        },
+        ranges: {
+            'Bugün': [moment(), moment()],
+            'Dünən': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Son 7 gün': [moment().subtract(6, 'days'), moment()],
+            'Son 30 gün': [moment().subtract(29, 'days'), moment()],
+            'Bu ay': [moment().startOf('month'), moment().endOf('month')],
+            'Keçən ay': [
+                moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')
+            ],
+            'I rub': [moment().startOf('year'), moment().startOf('year').add(2, 'month').endOf('month')],
+            'II rub': [moment().startOf('year').add(3, 'month'), moment().startOf('year').add(5, 'month').endOf('month')],
+            'III rub': [moment().startOf('year').add(6, 'month'), moment().startOf('year').add(8, 'month').endOf('month')],
+            'IV rub': [moment().startOf('year').add(9, 'month'), moment().startOf('year').add(11, 'month').endOf('month')],
+            '2019-cu il': [moment('01/01/2019'), moment('12/31/2019')]
+        }
+    }, function (start, end, label) { });
+    $('#executorOrganizationType').change(function () {
+
+        $(".searchSelectTree .form-control .span").text("Seç").attr("data-id", "0")
+
+        var executorOrganizationType = parseInt($("#executorOrganizationType option:selected").val());
+
+        switch (executorOrganizationType) {
+            case 0: fillDropDownForDepartmentAndOrganizations(organizations); break; // Qurumlari getirir
+            case 1: fillDropDownForDepartmentAndOrganizations(departments); break; // Nazirlik strukturundaki departmentleri getirir
+            default: $('#mainContentForDepartment').html('').append('<li class="drop"><a href = "#" value="0">Seç</a></li>'); break;
+        }
+
+    })     //fill dropdown for organizations
+    $('#submitFilter').click(function () {
+        var page = "1";
+        localStorage.removeItem("citizenReport")
+        refreshTable(page);
+    })   //search
+    $(document).on('click', '.btnPaging', function () {
+        var page = $(this).attr("data-page");
+        refreshTable(page);
+    });
+
+    // #region TreeView js
+    $(".searchSelectTree .form-control").click(function () {
+        var currentClciked = $(this);
+        $(this).next().slideToggle('fast');
+        $(document).click(function (e) {
+            if (!$(e.target).closest(currentClciked).length && !$(e.target).closest($(currentClciked).next()).length) {
+                $(currentClciked).next().slideUp('fast');
+            }
+        })
+    });
+    function bindEvents() {
+        $(".searchSelectTree .downContent a").bind("click", function (e) {
+            e.preventDefault();
+        });
+        $(".searchSelectTree .drop>i.fas").bind("click", function () {
+            if ($(this).hasClass("fa-angle-right")) {
+                $(this).removeClass("fa-angle-right");
+                $(this).addClass("fa-angle-down");
+            }
+            else {
+                $(this).addClass("fa-angle-right");
+                $(this).removeClass("fa-angle-down");
+            }
+            $(this).next().next().slideToggle('fast');
+        });
+        $(".searchSelectTree li a").bind("click", function () {
+            var inputTxt = $(this).text();
+            var inputVal = $(this).attr("value");
+            $(".searchSelectTree .form-control .span").text(inputTxt).attr("data-id", inputVal);
+            $(this).parents(".searchSelectTree").find(".downContent").slideUp();
+        });
+    }
+    //#endregion
+
+    // #region Extension
+    Array.prototype.removeArraysElement = function () {
+        var what, a = arguments, L = a.length, ax;
+        while (L && this.length) {
+            what = a[--L];
+            while ((ax = this.indexOf(what)) !== -1) {
+                this.splice(ax, 1);
+            }
+        }
+        return this;
+    };
+    //#endregion
+
+    //#region  Client Side Pdf Excell
+    $('#csvexe').on('click',function () {$("#tableReportExecution").tableHTMLExport({ type: 'csv', filename: 'İcrada olan sənədlər' + '' + '.csv' });});
+
+    $('#pdfexe').on('click',function () {$('#tableReportExecution').printThis();});
+
+    //#endregion
+
+    // #region Server Side Pdf Excell
+
+    $('#excellServerSide').on('click', function () {
+
+        let url = '/az/Report/ReportInExecutionDocsExcellServerSide';
+        let downloadUrl = '/az/Report/Download?fileName=';
+        DownloadDataAsFile(url, downloadUrl)
+
+    });
+
+    $('#pdfServerSide').on('click', function () {
+
+        let url = '/az/Report/ReportInExecutionDocsPdfServerSide';
+        let downloadUrl = '/az/Report/DownloadPdf?fileName=';
+        DownloadDataAsFile(url, downloadUrl)
+    });
+
+    function DownloadDataAsFile(dataFileUrl,urlForDownload)
+    {
+        var data = getInputValuesSetToData();
+        $.ajax({
+            type: "GET",
+            url: dataFileUrl,
+            data: data,
+            traditional: true,
+            cache: false,
+            beforeSend: function () {
+                $('#reportDiv').find("input, select, textarea, button").prop("disabled", true);
+                window.ShowLoading();
+            },
+            complete: function () {
+                $('#reportDiv').find("input, select, textarea, button").prop("disabled", false);
+                window.CloseLoading();
+            },
+            success: function (result) {
+                if (result && !result.Error) {
+                    $('#downloadIframe').attr('src', `${urlForDownload}${result.fileName}`);
+                }
+
+            }
+        });
+    }
+
+     // #endregion
+
+    $(document).ready(function () {
+        console.log("a");
+        getDropDownModel();
+        //$(document).on('click', '.btnPaging', function () {
+        //    var page = $(this).attr("data-page");
+        //    refreshTable(page);
+        //});
+    });
+</script>

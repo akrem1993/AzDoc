@@ -1,0 +1,473 @@
+﻿@using AzDoc.App_LocalResources
+@model CitizenRequests.Model.ViewModel.DocumentViewModel
+@{
+    ViewBag.Title = "AddNewDocument";
+    Layout = null;
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+<style>
+
+    .display-none {
+        display: none;
+    }
+
+    .display-block {
+        display: block;
+    }
+</style>
+
+
+<div class="mModal">
+    <div class="modal fade" id="individualModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Vətəndaş müraciəti - Fiziki şəxs</span>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <input id="CountApp" style="display: none" />
+                            <input id="FormType" style="display: none" />
+                            <input id="DocEnterNo" style="display: none" />
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label class="font-weight-bold">Soyadı <span style="color: red; font-weight: bold">*</span></label>
+                                    @Html.TextBoxFor(model => model.DocumentModel.SurName, new
+                                    {
+                                        @type = "text",
+                                        @class = "form-control",
+                                        @id = "individualSurName",
+                                        @data_required_edit = "Soyadı daxil edin."
+                                    })
+
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="font-weight-bold">Adı <span style="color: red; font-weight: bold">*</span></label>
+
+                                    @Html.TextBoxFor(model => model.DocumentModel.FirstName, new
+                                    {
+                                        @type = "text",
+                                        @class = "form-control",
+                                        @id = "individualFirstName",
+                                        @data_required_edit = "Adı daxil edin."
+                                    })
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="font-weight-bold">Ata adı</label>
+                                    @Html.TextBoxFor(model => model.DocumentModel.FatherName, new
+                                    {
+                                        @type = "text",
+                                        @class = "form-control",
+                                        @id = "individualFatherName",
+                                    })
+                                </div>
+
+                            </div>
+                            <div class="form-row">
+
+
+                                <div class="form-group col-md-4">
+                                    <label class="font-weight-bold">Telefon </label>
+                                    @Html.TextBoxFor(model => model.DocumentModel.MobilePhone, new
+                                    {
+                                        @type = "text",
+                                        @class = "form-control",
+                                        @id = "individualMobilePhone",
+                                    })
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label class="font-weight-bold">E-poçt </label>
+                                    @Html.TextBoxFor(model => model.DocumentModel.Email, new
+                               {
+                                   @type = "text",//text
+                                   @class = "form-control",
+                                   @id = "individualEmail",
+
+                               })
+
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="font-weight-bold">Ölkə <span style="color: red; font-weight: bold">*</span></label>
+                                    @Html.DropDownListFor(model => model.Country.Id,
+                                        new SelectList(Model.Countries, "Id", "Name", Model.DocumentModel.CountryId), new
+                                        {
+                                            @id = "individualCountry",
+                                            @class = "selectpicker",
+                                            @data_live_search = "true",
+                                            @data_width = "100%",
+                                            @data_required_edit = "Ölkəni daxil edin."
+                                        })
+                                </div>
+
+                            </div>
+                            <div class="form-row">
+
+                                <div class="form-group col-md-4">
+                                    <label class="font-weight-bold">Sosial status </label>
+                                    @Html.DropDownListFor(model => model.SocialStatus.Id,
+                                        new SelectList(Model.SocialStatuses, "Id", "Name", Model.DocumentModel.SocialsId), new
+                                        {
+                                            @id = "individualSocialStatus",
+                                            @class = "selectpicker",
+                                            @data_live_search = "true",
+                                            @data_width = "100%",
+                                            multiple = "multiple",
+                                            @data_actions_box = "true",
+                                        })
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="font-weight-bold">Təmsilçi <span style="color: red; font-weight: bold">*</span></label>
+                                    @Html.DropDownListFor(model => model.Representer.Id,
+                                        new SelectList(Model.Representeres, "Id", "Name", Model.DocumentModel.RepresenterId), "Seç", new
+                                        {
+                                            @id = "individualRepresenter",
+                                            @class = "selectpicker",
+                                            @data_live_search = "true",
+                                            @data_width = "100%",
+                                            @data_required_edit = "Təmsilçini daxil edin."
+                                        })
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label class="font-weight-bold">Rayon <span style="color: red; font-weight: bold">*</span></label>
+                                    @*<select name="Region.Id" id="individualRegion" class="selectpicker" data-live-search="true" data-width="100%" data-required-edit="Rayonu daxil edin."></select>*@
+                                    @Html.DropDownListFor(model => model.Region.Id,
+                                        new SelectList(Model.Regions, "Id", "Name", Model.DocumentModel.RegionId), new
+                                        {
+                                            @id = "individualRegion",
+                                            @class = "selectpicker",
+                                            @data_live_search = "true",
+                                            @data_width = "100%",
+                                            @data_required_edit = "Rayonu daxil edin."
+                                        })
+                                </div>
+
+                                <div class="form-group col-md-4">
+                                    <label class="font-weight-bold">Kənd <span style="color: red; font-weight: bold">*</span></label>
+                                    @*<select name="Village.Id" id="individualVillage" class="selectpicker" data-live-search="true" data-width="100%" data-required-edit="Kəndi daxil edin."></select>*@
+                                    @Html.DropDownListFor(model => model.Village.Id,
+                                        new SelectList(Model.Villages, "Id", "Name", Model.DocumentModel.VillageId), new
+                                        {
+                                            @id = "individualVillage",
+                                            @class = "selectpicker",
+                                            @data_live_search = "true",
+                                            @data_width = "100%"
+                                        })
+                                </div>
+
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    <label class="font-weight-bold">Ünvan <span style="color: red; font-weight: bold">*</span></label>
+                                    @Html.TextBoxFor(model => model.DocumentModel.Address, new
+                                    {
+                                        @type = "text",
+                                        @class = "form-control",
+                                        @id = "individualAddress",
+                                        @data_required_edit = "Ünvanı daxil edin."
+                                    })
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" id="closeBtn" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Ləğv et</button>
+
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="individualSaveBtn" class="mBtn mBtn-pr defaultBtn" style="width: 100%">@RLang.Save</button>
+                        <button type="button" id="individualEditBtn" class="mBtn mBtn-pr defaultBtn" style="width: 100%">@RLang.Edit</button>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    //$(document).ready(function() {
+    //    $('input').on('keyup',
+    //        function(event) {
+    //            $(this).val(function(i, v) {
+    //                return v.replace(/[a-zA-z]/,
+    //                    function(c) {
+    //                        return c.toUpperCase();
+    //                    });
+    //            });
+    //        });
+    //});
+
+
+    $('#individualCountry').on('change', function () {
+        $.ajax({
+            type: 'GET',
+            url: '/az/CitizenRequests/Document/GetRegion',
+            data: { countryId: this.value },
+            success: function (data) {
+                var s = '<option value="-1">Seç</option>';
+
+                for (var i = 0; i < data.length; i++) {
+
+                    s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                }
+                $("#individualRegion").html(s);
+
+                $('.selectpicker').selectpicker('refresh');
+
+                $("#individualRegion").val(-1);
+            }
+        });
+    });
+
+    $('#individualRegion').on('change', function () {
+        $.ajax({
+            type: 'GET',
+            url: '/az/CitizenRequests/Document/GetVillage',
+            data: { regionId: this.value },
+            success: function (data) {
+                var s = '<option value="-1">Seç</option>';
+                for (var i = 0; i < data.length; i++) {
+
+                    s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                }
+                $("#individualVillage").html(s);
+                $('.selectpicker').selectpicker('refresh');
+
+                $("#individualVillage").val(-1);
+            }
+        });
+    });
+
+
+    $('#individualSaveBtn').on('click', function () {
+
+        var required = $("[data-required-edit]");
+        var countRequired = 0;
+
+        $.each(required,
+            function () {
+                if (!$(this).val()) {
+                    if ($(this).hasClass("selectpicker")) {
+                        $(this).closest("div")
+                            .css("border", "1px solid red")
+                            .css("border-radius", ".25rem");
+                    } else {
+                        $(this).addClass("border-danger");
+                    }
+
+                    countRequired++;
+                } else {
+                    if ($(this).hasClass("selectpicker")) {
+                        $(this).closest("div")
+                            .css("border", "1px solid transparent");
+                    } else {
+                        $(this).removeClass("border-danger");
+                    }
+                }
+            });
+
+        if (countRequired > 0) {
+            toastr.warning("Bütün məcburi xanaların doldurulduğuna əmin olun.");
+            return;
+        }
+
+        var count = $("#citizenApply tbody tr td").closest("tr").length + 1;
+        var surName = $("#individualSurName").val();
+        var firstName = $("#individualFirstName").val();
+        var fatherName = $("#individualFatherName").val();
+        var countryValue = $("#individualCountry").val();
+        var country = $("#individualCountry").find('option:selected').text();
+        var regionValue = $("#individualRegion").val();
+        var region = $("#individualRegion").find('option:selected').text();
+        var villageValue = $("#individualVillage").val();
+        var village = $("#individualVillage").find('option:selected').text();
+        var representerValue = $("#individualRepresenter").val();
+        var socialValue = $("#individualSocialStatus").val();
+        var representer = $("#individualRepresenter").find('option:selected').text();
+        var address = $("#individualAddress").val();
+        var mobile = $("#individualMobilePhone").val();
+        var email = $("#individualEmail").val();
+        if (surName != '' && firstName != '' && countryValue != '' && regionValue != -1 && address != '') {
+            var delegateCount = 0;
+            $("#citizenApply tbody tr").each(function () {
+                var representer = $(this).find(".representerValue").html();
+
+                if (representer == '2') {
+                    delegateCount++;
+                }
+            });
+            if (delegateCount < 1) {
+                tbApplicationAdd(count,
+                    '',
+                    '',
+                    firstName,
+                    surName,
+                    fatherName,
+                    countryValue,
+                    country,
+                    regionValue,
+                    region,
+                    villageValue,
+                    village,
+                    socialValue,
+                    representerValue,
+                    representer,
+                    address,
+                    mobile,
+                    email,
+                    '');
+                toastr.success('Məlumat əlavə olundu');
+            } else {
+                toastr.warning('1-dən çıx nümayəndə daxil edə bilməzsiz');
+            }
+
+
+            $("#individualModal").modal('hide');
+            fnIndivdualInputClear();
+            var representerCount = 0;
+            $("#citizenApply tbody tr").each(function () {
+                var representer = $(this).find(".representerValue").html();
+                if (representer == '1') {
+                    representerCount++;
+                }
+            });
+
+            if (representerCount > 1) {
+                $('#basicInfo').removeClass('card-header-custom');
+                $('#basicInfo').addClass('bg-success');
+                $('#NumberOfApplicants').val(2);
+                $('#NumberOfApplicants').removeAttr('disabled', 'disabled');
+            }
+            fnIndivdualInputClear();
+
+        }
+        else {
+            toastr.warning('Zəhmət olmasa məcburi xanaları daxil edin');
+        }
+    });
+
+    $('#individualEditBtn').on('click', function () {
+
+        var required = $("[data-required-edit]");
+        var count = 0;
+
+
+        $.each(required,
+            function () {
+                if (!$(this).val()) {
+                    if ($(this).hasClass("selectpicker")) {
+                        $(this).closest("div")
+                            .css("border", "1px solid red")
+                            .css("border-radius", ".25rem");
+                    } else {
+                        $(this).addClass("border-danger");
+                    }
+
+                    count++;
+                } else {
+                    if ($(this).hasClass("selectpicker")) {
+                        $(this).closest("div")
+                            .css("border", "1px solid transparent");
+                    } else {
+                        $(this).removeClass("border-danger");
+                    }
+                }
+            });
+
+        if (count > 0) {
+            toastr.warning("Bütün məcburi xanaların doldurulduğuna əmin olun.");
+            return;
+        }
+
+        var surName = $("#individualSurName").val();
+        var firstName = $("#individualFirstName").val();
+        var fatherName = $("#individualFatherName").val();
+        var countryValue = $("#individualCountry").val();
+        var country = $("#individualCountry").find('option:selected').text();
+        var regionValue = $("#individualRegion").val();
+        var region = $("#individualRegion").find('option:selected').text();
+        var villageValue = $("#individualVillage").val();
+        var village = $("#individualVillage").find('option:selected').text();
+        var representerValue = $("#individualRepresenter").val();
+        var socialValue = $("#individualSocialStatus").val();
+        var representer = $("#individualRepresenter").find('option:selected').text();
+        var address = $("#individualAddress").val();
+        var mobile = $("#individualMobilePhone").val();
+        var email = $("#individualEmail").val();
+        if (surName != '' || firstName != '') {
+
+            var rowId = $("#CountApp").val();
+            var formType = $("#FormType").val();
+            var docEnterno = $("#DocEnterNo").val();
+
+            if (rowId > 0) {
+                $('#citizenApply #' + rowId).remove();
+
+                tbApplicationAdd(rowId,
+                    '',
+                    docEnterno,
+                    firstName,
+                    surName,
+                    fatherName,
+                    countryValue,
+                    country,
+                    regionValue,
+                    region,
+                    villageValue,
+                    village,
+                    socialValue,
+                    representerValue,
+                    representer,
+                    address,
+                    mobile,
+                    email,
+                    formType);
+
+            }
+            $("#individualModal").modal('hide');
+            var representerCount = 0;
+            $("#citizenApply tbody tr").each(function () {
+                var representer = $(this).find(".representerValue").html();
+                if (representer == '1') {
+                    representerCount++;
+                }
+            });
+
+            if (representerCount > 1) {
+                $('#basicInfo').addClass('bg-success');
+                $('#NumberOfApplicants').val(2);
+                $('#NumberOfApplicants').removeAttr('disabled', 'disabled');
+            } else {
+                $('#basicInfo').removeClass('bg-success');
+                $('#NumberOfApplicants').val(1);
+                $('#NumberOfApplicants').removeAttr('disabled', 'disabled');
+            }
+            fnIndivdualInputClear();
+            toastr.success('Məlumat dəyişildi');
+
+
+        }
+        else {
+            toastr.warning('Zəhmət olmasa vətəndaşın adını və soyadını daxil edin');
+        }
+    });
+</script>

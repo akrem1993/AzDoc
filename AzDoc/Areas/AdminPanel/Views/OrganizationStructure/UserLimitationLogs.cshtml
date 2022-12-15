@@ -1,0 +1,60 @@
+﻿@using System.Collections
+@using System.Linq
+@model List<Admin.Model.ViewModel.UserLimitationLogs>
+@{
+    ViewBag.Title = "UserLimitationLogs";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+
+
+
+<div>
+    
+    
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem"  style="padding-top:1px" data-brnum="1">
+            <div class="editGroup">
+                <h4>Qurumun istifadəçi limiti tarixçəsi</h4>
+                <br />
+            </div>
+        </div>
+        <br />
+    </div>
+    <div class="infoContent" style="font-weight: 700;margin-top: 4px;margin-bottom: 20px;box-shadow: 0px 0px 10px 0px #80808096;border-radius: 7px;font-size: 14px;color: #4f6870;">
+        <div class="infoContentInner" style="padding: 10px 20px;">
+            <table id="example" class="table table-striped table-bordered table-hover dataTable" style="width: 100%;" role="grid" aria-describedby="example_info">
+                <thead>
+                <tr role="row"><th class="sorting_asc" tabindex="0" aria-controls="example" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Name: activate to sort column descending" style="width: 124px; color: red">Redaktə edən</th><th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" aria-label="Position: activate to sort column ascending" style="width: 93px;color: red">Qurum</th><th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" aria-label="Office: activate to sort column ascending" style="width: 199px;color: red">Qeyd</th><th class="sorting" tabindex="0" aria-controls="example" rowspan="1" colspan="1" aria-label="Age: activate to sort column ascending" style="width: 36px;color: red">Tarix</th>
+                </thead>
+                <tbody>
+                @foreach (var item in Model )
+                {
+                    <tr role="row" class="odd">
+                        <td class="sorting_1">@item.UserName</td>
+                        <td>@item.OrganizationShortname</td>
+                        <td>@item.OperationNote</td>
+                        <td>@item.UpdatedDate</td>
+                    </tr>  
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="~/Scripts/adminPanel/DataTable.js"></script>
+
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/dataTables.jqueryui.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#example').DataTable();
+    });
+
+
+</script>

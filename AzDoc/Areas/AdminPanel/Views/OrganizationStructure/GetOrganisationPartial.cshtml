@@ -1,0 +1,60 @@
+﻿@model Admin.Model.ViewModel.PassOrganisationViewModel
+@using AzDoc.Helpers
+@using DMSModel
+@using Model.DB_Tables
+
+<div class="row">
+
+    <input type="hidden" name="OrgId" value="@Model.organisation.OrganizationId" />
+
+    <div class="col-sm-12">
+        <div class="form-group">
+            <label>Qurum adı</label>
+            <input id="OrgName" type="text" name="OrgName" class="form-control" value="@Model.organisation.OrganizationName" />
+        </div>
+    </div>
+
+    <div class="col-sm-12">
+        <div class="form-group">
+            <label>Üst qurumu </label>
+            <select id="TopOrgId" name="TopOrgId" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                <option>Seçin</option>
+                @foreach (DC_ORGANIZATION org in Model.Organisations)
+                {
+                    <option value="@org.OrganizationId" @(Model.organisation.OrganizationTopId == org.OrganizationId ? "selected" : "")>@org.OrganizationShortname</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="col-sm-12">
+        <div class="form-group">
+            <label>Indeks</label>
+            <input id="OrgIndex" type="text" name="OrgIndex" class="form-control" value="@Model.organisation.OrganizationIndex" />
+        </div>
+    </div>
+
+    @if (SessionHelper.SuperAdminPermission == 1)
+    {
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>İstifadəçi limiti</label>
+                <input id="MaxUserCount" type="text" name="MaxUserCount" class="form-control" value="@Model.organisation.MaxUserCount" />
+            </div>
+        </div>
+
+
+
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label>Komment</label>
+                <input id="UserLimitComment" type="text" name="UserLimitComment" class="form-control" value="@Model.organisation.UserLimitComment" />
+            </div>
+        </div>
+
+    }
+   
+
+
+
+</div>

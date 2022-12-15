@@ -1,0 +1,51 @@
+﻿@model OutgoingDoc.Model.ViewModel.ActionNameViewModel
+
+@foreach (var item in Model.ActionNameModels)
+{
+    switch (item.Id)
+    {
+        case 1:
+            {
+                <a href="#" id="@item.Id" class="list-group-item list-group-item-action flex-column align-items-start @item.Id">
+                    <i class="fas fa-paper-plane"></i>
+                    @item.Name
+                </a>
+            }
+            break;
+        case 2:
+            {
+                <a href="#" id="@item.Id" class="list-group-item list-group-item-action flex-column align-items-start @item.Id">
+                    <i class="fas fa-edit"></i>
+                    @item.Name
+                </a>
+            }
+            break;
+
+        case 4:
+            {
+                <a href="#" id="@item.Id" class="list-group-item list-group-item-action flex-column align-items-start @item.Id">
+                    <i class="fas fa-info-circle"></i>
+                    @item.Name
+                </a>
+            }
+            break;
+        case 8:
+            {
+                <a href="#" id="@item.Id" class="list-group-item list-group-item-action flex-column align-items-start @item.Id">
+                    <i class="fas fa-code-branch"></i>
+                    @item.Name
+                </a>
+            }
+            break;
+
+        default:
+            {
+                <a href="#" id="@item.Id" class="list-group-item list-group-item-action flex-column align-items-start @item.Id">
+                    <i class="fas fa-info-circle"></i>
+                    @item.Name
+                </a>
+            }
+            break;
+    }
+
+}

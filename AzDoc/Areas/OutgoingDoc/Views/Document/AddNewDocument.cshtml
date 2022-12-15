@@ -1,0 +1,235 @@
+﻿@using OutgoingDoc.Enum
+@model DocumentViewModel
+
+@{
+    ViewBag.Title = "AddNewDocument";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+    int docType = SessionHelper.DocTypeId;
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<link href="~/Content/common/style.css" rel="stylesheet" />
+@*<link href="~/Content/common/md-form-design.css" rel="stylesheet" />*@
+<style>
+    .display-none {
+        display: none;
+    }
+
+    .display-block {
+        display: block;
+    }
+
+    .card-header-custom {
+        background-color: #5c91af !important;
+        padding: 0.4em 1.25rem !important;
+    }
+</style>
+
+
+<div class="col-12">
+    <div class="row breadCrumbRow mt-5">
+        <div class="col-6 text-center" id="basicInformation">
+            <a href="#step1" class="brActive" data-brcrumb="1">
+                @RLang.BasicInfo
+            </a>
+        </div>
+        @*<div class="text-center disabled display-none" id="tasks">
+                <a href="#step2" data-brcrumb="2">Tapşırıqlar</a>
+            </div>*@
+        <div class="col-6 text-center" id="attachmentDocuments">
+            <a href="#step3" data-brcrumb="3">@RLang.EDocuments</a>
+        </div>
+    </div>
+</div>
+
+@using(Html.BeginForm("AddNewDocument", "Document", FormMethod.Post, new { id = "AddNewDocument" }))
+{
+
+
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            @Html.Partial("_BasicInformationPartial")
+        </div>
+        <div class="connectDoc contentItem d-none" id="step3" style="padding-top:1px" data-brnum="3">
+            @Html.Partial("~/Views/Document/AttachmentDocumentsPartial.cshtml")
+        </div>
+    </div>
+}
+
+@section scripts{
+    <script>
+    var config = {
+        getAuthorInfo: {
+            url: '@Url.Action("GetAuthorInfo", "Document", new { area = "OutgoingDoc", lang = _lang })'
+        },
+        addNewDocument: {
+            url: '@Url.Action("AddNewDocument", "Document", new { area = "OutgoingDoc", lang =_lang})',
+            data: { docType:  @docType }
+        }
+    };
+
+        $("#ParentButton").click(function () {
+            //mushterek icrachilarin elave olub olunmamasini yoxlayiriq
+            var newDocid = $("#spanToken").html();
+            var answerDocs = [];
+            $('#answerDocTable tbody tr').each(function () {
+                answerDocs.push($(this).attr('data-docid'));
+            });
+            answerDocs.push();
+            $.ajax({
+                type: "GET",
+                url: `/az/Viza/GetJointExecutors`,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false,
+                data: { answerDocs: JSON.stringify(answerDocs), currentDocid: newDocid },
+                success: function (response) {
+
+                    if (response.length > 0) {
+
+                        exsistsIsJoint = 1;
+                    }
+                    if (response.length < 1) {
+
+                        notExsistsIsJoint = 1;
+                    }
+                }
+            });
+            var AddedIsJoint = false;
+            if (vizaPersonList.length != 0) {
+                $(vizaPersonList).each(function () {
+                    if (this.isJoint == 1 && exsistsIsJoint == 1 && this.isDeleted != 1) {
+                        AddedIsJoint = true;
+                    }
+                });
+                if (!AddedIsJoint && exsistsIsJoint == 1) {
+                    return toastr.warning('Zəhmət olmasa müştərək icraçı əlavə edin.');
+                };
+            }
+
+            if ($(".table-custom").find("tr.rowSelector").length === 0) {
+                return toastr.warning(" Qoşma sənədi daxil edin.");
+            }
+
+            var isMainCount = 0;
+            var pageCopyCount = 0;
+
+            $.each($("input[name='isMain']"),
+                function () {
+                    if ($(this).attr('checked') === 'checked') {
+                        ++isMainCount;
+                    }
+                });
+
+            $.each($("i[name='icon']"),
+                function () {
+                    if ($.trim($(this).text()) === "") {
+                        $(this).closest("span").css('border', '1px solid red');
+                        ++pageCopyCount;
+                    }
+                });
+
+            if (isMainCount === 0) {
+                $.each($("input[name='isMain']"),
+                    function () {
+                        $(this.parentElement).css('border', 'solid red 1px');
+                    });
+                toastr.warning("Bütün məcburi xanaların doldurulduğuna əmin olun.");
+            }
+
+            if (isMainCount !== 0 && pageCopyCount === 0) {
+
+                if (vizaPersonList.length == 0)
+                    return toastr.warning("Sənədin vizaları təyin olunmayıb.");
+
+                var fileInfoId = $('#fileInfoId').val();
+                var formData = $('#AddNewDocument').getFormData();
+                console.log($('#AddNewDocument').getFormData());
+                formData.WhomAddressModels = $('#tbWhomAddress').tableToJsonList();
+                formData.RelatedDocModels = $('#relatedDocTable').tableToJsonList();
+                formData.AuthorModels = $('#dataTableOrgAuthor').tableToJsonList();
+                formData.AnswerByOutDocModels = $('#answerDocTable').tableToJsonList();
+                formData.VizaDataJson = JSON.stringify(vizaPersonList);
+
+                config.addNewDocument.data.model = formData;
+
+                $.ajax({
+                    type: 'POST',
+                    url: config.addNewDocument.url + "?fileInfoId="+fileInfoId,
+                    dataType: 'json',
+                    async: false,
+                    data: config.addNewDocument.data,
+                    beforeSend: function () { window.ShowLoading(); },
+                    success: function (response) {
+                        if (response.result == 1)
+                            window.location = response.url;
+                        else if (response.result == -1)
+                            toastr.warning("Qurum rəhbərini vizaya əlavə edin.");
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+        });
+    $(document).ready(function ()
+    {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('DocEnterDate').value = today;
+        document.getElementsByName("DocumentModel.DocEnterDate")[0].setAttribute('min', today);
+        //document.getElementsByName("DocumentModel.PlannedDate")[0].setAttribute('min', today);
+
+    });
+
+        //function deleteRowRelated(relatedId, element) {
+        //    $(element).parents("tr").remove();
+        //    $("#relatedDocTable").find("tr.rowSelector").length == 0
+        //        ? $("#relatedDocTable").hide()
+        //        : "";
+        //    toastr.success('Məlumat silindi');
+        //}
+
+    function deleteRowRelated(relatedId, element) {
+        Swal.fire({
+            title: 'Bu sətir cədvəldən silinəcək',
+            type: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'Ləğv et',
+            confirmButtonText: 'Təsdiqlə'
+        }).then((result) => {
+            if (result.value) {
+
+                var answerDocId = $(element).parents("tr").attr('data-docid'); // daxil olan sened
+                DeleteJointExecutors(answerDocId);// vizalardan musterek icracilarin silinmesi
+
+                $(element).parents("tr").remove();
+                $("#relatedDocTable").find("tr.data-row").length == 0
+                    ? $("#relatedDocTable").hide()
+                    : "";
+                $("#answerDocTable").find("tr.data-row").length == 0
+                    ? $("#answerDocTable").hide()
+                    : "";
+
+                Swal.fire({
+                    type: 'success',
+                    title: 'Məlumat silindi',
+                    showConfirmButton: false,
+                    timer: 1000
+                });
+            }
+        });
+    }
+
+
+    </script>
+
+    <script src="~/Scripts/outgoingdoc/form-wizard.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/outgoingdoc/outgoingdoc.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/AttachmentFile.js?v=@AppVersion.Version"></script>
+}

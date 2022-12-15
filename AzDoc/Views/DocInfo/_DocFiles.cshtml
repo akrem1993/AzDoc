@@ -1,0 +1,63 @@
+﻿@model IEnumerable<BLL.Models.DocInfo.DocFile>
+
+@if (Model?.Count() > 0)
+{
+    <div class="col-12">
+        <h4 class="text-center">
+            Sənəd
+        </h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col" class="thead">Faylın adı</th>
+                    <th scope="col" class="thead">Əsas sənəd</th>
+                    <th scope="col" class="thead">Nüsxə</th>
+                    <th scope="col" class="thead">Vərəq</th>
+                    <th scope="col" class="thead">Tarix</th>
+                    <th scope="col" class="thead">Yüklə</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model ?? null)
+                {
+                    <tr>
+                        <td>
+                            <a href="javascript:void(0)" onclick="fileShow(@item.FileInfoId)">
+                                <i class="fas fa-file"></i> @item.FileName
+                            </a>
+
+                        </td>
+                        <td align='center'>@item.FileNote</td>
+                        <td align='center'>@item.FileCopy</td>
+                        <td align='center'>@item.FilePage</td>
+                        <td align='center'>@item.FileDate</td>
+                        <td>
+                            <a align="right" href="/az/File/DownloadFile?fileInfoId=@item.FileInfoId">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+
+                    <tr id="trDocFileView" style="display:none">
+                        <td colspan="5">
+                            <input hidden id="currentDocInfoId" />
+                            <div id="docDisplay">
+                                @if (TempData["DocumentView"].ToString() != "")
+                                {
+                                    @Html.Partial("DocumentDisplay")
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    <tr id="trDocClose" style="display:none">
+                        <td colspan="5" class="text-center">
+                            <button type="button" id="closeDocViewer" class="mBtn mBtn-sec mr-5 defaultBtn">Bağla</button>
+                        </td>
+                    </tr>
+
+
+            </tbody>
+        </table>
+    </div>
+}

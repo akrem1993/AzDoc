@@ -1,0 +1,408 @@
+﻿@using AzDoc.Helpers
+@using AzDoc.App_LocalResources
+@using Model.DB_Tables
+@using Admin.Model.ViewModel.EditDocument
+@model EditDocumentViewModel
+@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+    RouteData routeData = ViewContext.RouteData;
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+    var _lang = routeValueDictionary["lang"] ?? "az";
+    var executorId = 0;
+    var workplaceId = 0;
+}
+<script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+
+<link href="~/Content/fontawesome/css/all.min.css" rel="stylesheet" />
+<link href="~/Content/fontawesome/css/v4-shims.min.css" rel="stylesheet" />
+
+<style>
+    .dialog { /*display: none;*/
+        background-color: #CC3300;
+    }
+</style>
+
+<div>
+    <form id="searchDocForm" name="searchDocForm">
+        <div class="col-10 mainContent">
+            <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+                <div class="editGroup">
+                    <h4>"Sənəd üzərində əməliyyatlar"</h4>
+                    <div class="col-12 mainContent" style="margin-top:50px">
+                        <div class="col-md-12">
+                            <div class="form-row">
+                                <div class="input-group">
+                                    <input type="hidden" id="topicIdHidden" />
+                                    <div class="form-group col-md-4">
+                                        <label for="DocEnterNo"><b>Sənədin qeydiyyat nömrəsi</b></label>
+                                        <input type="text" name="DocEnterNo" class="form-control" id="DocEnterNo" />
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="DocDocNo"><b>Sənədin layihə nömrəsi</b></label>
+                                        <input type="text" name="DocDocNo" class="form-control" id="DocDocNo" />
+                                    </div>
+                                    <div class="form-group col-md-4" style="margin-top:26px">
+                                        <button type="button" id="searchDocument" class="mBtn mBtn-sec defaultBtn"><i class="fa fa-search" aria-hidden="true">Axtar</i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+        </div>
+        <div style="padding-left: 15px;" class="row">
+            <div class="col-sm-4">
+                <label style="color:indianred" class="font-weight-bold">Xüsusi rolu olan şəxslər</label>
+                <div class="form-group">
+                    <select style="height: 31px;width: 142px" class="form-control selectpicker" name="PersonnelSexId" id="selectId">
+                        <option class="form-control" value="">Seç</option>
+                        <option class="form-control" value="24">Gültən Mirəliyeva</option>
+                        <option class="form-control" value="7698">Əminə İsayeva</option>
+                        <option class="form-control" value="49">Ellada Musayeva</option>
+                        <option class="form-control" value="48"> Rəna Vəliyeva</option>
+                        <option class="form-control" value="42"> Viktoriya Nəcəfli</option>
+                    </select>
+                </div>
+            </div>
+            <div style="padding-top: 27px" class="col-sm-4">
+                <button id="exceptionCase" type="button" class="mBtn mBtn-pr">
+                    Aç/bağla
+                </button>
+            </div>
+
+        </div>
+
+    </form>
+
+
+
+    <div class="mModal">
+        <div class="modal fade" id="redirectViza" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header"></div>
+                    <div class="modal-header2">
+                        <span>Müəllifi yaratma paneli</span>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label style="width: 500px;font-size: 20px" for="redirectId"><b style="background: gray; color: white; ">Sənədi şəxsə yönləndir</b>  </label>
+
+                            <select id="redirectId" name="redirectId" style="width: 500px" class="form-control selectpicker" data-live-search="true">
+                                <option class="form-control" style="width: 500px">Seç</option>
+                                @foreach (var itemUser in Model.PersonsList)
+                                {
+                                    <option class="form-control" style="width: 500px" value="@itemUser.Id">@itemUser.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer justify-content-center">
+                        <div class="col-3">
+                            <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Geriyə</button>
+                        </div>
+                        <div class="col-3">
+                            <button type="button" id="redirectVizaSave" onclick="SaveRedirection()" class="mBtn mBtn-pr defaultBtn" style="width: 100%">@RLang.Save</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="editDocModalDiv">
+        @Html.Partial(@"~\Areas\AdminPanel\Views\Documents\_EditDoc.cshtml", Model ?? new EditDocumentViewModel())
+    </div>
+
+    <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle"><b style="color: green">Gridin nişanları barədə izahat</b></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <text> <i class='fa fa-refresh' aria-hidden='true'></i> <b style="color: crimson">Redaktəyə açılıb-bağlanma</b></text>
+                    <br />
+                    <text><i style="padding-left: 0" class='fa fa-trash'></i> <b style="color: crimson">Oxunmamışlardan silinmə</b></text>
+                    <br />
+                    <text><i class='fas fa-eye'></i>  <b style="color: crimson">Qeydiyyat-nəzarət vərəqəsi</b></text>
+                    <br />
+                    <text><i class='fa fa-share'></i>   <b style="color: crimson">Sənədin şəxsə yönləndirilməsi</b></text>
+                    <br />
+                    <text><i class='fas fa-angle-double-right'></i>   <b style="color: crimson">Şəxsdə vizadan ötürülmə</b></text>
+                    <br />
+                    <text><i class='far fa-edit'></i> <b style="color: crimson">Mövcud sənədin redaktə olunması</b></text>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="input-group input-group-sm">
+        <button id="infoId" onclick="ShowInfo()" type="button" class="btn btn-default"><i class="fas fa-info-circle" style="color: #cc3300"></i></button>
+        <div class="form-group col-md-12" id="" style="padding-top: 10px; height: 30vh;">
+            @Html.Partial("EditDocumentGridViewPartial")
+        </div>
+    </div>
+
+</div>
+
+@section scripts
+{
+    <script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+    <script>
+
+        $('body').on("keypress",
+            function(e) {
+                if (e.keyCode === 13) {
+                    $("#searchDocument").click();
+                }
+            });
+
+        $(document).on('click',
+            '#searchDocument',
+            function() {
+                var inputData = $('#searchDocForm').getFormData();
+                $.ajax({
+                    url: "/@_lang/AdminPanel/OrganizationStructure/GetEditDocumentIndexGrid",
+                    type: 'GET',
+                    data: inputData,
+                    dataType: "json",
+                    success: function(model) {
+                        $('#ggridEditDocument').UpdateGrid({ items: model.Items, totalCount: model.TotalCount });
+                    },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            });
+
+
+        function EditDocumentOpen(item, boundData) {
+            $.ajax({
+                url: "/@_lang/AdminPanel/OrganizationStructure/OpenCloseDocument",
+                type: 'POST',
+                data: {
+                    executorId: boundData.Id,
+                    docId: boundData.DocId,
+                    workplaceId: boundData.WorkplaceId
+                },
+                dataType: "json",
+                success: function() {
+
+                    toastr.success("Əməliyyat uğurlu oldu");
+                    $('#searchDocument').click();
+                },
+
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+        }
+
+
+        $("#exceptionCase").click(function() {
+
+            var values = $("#selectId").children("option:selected").val();
+            var entrNoValues = $('#DocEnterNo').val();
+            $.ajax({
+                url: "/@_lang/AdminPanel/OrganizationStructure/OpenCloseSpecialPersons",
+                type: 'POST',
+                data: {
+                    docEnterNo: entrNoValues,
+                    workplaceId: values
+                },
+                dataType: "json",
+                success: function() {
+                    toastr.success("Əməliyyat uğurlu oldu");
+                },
+
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+
+
+        });
+
+        function CloseReadStatus(item, boundData) {
+            $.ajax({
+                url: "/@_lang/AdminPanel/OrganizationStructure/CloseDocumentReadStatus",
+                type: 'POST',
+                data: {
+                    executorId: boundData.Id,
+                    docId: boundData.DocId,
+                    workplaceId: boundData.WorkplaceId
+                },
+                dataType: "json",
+                success: function() {
+
+                    toastr.success("Bu şəxsdə sənəd oxunmamışlardan silindi");
+                    $('#searchDocument').click();
+                },
+
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+        }
+
+        function DocView(item, boundData) {
+            $.ajax({
+                type: 'GET',
+                url: '/az/Document/DocInfo',
+                dataType: 'json',
+                data: { docId: boundData.DocId },
+                success: function(result) {
+                    if (result != '') {
+                        window.open('/az/Document/GetDocView?token=' + result, '_blank');
+                    }
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+        }
+
+        function RedirectionViza(item, boundData) {
+
+            executorId = boundData.ExecutorId;
+            workPlaceId = boundData.WorkplaceId;
+            $("#redirectViza").modal("show");
+        }
+
+
+        function ShowInfo() {
+            $("#exampleModalLong").modal("show");
+        }
+
+
+        function SaveRedirection (item, boundData) {
+
+            var selectedPerson = $("#redirectId option:selected").val();
+
+            $.ajax({
+                url: "/@_lang/AdminPanel/OrganizationStructure/RedirectToAnyPerson",
+                type: 'POST',
+                data: {
+                    executorId: executorId,
+                    workplaceId: workPlaceId,
+
+                    redirectedPerson: selectedPerson
+                },
+                dataType: "json",
+                success: function (model) {
+
+                    toastr.success("Sənəd müvəffəqqiyyətlə yönləndirildi");
+
+                    $("#redirectViza").modal("hide");
+
+                    $('#searchDocument').click();
+                },
+
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+        };
+
+        function PassVizaFromPerson (item, boundData) {
+            Swal.fire({
+                    title: 'Bu şəxsdə viza ötürülsünmü?',
+                    type: 'warning',
+                    showCancelButton: true,
+                    cancelButtonText: 'Ləğv et',
+                    confirmButtonText: 'Təsdiqlə'
+                }).then((result) => {
+                    if (result.value) {
+
+                        $.ajax({
+                            url: '/@_lang/AdminPanel/OrganizationStructure/PassVizaByDocId',
+                            type: 'POST',
+                            data:  {
+                                docId: boundData.DocId,
+                                executorId: boundData.ExecutorId,
+                                workplaceId: boundData.WorkplaceId
+                            },
+                            dataType: "json",
+                            success: function (response) {
+                                if (response) {
+                                    Swal.fire({
+                                        type: 'success',
+                                        title: 'Viza müvəffəqiyyətlə ötürüldü',
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                    $('#searchDocument').click();
+                                }
+                                else
+                                {
+                                    Swal.fire({
+                                        type: 'error',
+                                        title: 'Xəta baş verdi',
+                                        showConfirmButton: false,
+                                        timer: 1000
+                                    });
+                                }
+                            },
+                            beforeSend: function () {
+                                window.ShowLoading();
+                            },
+                            complete: function () {
+                                window.CloseLoading();
+                            }
+                        });
+                    }
+                });
+
+        };
+
+
+        function EditDoc(item, gridData) {
+            $.ajax({
+                url: '/@_lang/AdminPanel/Documents/EditDoc',
+                type: 'GET',
+                data:  {
+                    docId: gridData.DocId
+                },
+                dataType: "html",
+                success: function (data) {
+                    $('#editDocModalDiv').html(data);
+                    $('#editDocModal').modal('show');
+                },
+                beforeSend: function () {
+                    window.ShowLoading();
+                },
+                complete: function () {
+                    window.CloseLoading();
+                }
+            });
+        }
+
+    </script>
+}

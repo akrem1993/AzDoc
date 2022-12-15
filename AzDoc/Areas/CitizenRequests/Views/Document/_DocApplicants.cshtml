@@ -1,0 +1,44 @@
+﻿@model CitizenRequests.Model.ViewModel.DocumentInfoViewModel
+
+@if (Model?.Applicants != null)
+{
+    <div class="col-12">
+
+        <h4 class="text-center page-header-color header-row">@Model.DocTypeName - Müraciət edən</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col" class="thead left">Adı</th>
+                    <th scope="col" class="thead left">Soyadı</th>
+                    <th scope="col" class="thead left">Ata adı</th>
+                    <th scope="col" class="thead left">Ölkə</th>
+                    <th scope="col" class="thead left">Rayon</th>
+                    <th scope="col" class="thead left">Kənd</th>
+                    <th scope="col" class="thead left">Sosial status</th>
+                    <th scope="col" class="thead left">Müracət edən şəxs</th>
+                    <th scope="col" class="thead left">Mobil</th>
+                    <th scope="col" class="thead left">E-poçt</th>
+                    <th scope="col" class="thead left">Ünvan</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Applicants)
+                {
+                <tr>
+                    <td align='left'>@item.AppFirstname</td>
+                    <td align='left'>@item.AppSurname</td>
+                    <td align='left'>@item.AppLastName</td>
+                    <td align='left'>@item.CountryName</td>
+                    <td align='left'>@item.RegionName</td>
+                    <td align='left'>@item.VillageName</td>
+                    <td align='left'>@item.SocialName</td>
+                    <td align='left'>@item.RepresenterName</td>
+                    <td align='left'>@item.AppPhone</td>
+                    <td align='left'>@item.AppEmail</td>
+                    <td align='left'>@item.AppAddress</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

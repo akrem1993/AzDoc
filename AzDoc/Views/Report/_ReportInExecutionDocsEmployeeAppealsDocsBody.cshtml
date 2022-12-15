@@ -1,0 +1,138 @@
+﻿@using BLL.Models.Report
+@using AzDoc.Helpers
+@model ReportInExecutionDocsBodyViewModel
+
+@if (Model?.ReportInExecutionDocsModel != null && Model.Pager.TotalItems > 0)
+{
+    int count = (Model.Pager.CurrentPage - 1) * Model.Pager.PageSize;
+
+    <div class="row" @*id="generalReport"*@>
+
+        <div class="col-12 mt-3" style="max-height: 60vh; overflow-y: auto">
+            <table class=" tableFixHead table table-striped table-sm mTable mTable2" id="tableReportExecution">
+                <thead>
+                    <tr>
+                        <th>Sıra sayı №</th>
+                        <th>Qeydiyyat nömrəsi</th>
+                        <th>Qeydiyyat tarixi</th>
+                        <th>İcra müddəti</th>
+                        <th>İcra müddəti(təqvim günü)</th>
+                        <th>Uzadılma barədə qeyd</th>
+                        <th>Sənədin statusu</th>
+                        <th>Sənədin nömrəsi</th>
+                        <th>Sənədin tarixi</th>
+                        <th>Haradan daxil olub</th>
+                        <th>Kimdən daxil olub (Vətəndaşın adı, soyadı, ata adı)</th>
+                        <th>Vətəndaşın sosial statusu</th>
+                        <th>Müraciətin forması</th>
+                        <th>Müraciətin növü</th>
+                        <th>Mövzu</th>
+                        <th>Alt mövzu</th>
+                        <th class="complainedOfDocStructure">Şikayət olunan qurum</th>
+                        <th class="complainedOfDocSubStructure">Şikayət olunan alt qurum</th>
+                        <th>Sənədin qısa məzmunu</th>
+                        <th>İcraçı struktur bölmə</th>
+                        <th>Cavab sənədinin nömrəsi</th>
+                        <th>Cavab sənədinin tarixi</th>
+                        <th class="docResultColumn">Müraciətlərə baxılmasının vəziyyəti</th>
+                        <th>Rayon/Şəhər</th>
+                        <th>Kənd</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                   @foreach (var reportInExecutionDocs in Model.ReportInExecutionDocsModel)
+                    {
+                        count++;
+                    <tr>
+                        <td>@count</td>
+                        <td><a href="/az/Document/GetDocView?token=@reportInExecutionDocs.TokenForDocId" target="_blank">@reportInExecutionDocs.DocEnterno</a></td> @*//senedin qeydiyyat nomresi*@
+                        <td>@reportInExecutionDocs.DocEnterDate.ToString("dd.MM.yyyy")</td> @*//senedin daxil olma tarixi*@
+                        @*//icra muddeti*@
+                        @if (reportInExecutionDocs.PlannedDate.HasValue)
+                        {
+                            <td>@reportInExecutionDocs.PlannedDate.Value.ToString("dd.MM.yyyy")</td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        <td>@reportInExecutionDocs.ExecutionDays</td> @*// icra muddeti(teqvim gunu)*@
+                        <td>@reportInExecutionDocs.DirectionChangeNote</td> @*Uzadılma barədə qeyd*@
+
+                        <td>@reportInExecutionDocs.DocumentStatusName</td> @*//senedin statusu*@
+                        <td>@reportInExecutionDocs.DocDocno</td>    @*//senedin nomresi*@
+                        <td>@(reportInExecutionDocs.DocDocDate.HasValue ? reportInExecutionDocs.DocDocDate.Value.ToString("dd.MM.yyyy"): "")</td> @*//senedin tarixi*@
+                        <td style="color:@(reportInExecutionDocs.DocUndercontrolStatusId.Value ==1  ? "red" : "")">@reportInExecutionDocs.EntryFromWhere</td> @*//haradan daxil olub*@
+                        <td>@reportInExecutionDocs.EntryFromWhoCitizenName</td> @*//kimden daxil olub*@
+                        <td>@reportInExecutionDocs.SocialName</td> @*//vetendasin sosial statusu*@
+                        <td>@reportInExecutionDocs.DocFormName</td> @*//muracietin formasi*@
+                        <td>@reportInExecutionDocs.ApplyTypeName</td> @*// muracietin novu*@
+                        <td>@reportInExecutionDocs.TopicTypeName</td> @*//movzu*@
+                        <td>@reportInExecutionDocs.TopicName</td> @*//alt  movzu*@
+                        <td class="complainedOfDocStructure">@reportInExecutionDocs.ComplainedOfDocStructure</td>    @*//sikayet olunan qurum*@
+                        <td class="complainedOfDocSubStructure">@reportInExecutionDocs.ComplainedOfDocSubStructure</td>    @*//skayet olunan alt qurum*@
+
+                        @*//senedin qisa mezmunu*@
+                        <td title="@reportInExecutionDocs.DocDescription">
+                            @if (reportInExecutionDocs.DocDescription?.Length >= 30)
+                            {
+                                @($"{reportInExecutionDocs.DocDescription.Substring(0, 30)} ...")
+                            }
+                            else
+                            {
+                                @reportInExecutionDocs.DocDescription;
+                            }
+                        </td>
+                        <td>@reportInExecutionDocs.NotExecutedExecutorsDepartment</td> @*/icraci struktur bolme*@
+
+                        @*//cavab senedin nomresi*@
+                        @if (reportInExecutionDocs.ReplyDocNumbersForView.Count > 0)
+                        {
+                            <td>
+                                @foreach (var item in reportInExecutionDocs.ReplyDocNumbersForView)
+                                {
+                                    <a style="margin-right:10px;" href="/az/Document/GetDocView?token=@item.Key" target="_blank">@item.Value;</a>
+                                }
+                            </td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        @*/Cavab sənədinin tarixi*@
+                        <td>@(reportInExecutionDocs.ReplyDocDate.HasValue ? reportInExecutionDocs.ReplyDocDate.Value.ToString("dd.MM.yyyy") : "")</td>
+                        <td class="docResultColumn">@reportInExecutionDocs.DocResultName</td>    @*//Müraciətlərə baxılmasının vəziyyəti*@
+                        <td>@reportInExecutionDocs.RegionName</td> @*//Rayon/Şəhər*@
+                        <td>@reportInExecutionDocs.VillageName</td> @*//Kend*@
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    Html.RenderPartial("_Pager", new BLL.Models.Report.Paging.PagerPartialModel() { Pager = Model.Pager/*, URL = "az/Report/ReportInExecutionDocs/" */});
+}
+else
+{
+    <div class="row">
+        <div class="col-12 text-center mt-2 ">
+            <span id="docsCount" style="color:red;font-size:30px;">Axtarışa uyğun məlumat tapılmadı.</span>
+        </div>
+    </div>
+}
+<div class="row" style="padding-top:70px;">
+    <div class="col-12 text-right mt-2">
+        <span id="docsCount" style="color: #7fa8b6">Tapılan məlumat sayı : @Model.Pager.TotalItems</span>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        PaintInfoButtons();
+    })
+</script>
+

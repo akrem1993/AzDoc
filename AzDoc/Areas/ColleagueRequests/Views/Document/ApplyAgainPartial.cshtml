@@ -1,0 +1,857 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@model ColleagueRequests.Model.ViewModel.DocumentViewModel
+@{
+    ViewBag.Title = "AddNewDocument";
+    Layout = null;
+
+    int docId = 0;
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<style>
+    .selected-row {
+        background-color: #113c54;
+        color: #ffffff;
+    }
+
+    .row-td {
+        color: #113c54;
+    }
+
+    .selected-row-td {
+        color: #ffffff;
+    }
+
+    .display-none {
+        display: none;
+    }
+
+    .display-block {
+        display: block;
+    }
+</style>
+
+<div class="mModal">
+    <div class="modal fade" id="applyAgainModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document" style="max-width: 60%!important">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Vətəndaşın məlumatlarını daxil edin</span>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-row">
+                                <div class="input-group">
+                                    <input type="hidden" id="topicIdHidden" />
+                                    <div class="form-group col-md-3">
+                                        <label class="font-weight-bold">Soyadı <span style="color: red; font-weight: bold">*</span></label>
+                                        @Html.TextBoxFor(model => model.DocumentModel.SurName, new
+                                        {
+                                            @type = "text",
+                                            @class = "form-control",
+                                            @id = "SurName",
+                                            @data_required_modal = "Soyadı daxil edin"
+                                        })
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="font-weight-bold">Adı <span style="color: red; font-weight: bold">*</span></label>
+                                        @Html.TextBoxFor(model => model.DocumentModel.FirstName, new
+                                        {
+                                            @type = "text",
+                                            @class = "form-control",
+                                            @id = "FirstName",
+                                            @data_required_modal = "Adı daxil edin"
+                                        })
+                                    </div>
+                                    <div class="form-group col-sm-3">
+                                        <label class="font-weight-bold">Ölkə <span style="color: red; font-weight: bold">*</span></label>
+                                        @Html.DropDownListFor(model => model.Country.Id,
+                                            new SelectList(Model.Countries, "Id", "Name", Model.DocumentModel.CountryId), new
+                                            {
+                                                @id = "Country",
+                                                @class = "selectpicker country",
+                                                @data_live_search = "true",
+                                                @data_width = "100%",
+                                                @data_required_modal = "Ölkəni daxil edin",
+                                                @value=931
+                                            })
+                                    </div>
+
+                                    <div class="form-group col-sm-3">
+                                        <label class="font-weight-bold">Rayon <span style="color: red; font-weight: bold">*</span></label>
+                                        @Html.DropDownListFor(model => model.Region.Id,
+                                            new SelectList(Model.Regions, "Id", "Name", "Seç",-1), new
+                                            {
+                                                @id = "Region",
+                                                @class = "selectpicker region",
+                                                @data_live_search = "true",
+                                                @data_width = "100%",
+                                                @data_required_modal = "Rayonu daxil edin"
+                                            })
+                                    </div>
+
+                                    <div class="form-group col-sm-3">
+                                        <label class="font-weight-bold">
+                                            Kənd
+                                            @*<span style="color: red; font-weight: bold">*</span>*@
+                                        </label>
+                                        @Html.DropDownListFor(model => model.Village.Id,
+                                            new SelectList(Model.Villages, "Id", "Name","Seç","-1", Model.DocumentModel.VillageId), new
+                                            {
+                                                @id = "Village",
+                                                @class = "selectpicker",
+                                                @data_live_search = "true",
+                                                @data_width = "100%"
+                                            })
+                                    </div>
+
+                                </div>
+                                <div class="input-group">
+                                    <div class="form-group col-md-12">
+                                        <label class="font-weight-bold">Ünvan <span style="color: red; font-weight: bold">*</span></label>
+                                        @Html.TextBoxFor(model => model.DocumentModel.Address, new
+                                        {
+                                            @type = "text",
+                                            @class = "form-control",
+                                            @id = "Address"
+                                        })
+                                    </div>
+                                </div>
+
+                                <div class="input-group">
+                                    <div class="form-group text-center col-md-12">
+                                        <button type="button" id="search" class="mBtn mBtn-sec defaultBtn"><i class="fa fa-search" aria-hidden="true">Axtar</i></button>
+                                    </div>
+                                </div>
+
+                                <div class="input-group input-group-sm">
+                                    <div class="form-group col-md-12" id="hidden_tbApplicationInfo" style="padding-top: 10px; height: 30vh;display: none">
+                                        @Html.Partial("ApplyGridPartial")
+                                    </div>
+                                </div>
+
+                                <div class="input-group">
+                                    <div class="form-group col-md-3">
+                                        <button type="button" id="initialApplication" class="custom-btn btn btn-light">İlkin müraciət</button>
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <button type="button" id="applyAgain" class="custom-btn btn btn-light">Təkrar müraciət</button>
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <button type="button" id="applyAgainDifferentSubjects" class="custom-btn btn btn-light">Təkrar müraciət(müxtəlif mövzuda)</button>
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <button type="button" id="duplicateApplication" class="custom-btn btn btn-light">Eyni məzmunlu müraciət</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer ">
+                    <button type="button" class="mBtn mBtn-sec mr-5" onclick="location.href = '@Url.Action("Index", "Document", new {docType = SessionHelper.DocTypeId})'">
+                        @RLang.PrevStep
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    //$("body").on("keypress",
+    //    function(e) {
+    //        if (e.keyCode === 13) {
+    //            $("#search").focus().click();
+    //        }
+    //    });
+
+    $(document).ready(function() {
+        $("#applyAgain").attr("disabled", "disabled");
+        $("#applyAgainDifferentSubjects").attr("disabled", "disabled");
+        $("#duplicateApplication").attr("disabled", "disabled");
+    });
+    $('#search').on('click', function () {
+
+        var required = $("[data-required-modal]");
+        $.each(required,
+            function () {
+                if ($(this).hasClass("selectpicker")) {
+                    $(this).closest("div")
+                        .css("border", "1px solid transparent");
+                }
+                $(this).removeClass("border-danger");
+            });
+
+        var count = 0;
+        if (!$("#SurName").val().trim()) {
+            $("#SurName").addClass("border-danger");
+            count++;
+
+            if (!$("#FirstName").val().trim()) {
+                $("#FirstName").addClass("border-danger");
+                count++;
+            } else {
+                count--;
+                $("#SurName").removeClass("border-danger");
+                $("#FirstName").removeClass("border-danger");
+            }
+        } else {
+            $("#SurName").removeClass("border-danger");
+            $("#FirstName").removeClass("border-danger");
+        }
+
+        if (count>0) {
+            toastr.warning('Zəhmət olmasa məcburi xanalardan her hansi birini daxil edin');
+            return;
+        }
+
+        var surName = $("#SurName").val();
+        var firstName = $("#FirstName").val();
+
+        if (surName != '' || firstName != '') {
+            $("#applyAgain").removeAttr("disabled", "disabled");
+            $("#applyAgainDifferentSubjects").removeAttr("disabled", "disabled");
+            $("#duplicateApplication").removeAttr("disabled", "disabled");
+
+            $('#hidden_tbApplicationInfo').css('display', 'block');
+
+            $.ajax({
+                type: 'POST',
+                url: '/@lang/ColleagueRequests/Document/GetApplyAgain',
+                data: { docType:@SessionHelper.DocTypeId, surName: surName, firstName: firstName},
+                dataType: "json",
+                success: function (model) {
+                    if (model.length > 0) {
+                        //var colleagueGrid = $('#colleagueRequestsApplyAgain').CachedGrid();
+                        //colleagueGrid.config.datasource.localdata = { items: data, totalCount: 0 };
+                        //colleagueGrid.jqxGrid('updatebounddata');
+                        $('#ggridColleagueRequestsApplyAgain').UpdateGrid({ items: model, totalCount: 0 });
+
+                        $("#applyAgain").addClass('display-block');
+                        $("#applyAgainDifferentSubjects").addClass('display-block');
+                        $("#duplicateApplication").addClass('display-block');
+                        $("#applyAgain").removeClass('display-none');
+                        $("#applyAgainDifferentSubjects").removeClass('display-none');
+                        $("#duplicateApplication").removeClass('display-none');
+                    } else {
+                        toastr.info('Vətəndaş tapılmadı');
+                        $('#hidden_tbApplicationInfo').css('display', 'none');
+                        $("#applyAgain").removeClass('display-block');
+                        $("#applyAgainDifferentSubjects").removeClass('display-block');
+                        $("#duplicateApplication").removeClass('display-block');
+                        $("#applyAgain").addClass('display-none');
+                        $("#applyAgainDifferentSubjects").addClass('display-none');
+                        $("#duplicateApplication").addClass('display-none');
+
+                    }
+
+                }
+            });
+
+        }
+        else {
+            toastr.warning('Zəhmət olmasa məcburi xanaları daxil edin');
+        }
+    });
+
+    function ToJavaScriptDate(value) {
+        var pattern = /Date\(([^)]+)\)/;
+        var results = pattern.exec(value);
+        if (results != null) {
+            var dt = new Date(parseFloat(results[1]));
+            return (dt.getMonth() + 1) + "/" + dt.getDate() + "/" + dt.getFullYear();
+        } else {
+            return '';
+        }
+    }
+
+    function DocView(docId) {
+        $.ajax({
+            type: 'GET',
+            url: '/az/Document/DocInfo',
+            dataType: 'json',
+            data: { docId: docId},
+            success: function (result) {
+                if (result!='') {
+                    window.open('/az/Document/GetDocView?token=' + result, '_blank');
+                }
+            },
+            complete: function () {
+                window.CloseLoading();
+            }
+        });
+    }
+
+    function DocViewFromTable(item, boundData) {
+        $.ajax({
+            type: 'GET',
+            url: '/az/Document/DocInfo',
+            dataType: 'json',
+            data: { docId: boundData.DocId },
+            success: function (result) {
+                if (result != '') {
+                    window.open('/az/Document/GetDocView?token=' + result, '_blank');
+                }
+            },
+            complete: function () {
+                window.CloseLoading();
+            }
+        });
+
+    }
+
+
+
+
+
+
+
+
+    function fnTableRowClickSelect(element) {
+        $("#tbApplicationInfo tbody tr").removeClass("selected-row");
+        $(element).addClass("selected-row");
+        console.log($("#tbApplicationInfo tbody tr td").childNodes.data);
+    }
+
+    $('#initialApplication').on('click', function () {
+
+        var required = $("[data-required-modal]");
+        var count = 0;
+        $.each(required,
+            function() {
+                if (!$(this).val()) {
+                    if ($(this).hasClass("selectpicker")) {
+                        $(this).closest("div")
+                            .css("border", "1px solid red")
+                            .css("border-radius", ".25rem");
+                    } else
+                        $(this).addClass("border-danger");
+
+                    count++;
+                } else {
+
+                    if ($(this).hasClass("selectpicker")) {
+                        $(this).closest("div")
+                            .css("border", "1px solid transparent");
+                    } else {
+                        $(this).removeClass("border-danger");
+                    }
+
+                    if ($(this).val() == -1) {
+                        count++;
+                        if ($(this).hasClass("selectpicker")) {
+                            $(this).closest("div")
+                                .css("border", "1px solid red")
+                                .css("border-radius", ".25rem");
+                        } else
+                            $(this).addClass("border-danger");
+                    }
+                }
+            });
+
+        if (count > 0) {
+            toastr.warning('Zəhmət olmasa məcburi xanaları daxil edin');
+            return;
+        }
+
+
+        var surName = $("#SurName").val();
+        var firstName = $("#FirstName").val();
+        var countryValue = $("#Country").val();
+        var country = $("#Country").find('option:selected').text();
+        var regionValue = $("#Region").val();
+        var region = $("#Region").find('option:selected').text();
+
+        var villageValue = $("#Village").val();
+        var village = $("#Village").find('option:selected').text();
+
+        var address = $("#Address").val();
+        var representerValue = 1;
+
+        if (surName != '' && firstName != '' && countryValue != '' && regionValue != '' && address != '' && villageValue!='') {
+            $('#hidden_tbApplicationInfo').css('display', 'block');
+
+            tbApplicationAdd(1,
+                '',
+                '',
+                firstName,
+                surName,
+                '',
+                countryValue,
+                country,
+                regionValue,
+                region,
+                villageValue,
+                village,
+                '',
+                1,
+                'Müraçiətçi',
+                address,
+                '',
+                '',
+                '');
+
+            $('#applyAgainId').addClass('display-none');
+            $('#applyAgainModal').modal('hide');
+            $('#applyAgainId').removeClass('display-block');
+            $('#applyAgainId').addClass('display-none');
+            $('#NumberOfApplicants').val(1);
+            toastr.success('Məlumat əlavə olundu');
+
+        }
+        else {
+            toastr.warning('Zəhmət olmasa məcburi xanaları daxil edin');
+        }
+    });
+
+    $('#Country').on('change', function () {
+        $.ajax({
+            type: 'GET',
+            url: '/az/ColleagueRequests/Document/GetRegion',
+            data: { countryId: this.value },
+            success: function (data) {
+                var s = '<option value="-1">Seç</option>';
+                for (var i = 0; i < data.length; i++) {
+
+                    s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                }
+                $("#Region").html(s);
+
+                $('.selectpicker').selectpicker('refresh');
+
+                $("#Region").val(-1);
+            }
+        });
+    });
+
+
+    $('#Region').on('change', function () {
+        $.ajax({
+            type: 'GET',
+            url: '/az/ColleagueRequests/Document/GetVillage',
+            data: { regionId: this.value },
+            success: function (data) {
+                var s = '<option value="-1">Seç</option>';
+                for (var i = 0; i < data.length; i++) {
+
+                    s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                }
+                $("#Village").html(s);
+
+                $('.selectpicker').selectpicker('refresh');
+
+                $("#Village").val(-1);
+            }
+        });
+    });
+
+
+
+    function SetVillage(regionId,villageId) {
+        $.ajax({
+            type: 'GET',
+            url: '/@lang/ColleagueRequests/Document/GetVillage',
+            data: { regionId: regionId},
+            success: function (data) {
+                var s = '<option value="-1">Seç</option>';
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                }
+
+                $("#individualVillage").html(s);
+                $("#individualVillage").val(villageId);
+
+                $('.selectpicker').selectpicker('refresh');
+            }
+        });
+    }
+
+
+    function applyAgainEdit(element) {
+        var $row = $(element).closest("tr");
+
+        document.getElementById("CountApp").value = $(element).closest("tr").attr('id');
+
+        if ($row.find(".surName").text() =='null') {
+            document.getElementById("individualSurName").value = '';
+        } else {
+            document.getElementById("individualSurName").value = $row.find(".surName").text();
+        }
+
+        if ($row.find(".firstName").text() ==' null') {
+            document.getElementById("individualFirstName").value = '';
+        } else {
+            document.getElementById("individualFirstName").value = $row.find(".firstName").text();
+        }
+
+        if ($row.find(".fatherName").text() == 'null') {
+            document.getElementById("individualFatherName").value = '';
+        } else {
+            document.getElementById("individualFatherName").value = $row.find(".fatherName").text();
+
+        }
+
+        if ($row.find(".representerValue").text() =='null') {
+            document.getElementById("individualRepresenter").value = '';
+        } else {
+            document.getElementById("individualRepresenter").value = $row.find(".representerValue").text();
+        }
+
+        if ($row.find(".countryValue").text() =='null') {
+            document.getElementById("individualCountry").value = '';
+        } else {
+            document.getElementById("individualCountry").value = $row.find(".countryValue").text();
+        }
+
+        var appformType = $row.find(".formType").text();
+        if (appformType >0) {
+            $("#individualSurName").attr('disabled', 'disabled');
+            $("#individualFirstName").attr('disabled', 'disabled');
+            $("#individualFatherName").attr('disabled', 'disabled');
+        }
+
+        var countryId = $row.find(".countryValue").text();
+        var regionId = $row.find(".regionValue").text();
+        var villageId = $row.find(".villageValue").text();
+        $("#individualRegion").html('');
+        $("#individualVillage").html('');
+
+        $("#individualCountry").val(countryId);
+
+        $('.selectpicker').selectpicker('refresh');
+
+            $.ajax({
+                type: 'GET',
+                url: '/az/ColleagueRequests/Document/GetRegion',
+                data: { countryId: countryId },
+                success: function (data) {
+                    var s = '';
+                    for (var i = 0; i < data.length; i++) {
+
+                        s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                    }
+
+
+                    $("#individualRegion").html(s);
+
+                    $("#individualRegion").val(regionId);
+                    $('.selectpicker').selectpicker('refresh');
+
+
+                    if (villageId != null) {
+                        $.ajax({
+                            type: 'GET',
+                            url: '/az/ColleagueRequests/Document/GetVillage',
+                            data: { regionId: regionId },
+                            success: function (data) {
+                                var s = '';
+                                for (var i = 0; i < data.length; i++) {
+
+                                    s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                                }
+
+                                $("#individualVillage").html(s);
+                                $("#individualVillage").val(villageId);
+                                $('.selectpicker').selectpicker('refresh');
+                            }
+                        });
+                    }
+                }
+            });
+
+
+
+
+
+        var sosialValue = $row.find(".socialValue").text();
+
+        $('#individualSocialStatus').selectpicker('val', JSON.parse("["+sosialValue+"]"));
+
+        if ($row.find(".address").text() =='null') {
+            document.getElementById("individualAddress").value = '';
+        } else {
+            document.getElementById("individualAddress").value = $row.find(".address").text();
+        }
+
+        if ($row.find(".mobile").text() =='null') {
+            document.getElementById("individualMobilePhone").value = '';
+        } else {
+            document.getElementById("individualMobilePhone").value = $row.find(".mobile").text();
+        }
+
+        if ($row.find(".email").text() =="") {
+            document.getElementById("individualEmail").value = '@@';
+        } else {
+            document.getElementById("individualEmail").value = $row.find(".email").text();
+        }
+
+        document.getElementById("FormType").value = $row.find(".formType").text();
+        document.getElementById("DocEnterNo").value = $row.find(".docEnterno").text();
+
+        $('.selectpicker').selectpicker('refresh');
+
+        $("#individualSaveBtn").removeClass('display-block');
+        $("#individualSaveBtn").addClass('display-none');
+        $("#individualEditBtn").removeClass('display-none');
+        $("#individualEditBtn").addClass('display-block');
+
+        $("#individualModal").modal();
+    }
+
+    $('#hidden_tbApplicationInfo').css('display', 'block');
+
+    function CrateDocumentInfoLink(rowdata, button) {
+        $('#DocLinkPanel').show();
+        $('#DocLink').attr('href', '/az/Document/GetDocView?token=' + rowdata.Token);
+        $('#DocNumberLink').html($(button).text() +': '+ rowdata.DocEnterno);
+    }
+
+    function onRowClick(event, rowdata) {
+        $('#applyAgain').unbind('click').on('click', function () {
+            $('#applyAgain').attr('disabled',true);
+            CrateDocumentInfoLink(rowdata, this);
+            $('#TypeOfApplication').val(rowdata.DocApplytypeId);
+            $('#TopicTypeName').val(rowdata.DocTopicType);
+
+            //$('#TopicTypeName option:not(:selected)').attr('disabled', true);
+
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/ColleagueRequests/Document/GetSubtitle',
+                data: { topicTypeId: rowdata.DocTopicType},
+                success: function (data) {
+                    var s = '<option value="-1">Seç</option>';
+                    for (var i = 0; i < data.length; i++) {
+
+                        s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                    }
+                    $("#Subtitle").html(s);
+                    $('#Subtitle').val(rowdata.DocTopicId);
+                    console.log('rowdata DocTopicId'+rowdata.DocTopicId);
+
+                    var selectedTopicType = $("#TopicTypeName option:selected").text();
+                    var selectedSubtitle = $("#Subtitle option:selected").text();
+
+                    Swal.fire({
+                        title: 'Mövzünün qısa məzmuna əlavə edilməsi',
+                        type: 'warning',
+                        showCancelButton: true,
+                        cancelButtonText: 'Ləğv et',
+                        confirmButtonText: 'Təsdiqlə'
+                    }).then((result) => {
+                        if (result.value) {
+                            $('#ShortContent').val(selectedTopicType + ' /' + selectedSubtitle);
+
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Məlumat əlavə olundu',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        }
+                        });
+
+                    //$('#Subtitle option:not(:selected)').attr('disabled', true);
+                    $('.selectpicker').selectpicker('refresh');
+                }
+            });
+            $('.selectpicker').selectpicker('refresh');
+
+            $.ajax({
+                type: 'POST',
+                url: '/@lang/ColleagueRequests/Document/GetApplyAgainDocId',
+                data: { docId: rowdata.DocId},
+                dataType: "json",
+                success: function (data) {
+                    if (data.length > 0) {
+                        var count = 0;
+                        $.each(data,
+                            function (index, item) {
+                                tbApplicationAdd(++count,
+                                    '',
+                                    item.DocEnterno,
+                                    item.AppFirstname,
+                                    item.AppSurname,
+                                    item.AppLastName,
+                                    item.AppCountryId,
+                                    item.CountryName,
+                                    item.AppRegionId,
+                                    item.RegionName,
+                                     item.AppVillageId,
+                                    item.VillageName,
+                                    item.AppSosialStatusId,
+                                    item.AppRepresenterId,
+                                    item.Representer,
+                                    item.AppAddress,
+                                    item.AppPhone,
+                                    item.AppEmail,
+                                    1);
+                            });
+
+                        collectiveApply();
+                    }
+                }
+            });
+
+        });
+       //unbind('click').
+        $('#applyAgainDifferentSubjects').one('click', function () {
+            //$('#TopicTypeName').val(rowdata.DocTopicType);
+            $('#TopicTypeName option:not(:selected)').removeAttr('disabled');
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/ColleagueRequests/Document/GetSubtitle',
+                data: { topicTypeId: rowdata.DocTopicType},
+                success: function (data) {
+                    var s = '<option value="-1">Seç</option>';
+                    for (var i = 0; i < data.length; i++) {
+
+                        s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                    }
+                    $("#Subtitle").html(s);
+                    //$("#Subtitle option[value=" + rowdata.DocTopicId + "]").attr('disabled',true);
+                    $("#topicIdHidden").val(rowdata.DocTopicId);
+
+                    $('.selectpicker').selectpicker('refresh');
+                }
+            });
+            $('.selectpicker').selectpicker('refresh');
+
+            CrateDocumentInfoLink(rowdata,this);
+            $.ajax({
+                type: 'POST',
+                url: '/@lang/ColleagueRequests/Document/GetApplyAgainDocId',
+                data: { docId: rowdata.DocId},
+                dataType: "json",
+                success: function (data) {
+                    if (data.length > 0) {
+                        var count = 0;
+                        $.each(data,
+                            function (index, item) {
+                                tbApplicationAdd(++count,
+                                    '',
+                                    item.DocEnterno,
+                                    item.AppFirstname,
+                                    item.AppSurname,
+                                    item.AppLastName,
+                                    item.AppCountryId,
+                                    item.CountryName,
+                                    item.AppRegionId,
+                                    item.RegionName,
+                                      item.AppVillageId,
+                                    item.VillageName,
+                                    item.AppSosialStatusId,
+                                    item.AppRepresenterId,
+                                    item.Representer,
+                                    item.AppAddress,
+                                    item.AppPhone,
+                                    item.AppEmail,
+                                    2);
+                            });
+
+                        collectiveApply();
+                    }
+                }
+            });
+
+        });
+
+        $('#duplicateApplication').unbind('click').on('click', function () {
+            $('#duplicateApplication').attr('disabled',true);
+            $('#TypeOfApplication').val(rowdata.DocApplytypeId);
+            $('#TopicTypeName').val(rowdata.DocTopicType);
+            $('#TopicTypeName option:not(:selected)').attr('disabled', true);
+
+            CrateDocumentInfoLink(rowdata, this);
+
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/ColleagueRequests/Document/GetSubtitle',
+                data: { topicTypeId: rowdata.DocTopicType},
+                success: function (data) {
+                    var s = '<option value="-1">Seç</option>';
+                    for (var i = 0; i < data.length; i++) {
+
+                        s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                    }
+                    $("#Subtitle").html(s);
+                    $('#Subtitle').val(rowdata.DocTopicId);
+
+                    var selectedTopicType = $("#TopicTypeName option:selected").text();
+                    var selectedSubtitle = $("#Subtitle option:selected").text();
+
+                    Swal.fire({
+                        title: 'Mövzünün qısa məzmuna əlavə edilməsi',
+                        type: 'warning',
+                        showCancelButton: true,
+                        cancelButtonText: 'Ləğv et',
+                        confirmButtonText: 'Təsdiqlə'
+                    }).then((result) => {
+                        if (result.value) {
+                            $('#ShortContent').val(selectedTopicType + ' /' + selectedSubtitle);
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Məlumat əlavə olundu',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        }
+                        });
+
+                    $('#Subtitle option:not(:selected)').attr('disabled', true);
+
+                    $('.selectpicker').selectpicker('refresh');
+                }
+            });
+            $('.selectpicker').selectpicker('refresh');
+
+            $.ajax({
+                type: 'POST',
+                url: '/@lang/ColleagueRequests/Document/GetApplyAgainDocId',
+                data: { docId: rowdata.DocId},
+                dataType: "json",
+                success: function (data) {
+                    if (data.length > 0) {
+                        var count = 0;
+                        $.each(data,
+                            function (index, item) {
+                                tbApplicationAdd(++count,
+                                    '',
+                                    item.DocEnterno,
+                                    item.AppFirstname,
+                                    item.AppSurname,
+                                    item.AppLastName,
+                                    item.AppCountryId,
+                                    item.CountryName,
+                                    item.AppRegionId,
+                                    item.RegionName,
+                                    item.AppVillageId,
+                                    item.VillageName,
+                                    item.AppSosialStatusId,
+                                    item.AppRepresenterId,
+                                    item.Representer,
+                                    item.AppAddress,
+                                    item.AppPhone,
+                                    item.AppEmail,
+                                    3);
+                            });
+                        collectiveApply();
+                    }
+                }
+            });
+
+        });
+
+    }
+</script>

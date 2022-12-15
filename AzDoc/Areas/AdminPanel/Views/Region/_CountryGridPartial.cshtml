@@ -1,0 +1,202 @@
+﻿@using AzDoc.Helpers
+@using Widgets
+
+@{
+    Layout = null;
+
+    var grid = Html.MhmGrid("gridCountries", "GetCountries", "Region", routeValues: new { area = "AdminPanel" })
+        .Columns(cols =>
+        {
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='fas fa-plus'></i></a>", htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    fn_onclick = "AddNewCountry",
+                    title = "Yeni ölkə"
+                });
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='far fa-edit'></i></a>", htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    fn_onclick = "EditCountry",
+                    title = "Mövcud ölkənin redaktə olunması"
+                });
+            });
+
+    //cols.Column(c =>
+    //{
+    //    c.SetText("");
+    //    c.SetHeaderAlign(TextAlign.Center);
+    //    c.SetWidth(35);
+    //    c.IsCrud("x", "x");
+    //    c.SetRenderer("<a><i class='fa fa-trash'></i></a>", htmlAttributes: new
+    //    {
+    //        @class = "operation-button",
+    //        fn_onclick = "RemoveCountry",
+    //        title = "Ölkənin silinməsi"
+    //    });
+    //});
+
+    cols.Column(c =>
+            {
+                c.SetDataField("CountryId");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Ölkə adı</b>");
+                c.SetDataField("CountryName");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable(Filtertype.TextBox, null, "CountryName");
+                c.SetMaxWidth(200);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Ölkənin kodu</b>");
+                c.SetDataField("CountryCode");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable(Filtertype.TextBox);
+                c.SetWidth(150);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Ölkənin statusu</b>");
+                c.SetDataField("CountryStatus");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable(Filtertype.CheckedList, filterItems: "[{\"text\": \"Aktiv\", \"value\":\"1\"}, {\"text\": \"Deaktiv\", \"value\":\"0\"}]", filterField: "CountryStatus");
+                c.SetWidth(250);
+            });
+
+        })
+
+.AllowSorting(true)
+.AllowTooltips(true)
+.AllowPaging(true)
+.AllowFiltering(true)
+.AllowFilterRow(true)
+.AllowColumnOrdering(true)
+.AllowColumnResizing(true)
+.ColumnCustomizer(false)
+.SetOnFilter("onFilterCountry")
+.SetPageSize(35)
+.SetWidth("1334px")
+.SetHeight("500px");
+}
+
+@grid.GetHtml()
+
+
+<div class="modal fade" id="countryModal" tabindex="-1" style="top:-300px!important" role="dialog" aria-labelledby="countryModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" id="countryModalLabel">Yeni ölkə yarat</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="/az/AdminPanel/Region/AddCountryAsync" id="AddCountryForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <input type="hidden" id="countryId" name="CountryId" />
+                    <div class="form-group">
+                        <label for="countryName">Ölkə adı <span style="font-weight:bold; color:red">*</span></label>
+                        <input type="text" class="form-control" id="countryName" data-required="Ölkənin adını daxil edin" name="CountryName" placeholder="ölkənin adını daxil edin">
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" id="countryStatus" name="CountryStatus" checked="checked">
+                        <label for="countryStatus"> Ölkənin statusu</label><br>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 d-flex justify-content-center">
+                    <button type="submit" class="btn btn-success">Yadda saxla</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-danger">Bağla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+    function AddNewCountry(item, data) {
+        $('#countryModal').modal('show');
+    }
+
+    $('#AddCountryForm').submit(function (e) {
+        e.preventDefault(); // varsayilan eventleri engellemek
+
+        var form = new FormData(this);
+        var countryName = form.get('CountryName');
+        var countryStatus = $(this).find("input[name='CountryStatus']").prop('checked') == true ? 1 : 0;
+
+        form.set('CountryStatus', countryStatus);
+
+        if (countryName == '' || countryName == undefined) {
+            return toastr.warning('Ölkənin adını daxil edin');
+        }
+        var countryId = $('#countryId').val();
+        var url = `/az/AdminPanel/Region/${countryId == '' || countryId == undefined ? 'AddCountryAsync' : 'EditCountryAsync'}`;
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: form,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                toastr.success('Məlumat uğuurla əlavə olundu');
+                $('#countryModal').modal('hide');
+                $('#gridCountries').bindgrid(1);
+            }
+        });
+
+
+    });
+
+    $('#countryModal').on('hidden.bs.modal', function (e) {
+        $('#countryId').val('');
+        $('#AddCountryForm').trigger('reset');
+    })
+
+    function EditCountry(item, data) {
+        console.log(data.CountryId);
+        $.ajax({
+            type: 'GET',
+            url: '/az/AdminPanel/Region/EditCountryAsync',
+            data: { countryId: data.CountryId },
+            //processData: false,
+            contentType: false,
+            success: function (data) {
+                $('#countryId').val(data.CountryId);
+                $('#countryName').val(data.CountryName);
+                $('#countryStatus').prop('checked', data.CountryStatus == 1 ? true : false);
+                $('#countryModal').modal('show');
+            }
+        });
+
+    }
+    //function DeleteCountry(item, data) {
+
+    //}
+</script>

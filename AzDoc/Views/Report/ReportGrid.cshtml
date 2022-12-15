@@ -1,0 +1,72 @@
+﻿@model BLL.Models.Report.ReportsViewModel
+@if (Model.ReportModels != null)
+{   <style>
+        .mTable2 tbody tr td {
+            max-width: 260px;
+        }
+        .mTable2 tbody tr td a{
+            white-space: nowrap;
+        }
+    </style>
+   
+    <div class="row" id="generalReport">
+        <div class="col-12 mt-3" style="max-height: 60vh; overflow-y: auto">
+
+            <table class="table table-striped table-sm mTable mTable2" id="tbReport">
+                <thead>
+                    <tr>
+                        <th>Qeydiyyat nömrəsi</th>
+                        <th>Qeydiyyat tarixi</th>
+                        <th>Əsas icraçı</th>
+                        <th>Son icra müddəti</th>
+                        <th>Sənədin nömrəsi</th>
+                        <th>Sənədin tarixi</th>
+                        <th>Kimə ünvanlanıb</th>
+                        <th>Müəllifin məlumatları</th>
+                        <th>Qısa məzmun</th>
+                    </tr>
+                </thead>
+                <tbody class="text-left">
+
+                    @foreach (var item in Model.ReportModels)
+                    {
+                        <tr>
+                            <td><a href="/az/Document/GetDocView?docId=@item.DocId" target="_blank">@item.DocEnterno</a></td>
+                            @if (@item.DocEnterdate != null)
+                            {
+                                <td>@item.DocEnterdate.Value.ToShortDateString()</td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+
+                            <td>@item.MainPerformer</td>
+                            @if (@item.DocPlannedDate != null)
+                            {
+                                <td>@item.DocPlannedDate.Value.ToShortDateString()</td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+
+                            <td><a href="/az/Document/GetDocView?docId=@item.DocId" target="_blank">@item.DocDocno</a></td>
+                            @if (@item.DocDocdate != null)
+                            {
+                                <td>@item.DocDocdate.Value.ToShortDateString()</td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+                            <td>@item.FullName</td>
+                            <td>@item.EntryFromWhere</td>
+                            <td>@item.DocDescription</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

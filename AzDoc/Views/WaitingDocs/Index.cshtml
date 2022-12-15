@@ -1,0 +1,434 @@
+﻿@using AzDoc.Helpers
+@using Widgets
+@model BLL.Models.Document.EntityModel.DocumentGridModel
+@using BLL.Models.Document.ViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+    var docType = SessionHelper.DocTypeId;
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+    var grid = Html.MhmGrid("gridWaiting", "Document", "WaitingDocs", routeValues: new { docType = SessionHelper.DocTypeId })
+.Columns(cols =>
+{
+    cols.Column(c =>
+    {
+        c.SetText("");
+        c.SetDataField("DocId", FieldType.Number);
+        c.SetHeaderAlign(TextAlign.Center).IsFilterable();
+        c.SetWidth(35);
+        c.IsCrud("x", "x");
+        c.SetHidden();
+
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("");
+        c.SetDataField("", FieldType.Number);
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetWidth(35);
+        c.IsCrud("x", "x");
+        c.SetRenderer("<a><i class='fas fa-eye'></i></a>", htmlAttributes: new { @class = "operation-button", fn_onclick = "DocView" });
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Qeydiyyat nömrəsi");
+        c.SetDataField("DocEnterno");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("14%");
+        c.IsPinned();
+        c.IsFilterable();
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("");
+        c.SetDataField("DocDoctypeId");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("14%");
+        c.IsFilterable();
+        c.SetHidden();
+    });
+
+
+    cols.Column(c =>
+    {
+        c.SetText("Qeydiyyat tarixi");
+        c.SetDataField("DocEnterdate", FieldType.Date, "dd.MM.yyyy");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("14%");
+        c.IsPinned();
+        c.IsFilterable(Filtertype.Date);
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("İcraçılar");
+        c.SetDataField("SendTo");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("15%");
+        c.IsFilterable();
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Son icra müddəti");
+        c.SetDataField("DocPlannedDate", FieldType.Date, "dd.MM.yyyy");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("14%");
+        c.IsFilterable(Filtertype.Date);
+    });
+
+    //cols.Column(c =>
+    //{
+    //    c.SetText("Əməliyyatın növü");
+    //    c.SetDataField("ExecuteRule");
+    //    c.SetHeaderAlign(TextAlign.Center);
+    //    c.SetCellsAlign(TextAlign.Left);
+    //    c.SetMinWidth(50);
+    //    c.SetWidth("14%");
+    //    c.IsFilterable();
+    //});
+
+    //cols.Column(c =>
+    //{
+    //    c.SetText("Əməliyyatı aparan");
+    //    c.SetDataField("CreaterPersonnelName");
+    //    c.SetHeaderAlign(TextAlign.Center);
+    //    c.SetCellsAlign(TextAlign.Left);
+    //    c.SetMinWidth(50);
+    //    c.SetWidth("14%");
+    //    c.IsFilterable();
+    //});
+
+    cols.Column(c =>
+    {
+        c.SetText("Sənədin nömrəsi");
+        c.SetDataField("DocDocno");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("14%");
+        c.IsFilterable();
+    });
+
+
+    cols.Column(c =>
+    {
+        c.SetText("Sənədin tarixi");
+        c.SetDataField("DocDocdate", FieldType.Date, "dd.MM.yyyy");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("14%");
+        c.IsFilterable(Filtertype.Date);
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Sənədin statusu");
+        c.SetDataField("DocumentstatusName");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("14%");
+        c.SetHidden();
+        c.IsFilterable(Filtertype.CheckedList);
+    });
+
+
+    cols.Column(c =>
+    {
+        c.SetText("Kimə ünvanlanıb");
+        c.SetDataField("Signer");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("14%");
+        c.IsFilterable();
+
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Hardan daxil olub");
+        c.SetDataField("DocAuthorInfo");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(200);
+        c.SetMaxWidth(300);
+        c.IsFilterable();
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Kimdən daxil olub");
+        c.SetDataField("WhomFromInfo");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(200);
+        c.SetMaxWidth(300);
+        c.IsFilterable();
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Müəllifin məlumatları");
+        c.SetDataField("EntryFromWhere");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("14%");
+        c.IsFilterable();
+    });
+
+
+    cols.Column(c =>
+    {
+        c.SetText("Qısa məzmun");
+        c.SetDataField("DocDescription");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("14%");
+        c.IsFilterable();
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("");
+        c.SetDataField("ExecutorControlStatus");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(100);
+        c.SetWidth("12.5%");
+        c.SetHidden();
+        c.IsFilterable(Filtertype.CheckedList);
+    });
+
+
+})
+
+
+
+.AllowCrud()
+.SetRowDoubleClick("GridRowDoubleClick")
+.AllowSorting(false)
+.AllowTooltips(false)
+.AllowPaging(true)
+.AllowFiltering(true)
+.AllowFilterRow(true)
+.AllowColumnOrdering(true)
+.AllowColumnResizing(true)
+.SetPageSize(35)
+// .SetOnFilter("onFilter")
+//.SetUnRead("checkUnread")
+//.SetRowExpand("rowExpand")
+.SetWidth("100%")
+.SetHeight("100%");
+}
+
+
+<div class="col-10">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="\">Gözləmədə olan sənədlər</a></li>           
+        </ol>
+    </nav>
+</div>
+
+<div class="row no-gutters">
+
+    <div class="editGroup">
+        <div class="input-group input-group-sm">
+            <div class="col-sm-4" style="padding-left: 0;">
+                @Html.TextBoxFor(model => model.DocDocno, new
+                          {
+                              @type = "text",
+                              @class = "form-control",
+                              @id = "DocNo"
+                          })
+            </div>
+            <div class="col-sm-4" style="padding-left: 0;">
+
+                <button id="submit" type="button" class="mBtn mBtn-pr" onclick="findDoc()" style="width: 100%"> <i class="fas fa-plus">Əlavə et</i></button>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="mModal">
+    <div class="modal fade" id="infoDoc" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document" style="max-width: 75% !important">
+            <div class="modal-content" style="background: #ffffff">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>@ViewData["DocTypeName"]</span>
+                </div>
+                <div class="modal-header3">
+                    <div class="row no-gutters" style="border-bottom:1px solid #8080805e; margin: 0 1rem">
+                        <div class="col-12">
+                            <a href="#ElectronicDocument" class="individual active">
+                                @*@RLang.EDocumentsView*@
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+                    <form class="indForm" id="ElectronicDocument">
+                        <table class="table table-hover table-sm mTable">
+                            <thead>
+                                <tr>
+                                    <td>
+                                        Sənədin nömrəsi
+                                    </td>
+                                    <td>
+
+                                        Sənədin növü
+                                    </td>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="docNum"></td>
+                                    <td id="docType"></td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </form>
+
+
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" data-dismiss="modal">Təsdiq</button>
+                    <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" data-dismiss="modal">İmtina</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-md-12" id="DocGrid" style="padding-top: 10px; height: 86vh">
+    @grid.GetHtml()
+</div>
+
+<script>
+    function DocView(item, boundData) {
+        console.log(boundData);
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/Document/DocInfo',
+                dataType: 'json',
+                data: { docId: boundData.DocId},
+                success: function (result) {
+                    if (result!='') {
+                        window.open('/@lang/Document/GetDocView?token=' + result, '_blank');
+                    }
+                },
+                complete: function () {
+                    window.CloseLoading();
+                }
+            });
+    }
+    function findDoc()
+    {
+       // console.log($('#DocNo').val());
+        var id = $('#DocNo').val()
+
+         $.ajax({
+                    url: '/@lang/WaitingDocs/GetInfo',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { docnumber:id },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+             success: function (response) {
+                 console.log(response);
+                 $('#infoDoc').modal('show');
+                 $('#docNum').html(response["DocEnterno"]);
+                 $('#docType').html(response["DocType"]);
+ 
+
+             },
+             error: function (jqXHR, textStatus, errorThrown) {
+                 alert('Sənəd tapılmadı');
+             },
+                    complete: function() {
+                        window.CloseLoading();
+             }
+                   
+                });
+
+    }
+         function GridRowDoubleClick(event, rowdata) {
+            console.log(event, rowdata);
+            $("#globalDocId").val(rowdata.DocId);
+            window.ShowLoading();
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/WaitingDocs/ElectronicDocument',
+                dataType: 'html',
+                data: { docId: rowdata.DocId },
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                success: function(response) {
+
+                    $('#ElectronicDocument').html(response);
+                    readAs(rowdata.docId);
+                    $("#doubleClickModal").modal();
+
+                    @*$.ajax({
+                        type: 'GET',
+                        url: '/@lang/Document/DocInfo',
+                        dataType: 'json',
+                        data: { docId: rowdata.DocId },
+                        success: function(result) {
+                            if (result != '') {
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '/@lang/Document/GetDocView'.buildUrl({ token: result }),
+                                    dataType: 'html',
+                                    success: function(response) {
+                                        window.CloseLoading();
+                                        $('#DocInfo').html(response);
+                                    }
+                                });
+                            }
+                        },
+                        complete: function() {
+                            window.CloseLoading();
+                        }
+                    });*@
+
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+
+        }
+
+</script>
+

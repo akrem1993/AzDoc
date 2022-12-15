@@ -1,0 +1,23 @@
+CREATE TABLE [dbo].[DOCS_VIZA](
+	[VizaId] int identity NOT NULL,
+	[VizaDocId] int NOT NULL,
+	[VizaFileId] int NOT NULL,
+	[VizaWorkPlaceId] int NOT NULL,
+	[VizaReplyDate] [datetime] NULL,
+	[VizaNotes] nvarchar(max) NULL,
+	[VizaOrderindex] int NULL,
+	[VizaSenderWorkPlaceId] int NOT NULL,
+	[VizaSenddate] [datetime] NULL,
+	[VizaConfirmed] [tinyint] NULL CONSTRAINT [DfDOCS_VIZAVizaConfirmed] DEFAULT 0,
+	[IsDeleted] bit NULL,
+	[VizaAgreementTypeId] int NULL,
+	[VizaFromWorkflow] int NULL,
+	[VizaPersonnelId] int NOT NULL,
+	[VizaAnswerDocId] int NULL,
+    CONSTRAINT [PK_DOCS_VIZA] PRIMARY KEY ([VizaId]),
+    CONSTRAINT [FK_DOCS_VIZA_DC_WORKPLACE] FOREIGN KEY([VizaWorkPlaceId]) REFERENCES [dbo].[DC_WORKPLACE] ([WorkplaceId]),
+    CONSTRAINT [FK_DOCS_VIZA_DC_WORKPLACE1] FOREIGN KEY([VizaSenderWorkPlaceId]) REFERENCES [dbo].[DC_WORKPLACE] ([WorkplaceId]),
+	CONSTRAINT [FK_DOCS_VIZA_DOCS] FOREIGN KEY([VizaDocId]) REFERENCES [dbo].[DOCS] ([DocId]),
+	CONSTRAINT [FK_DOCS_VIZA_DOCS_FILE] FOREIGN KEY([VizaFileId]) REFERENCES [dbo].[DOCS_FILE] ([FileId]),
+	CONSTRAINT [FK_DOCS_VIZA_FILES] FOREIGN KEY([VizaFileId]) REFERENCES [dbo].[DOCS_FILE] ([FileId])
+)

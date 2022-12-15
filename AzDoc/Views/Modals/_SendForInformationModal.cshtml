@@ -1,0 +1,191 @@
+﻿@using AzDoc.Helpers
+@using AzDoc.App_LocalResources
+
+<div class="mModal" style="z-index:1900">
+    <div class="modal fade" id="sendForInformationModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true" data-keyboard="false" data-backdrop="static" style="z-index:1059">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="background: #ffffff">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Məlumat üçün göndərmək</span>
+                    <span id="sendToken"></span>
+                </div>
+
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+                    <div class="row">
+                        <div class="col-11">
+                            <select id="Person" class="form-control selectpicker  mb-3" data-live-search="true" data-width="100%" style="max-width: 520px" data-container="body"></select>
+                        </div>
+                        <div class="col-1">
+                            <a href="#" class="circleBtn circleBtn-sm" id="sendForInformation">
+                                <i class="fas fa-plus"></i>
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <table class="table table-hover table-bordered mTable" id="tbSendForInformation">
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Ləğv et</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="SaveSendForInformation" class="mBtn mBtn-pr defaultBtn" style="width: 100%">@RLang.Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var requestToken = undefined;
+
+    function SendForInformaton(token) {
+        requestToken = token;
+        var select = $("#Person");
+        select.empty().append($("<option value='-1' selected disabled>Seçin</option>").val("-1"));
+
+        $.ajax({
+            type: "GET",
+            url: `/az/Document/SendForInformation?token=${requestToken}`,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            beforeSend: function () {
+                window.ShowLoading();
+            },
+            success: function (response) {
+                $("#tbSendForInformation").find("tr.data-row").remove();
+                $("#sendForInformationModal").modal().show();
+                $('#sendToken').html(response.Token);
+                $.each(response.Model,
+                    function () {
+                        if (this.FormTypeId != 2) {
+                            select.append($("<option></option>").val(this.Id).html(this.Name));
+                        } else {
+                            if (((this.PositionGroupLevel == 1) ||
+                                (this.PositionGroupLevel == 2) ||
+                                (this.PositionGroupLevel == 3)) &&
+                                (this.DirectionConfirmed == 1)) {
+                                var markup = "<tr class='data-row '" +
+                                    "data-PersonId='" +
+                                    this.Id +
+                                    "'>" +
+                                    '<td>' +
+                                    this.Name +
+                                    '</td>' +
+                                    '<td style="width:20px">' +
+                                    '</td>' +
+                                    '</tr>';
+                            } else {
+                                var markup = "<tr class='data-row '" +
+                                    "data-PersonId='" +
+                                    this.Id +
+                                    "'>" +
+                                    '<td>' +
+                                    this.Name +
+                                    '</td>' +
+                                    '<td style="width:20px">' +
+                                    "<a href='javascript:void(0);' onclick='deleteSenForInformation(" +
+                                    this.Id +
+                                    ",this,`" +
+                                    response.Token +
+                                    "`)' id='deleteRowDataTable' class='remove'><span class='fas fa-trash-alt btn' style='color:red'></span></a>" +
+                                    '</td>' +
+                                    '</tr>';
+                            }
+
+
+                            $("#tbSendForInformation").append(markup);
+                        }
+
+                    });
+                $('.selectpicker').selectpicker('refresh');
+
+            },
+            complete: function () {
+                window.CloseLoading();
+            }
+        });
+    }
+
+    $("#sendForInformation").click(function () {
+        if ($("#Person").val() == null) {
+            $("#Person").closest("div").css("border", "1px solid red");
+            return toastr.warning('Zəhmət olmasa məcburi xanaları doldurun');
+        } else {
+            $("#Person").closest("div").removeAttr("style");
+        }
+        $("#sendForInformation").removeAttr("style");
+        var personId = $("#Person").val();
+        var personName = $("#Person option:selected").text();
+        if (personId != null) {
+            var markup = "<tr class='data-row rowSelector'" +
+                "data-PersonId='" +
+                personId +
+                "'>" +
+                '<td>' +
+                personName +
+                '</td>' +
+                '<td style="width:20px">' +
+                "<a href='javascript:void(0);' onclick='deleteRowSendForInformation(this)' id='deleteRowDataTable' class='remove'><span class='fas fa-trash-alt btn' style='color:red'></span></a>" +
+                '</td>' +
+                '</tr>';
+            $("#tbSendForInformation").append(markup);
+            toastr.success('Məlumat əlavə olundu');
+            $("#Person").val(-1);
+            $('.selectpicker').selectpicker('refresh');
+        } else {
+            toastr.warning('Zəhmət olmasa məcburi xanaları doldurun');
+        }
+    });
+
+    $("#SaveSendForInformation").click(function () {
+
+        if ($("#Person").val() == null && $("#tbSendForInformation tr").length === 0) {
+            $("#Person").closest("div").css("border", "1px solid red");
+            return toastr.warning('Zəhmət olmasa məcburi xanaları doldurun');
+        } else {
+            $("#Person").closest("button").removeAttr("style");
+        }
+
+        if ($("#Person").val() != null) {
+            $("#sendForInformation").css("border", "1px solid red");
+            return toastr.warning('Zəhmət olmasa seçilmiş şəxsi əlavə edin.');
+        }
+
+        var formData = $('#SendForInformation').getFormData();
+        formData.Persons = ($('#tbSendForInformation').tableToJsonList());
+
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        $.ajax({
+            type: 'POST',
+            url: `/az/Document/SendForInformation?token=${requestToken}`,
+            dataType: 'json',
+            data: { __RequestVerificationToken: token, model: formData },
+            beforeSend: function () {
+                window.ShowLoading();
+            },
+            success: function (response) {
+                if (response) {
+                    var pageIndex = $('.jqx-grid').CachedGrid().config.params.pageIndex;
+                    $('.jqx-grid').bindgrid(pageIndex, undefined);
+                    $('#sendForInformationModal').modal('hide');
+                }
+            },
+            complete: function () {
+                window.CloseLoading();
+            }
+        });
+    });
+
+    $(".closeBtn").click(function () {
+        $(".modalBtn").modal("hide");
+    });
+</script>
+
+<script src="~/Scripts/common/SendForInformation.js?v=@AppVersion.Version"></script>

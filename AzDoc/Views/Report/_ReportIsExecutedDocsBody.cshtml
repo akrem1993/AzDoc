@@ -1,0 +1,176 @@
+﻿@using BLL.Models.Report
+@model ReportIsExecutedDocsBodyViewModel
+
+@if (Model?.IsExecutedDocs != null && Model.Pager.TotalItems > 0)
+{
+    int count = (Model.Pager.CurrentPage - 1) * Model.Pager.PageSize;
+    <div class="row">
+        <div class="col-12 mt-3" style="max-height: 60vh; overflow-y: auto">
+            <table class=" tableFixHead table table-striped table-sm mTable mTable2" id="tableReportExecution">
+                <thead>
+                    <tr>
+                        <th>Sıra sayı №</th>
+                        <th>Qeydiyyat nömrəsi</th>
+                        <th>Qeydiyyat tarixi</th>
+                        <th>İcra müddəti</th>
+                        <th>İcra müddəti(təqvim günü)</th>
+                        <th>Uzadılma barədə qeyd</th>
+                        <th>Neçə gün gecikmə ilə icra olunub</th>
+                        <th>Sənədin statusu</th>
+                        <th>Sənədin nömrəsi</th>
+                        <th>Sənədin tarixi</th>
+                        <th>Haradan daxil olub</th>
+                        <th>Kimdən daxil olub (Vətəndaşın adı, soyadı, ata adı)</th>
+                        <th>Nəzarətə götürən şəxs</th>
+                        <th>Vətəndaşın sosial statusu</th>
+                        <th>Müraciətin forması</th>
+                        <th>Müraciətin növü</th>
+                        <th>Mövzu</th>
+                        <th>Alt mövzu</th>
+                        <th class="complainedOfDocStructure">Şikayət olunan qurum</th>
+                        <th class="complainedOfDocSubStructure">Şikayət olunan alt qurum</th>
+                        <th>Sənədin qısa məzmunu</th>
+                        <th>İcraçı struktur bölmə</th>
+                        <th>Sənədin icraçısı</th>
+                        <th>Sənədin icraçısı (şöbənin əməkdaşı) </th>
+                        <th>Cavab sənədinin nömrəsi</th>
+                        <th>Cavab sənədinin tarixi</th>
+                        <th>Cavab sənədinin statusu</th>
+                        <th>Əlaqəli sənədlər</th>
+                        <th class="docResultColumn">Müraciətlərə baxılmasının vəziyyəti</th>
+                        <th>Rayon/Şəhər</th>
+                        <th>Kənd</th>
+                        <th>Nəzarət</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                   @foreach (var isExecutedDocs in Model.IsExecutedDocs)
+                    {
+                        count++;
+                    <tr>
+                        <td>@count</td>
+                        <td><a href="/az/Document/GetDocView?token=@isExecutedDocs.TokenForDocId" target="_blank">@isExecutedDocs.DocEnterno</a></td> @*//senedin qeydiyyat nomresi*@
+                        <td>@isExecutedDocs.DocEnterDate.Value.ToString("dd.MM.yyyy")</td> @*//senedin daxil olma tarixi*@
+                        @*//icra muddeti*@
+                        @if (isExecutedDocs.PlannedDate.HasValue)
+                        {
+                            <td>@isExecutedDocs.PlannedDate.Value.ToString("dd.MM.yyyy")</td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        <td>@isExecutedDocs.ExecutionDays</td> @*// icra muddeti(teqvim gunu)*@
+                        <td>@isExecutedDocs.DirectionChangeNote</td> @*Uzadılma barədə qeyd*@
+
+                        @*//nece gun gecikme ile icra olunub*@
+                        @if (isExecutedDocs.LatelyExecutedDays.HasValue && isExecutedDocs.LatelyExecutedDays.Value < 0)
+                        {
+                            <td style="color:red">@isExecutedDocs.LatelyExecutedDays</td>
+                        }
+                        else
+                        {
+                            <td>@isExecutedDocs.LatelyExecutedDays</td>
+                        }
+
+                        <td>@isExecutedDocs.DocumentStatusName</td> @*//senedin statusu*@
+                        <td>@isExecutedDocs.DocDocno</td>    @*//senedin nomresi*@
+                        <td>@(isExecutedDocs.DocDocDate.HasValue ? isExecutedDocs.DocDocDate.Value.ToString("dd.MM.yyyy"): "")</td> @*//senedin tarixi*@
+                        <td style="color:@(isExecutedDocs.DocUndercontrolStatusId.Value ==1  ? "red" : "")">@isExecutedDocs.EntryFromWhere</td> @*//haradan daxil olub*@
+                        <td>@isExecutedDocs.EntryFromWhoCitizenName</td> @*//kimden daxil olub*@
+                        <td>@isExecutedDocs.EntryFromWho</td> @*//Nezarete goturem sexsin adi*@
+                        <td>@isExecutedDocs.SocialName</td> @*//vetendasin sosial statusu*@
+                        <td>@isExecutedDocs.DocFormName</td> @*//muracietin formasi*@
+                        <td>@isExecutedDocs.ApplyTypeName</td> @*// muracietin novu*@
+                        <td>@isExecutedDocs.TopicTypeName</td> @*//movzu*@
+                        <td>@isExecutedDocs.TopicName</td> @*//alt movzu*@
+                        <td class="complainedOfDocStructure">@isExecutedDocs.ComplainedOfDocStructure</td>    @*//sikayet olunan qurum*@
+                        <td class="complainedOfDocSubStructure">@isExecutedDocs.ComplainedOfDocSubStructure</td>    @*//skayet olunan alt qurum*@
+
+                        @*//senedin qisa mezmunu*@
+                        <td title="@isExecutedDocs.DocDescription">
+                            @if (isExecutedDocs.DocDescription?.Length >= 30)
+                            {
+                                @($"{isExecutedDocs.DocDescription.Substring(0, 30)} ...")
+                            }
+                            else
+                            {
+                                @isExecutedDocs.DocDescription;
+                            }
+                        </td>
+                        <td>@isExecutedDocs.ExecutorDepartment</td> @*/icraci struktur bolme*@
+
+                        @*//senedin icracisi*@
+                        <td title="@isExecutedDocs.NotExecutedExecutorsName">
+
+                            @if (!string.IsNullOrWhiteSpace(isExecutedDocs.NotExecutedExecutorsName) ? isExecutedDocs.NotExecutedExecutorsName.Length >= 30 : false)
+                            {
+                                @($"{isExecutedDocs.NotExecutedExecutorsName.Substring(0, 30)} ...")
+                            }
+                            else
+                            {
+                                @isExecutedDocs.NotExecutedExecutorsName
+                            }
+                        </td>
+
+                        <td>@isExecutedDocs.LastExecutorName</td>
+
+
+
+                        @*//cavab senedin nomresi*@
+                        @if (isExecutedDocs.ReplyDocNumbersForView.Count > 0)
+                        {
+                            <td>
+                                @foreach (var item in isExecutedDocs.ReplyDocNumbersForView)
+                                {
+                                    <a style="margin-right:10px;" href="/az/Document/GetDocView?token=@item.Key" target="_blank">@item.Value;</a>
+                                }
+                            </td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        <td>@(isExecutedDocs.ReplyDocDate.HasValue ? isExecutedDocs.ReplyDocDate.Value.ToString("dd.MM.yyyy") : "")</td>     @*/Cavab sənədinin tarixi*@
+                        <td>@isExecutedDocs.ReplyDocStatus</td> @*//Cavab sənədinin statusu*@
+                        @if (isExecutedDocs.RelationDocNumbersForView.Count > 0)
+                        {
+                            <td>
+                                @foreach (var item in isExecutedDocs.RelationDocNumbersForView)
+                                {
+                                    <a style="margin-right:10px;" href="/az/Document/GetDocView?token=@item.Key" target="_blank">@item.Value;</a>
+                                }
+                            </td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        <td class="docResultColumn">@isExecutedDocs.DocResultName</td>    @*//Müraciətlərə baxılmasının vəziyyəti*@
+                        <td>@isExecutedDocs.RegionName</td> @*//Rayon/Şəhər*@
+                        <td>@isExecutedDocs.VillageName</td> @*//Kend*@
+                        <td>@isExecutedDocs.DocUnderControlStatusValue</td>@*//nezater*@
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    Html.RenderPartial("_Pager", new BLL.Models.Report.Paging.PagerPartialModel() { Pager = Model.Pager/*, URL = "az/Report/ReportIsExecutedDocs/" */});
+}
+else
+{
+    <div class="row">
+        <div class="col-12 text-center mt-2 ">
+            <span id="docsCount" style="color:red;font-size:30px;">Axtarışa uyğun məlumat tapılmadı.</span>
+        </div>
+    </div>
+}
+<div class="row" style="padding-top:70px;">
+    <div class="col-12 text-right mt-2">
+        <span id="docsCount" style="color: #7fa8b6">Tapılan məlumat sayı : @Model.Pager.TotalItems</span>
+    </div>
+</div>
+

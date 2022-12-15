@@ -1,0 +1,68 @@
+﻿@model BLL.Models.Document.QrDocModel.IQrDocument
+
+@if (Model != null && Model.FileSignatureStatus == 2)
+{
+    <style>
+        .textCenter {
+            text-align: center !important;
+        }
+    </style>
+    <br />
+    <div class="row">
+        <div class="col-6">
+            <table class="table table-hover table-sm mTable">
+                <thead>
+                    <tr>
+                        <td scope="col">Əməliyyatı aparan</td>
+                        <td scope="col">Əməliyyatın növü</td>
+                        <td scope="col">Əməliyyatın statusu</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="textCenter">@Model.SignerPerson</td>
+                        <td class="textCenter">İmza üçün</td>
+                        <td class="textCenter"><i class="fas fa-fingerprint operationIcons" style="color: #4e9a46"></i>&nbsp; Imzalanıb</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-2">
+            <table class="table table-hover table-sm mTable">
+                <thead>
+                    <tr>
+                        <th scope="col">
+                            Sənədin QR-kodu
+                            <button type="button" class="next p-0 squareBtn" onclick="showQr()" style="border-color: transparent">
+                                <i class="fas fa-angle-down" style="color: white" id="spanQr"></i>
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="imageSrc" hidden style="text-align: center">
+                            <img id="docQrCode" src="data:jpeg;base64, @Model.Base64QrCode" height="120" width="120" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function showQr() {
+            var tdImage = $('#imageSrc');
+            console.log(tdImage);
+            if (tdImage.is(":hidden")) {
+                tdImage.removeAttr("hidden");
+                $('#spanQr').removeClass('fa-angle-down');
+                $('#spanQr').addClass('fa-angle-up');
+            } else {
+                tdImage.attr("hidden", "hidden");
+                $('#spanQr').removeClass('fa-angle-up');
+                $('#spanQr').addClass('fa-angle-down');
+            }
+        }
+    </script>
+}

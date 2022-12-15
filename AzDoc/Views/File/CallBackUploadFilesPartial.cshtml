@@ -1,0 +1,230 @@
+﻿@using Model.DB_Views
+@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@model IEnumerable<VW_DOC_FILES>
+
+@{
+    var count = 1;
+}
+
+<style>
+    .table-custom {
+        border: #ccc solid 1px;
+        margin-top: 10px;
+    }
+
+    .thead {
+        border: #ccc solid 1px;
+        text-align: center !important;
+        vertical-align: middle !important
+    }
+
+    .thead-tr {
+        border: #ccc solid 1px !important;
+        text-align: center !important;
+    }
+
+    .td {
+        border: #ccc solid 1px;
+        vertical-align: middle !important
+    }
+
+    .th-oper {
+        width: 102px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .table-body {
+        text-align: center
+    }
+
+    .accept-modal-dialog {
+        width: 30%;
+        margin: 20% auto;
+    }
+
+    .btn:hover {
+        cursor: pointer !important;
+    }
+
+    .fas:hover {
+        cursor: pointer !important;
+    }
+
+    .fa:hover {
+        cursor: pointer !important;
+    }
+</style>
+<table class="table table-hover table-custom table-sm  mTable" style="margin-top: -20px">
+    <thead>
+        <tr class="thead-tr">
+            <td scope="col" class="thead">№</td>
+            @if(new[] { 3, 12, 18 }.Contains(SessionHelper.DocTypeId))
+            {
+                <td scope="col" class="thead">Razılaşma sxemi</td>
+            }
+            <td scope="col" class="thead">Əsas sənəd</td>
+            <td scope="col" class="thead">Nüsxə</td>
+            <td scope="col" class="thead">Vərəq</td>
+            <td scope="col" class="thead">Adı</td>
+            <td scope="col" class="thead">Tarixi</td>
+            <td scope="col" class="thead">Yüklənib</td>
+            <td scope="col" class="thead th-oper">Əməliyyatlar</td>
+        </tr>
+    </thead>
+    <tbody class="table-body">
+        @foreach(var item in Model)
+        {
+            <tr class="rowSelector">
+                <td hidden><input type="hidden" id="fileInfoId" value="@item.FileInfoId" /></td>
+                <th scope="row" class="td" name="countNo">
+                    <span id="countNo">@(count++)</span>
+                </th>
+                @if(new[] { 3, 12, 18 }.Contains(SessionHelper.DocTypeId))
+                {
+                    <td class="td">
+                        @if(item.FileIsMain)
+                        {
+                            <i class="fas fa-list-ol icon-size btn btn-light" title="Razılaşma sxemi" onclick="GetAgreementModal()"></i>
+                        }
+                    </td>
+                }
+                <td class="td">
+                    <label class="btn" style="margin-bottom: 0">
+                        <input type="radio" name="isMain" @(item.FileIsMain ? "checked" : "") id="radioIsMain" onchange="SetMainFile(this)" />
+                    </label>
+                </td>
+                <td class="td">
+                    <span class="btn" onclick="PageCopyCount(this)" style="background: transparent" id="countPageId">
+                        @if(item.FileInfoPageCount == null)
+                        {<i class="fa fa-warning icon-size" name="icon" style="color:red" id="iconPage" title="Nüsxə sayını daxil edin">&nbsp;@item.FileInfoCopiesCount</i>}
+                    else
+                    { <i class="fas fa-edit icon-size" name="icon" id="iconPage" title="Redaktə edin">&nbsp;@item.FileInfoCopiesCount</i>}
+                    </span>
+                </td>
+                <td class="td">
+                    <span class="btn" onclick="PageCopyCount(this)" style="background: transparent" id="countCopyId">
+                        @if(item.FileInfoCopiesCount == null)
+                        {<i class="fa fa-warning icon-size" name="icon" style="color:red" id="iconPage" title="Vərəq sayını daxil edin">&nbsp;@item.FileInfoPageCount</i>}
+                    else
+                    { <i class="fas fa-edit icon-size" name="icon" id="iconPage" title="Redaktə edin">&nbsp;@item.FileInfoPageCount</i>}
+                    </span>
+                </td>
+                <td class="td">@item.FileInfoName</td>
+                <td class="td">@item.FileInfoInsertdate</td>
+                <td class="td">@item.PersonFullName</td>
+                <td class="td">
+                    <div>
+                        <i class="fas fa-print icon-size" title="@RLang.Scan" style="padding: unset"></i>
+                        <i class="fas fa-download icon-size" onclick="DownloadFile(this)" title="@RLang.Download" style="padding: unset"></i>
+                        <i class="fas fa-retweet icon-size" onclick="ChangeFile(this)" title="@RLang.Replace" style="padding: unset"></i>
+
+                        @if(new[] { 1, 2 }.Contains(item.DocDoctypeId))
+                        {<i class="fas fa-trash-alt icon-size" onclick="DeleteFile(this)" title="@RLang.Delete" style="padding: unset;color:red"></i>}
+                        else
+                        {
+                            if(!item.FileIsMain)
+                            {<i class="fas fa-trash-alt icon-size" onclick="DeleteFile(this)" title="@RLang.Delete" style="padding: unset;color:red"></i>}
+                        }
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        var table = $(".table-custom");
+        if ($(table).find(".rowSelector").length === 0) {
+            $(table).hide();
+        } else {
+            $(table).show();
+        }
+    });
+
+    function SetMainFile(element) { // esas sened kimi secmek
+        var fileInfoId = $(element).closest("tr").find("#fileInfoId")[0].value; // radiobutton secilende oldugu setirdeki senedin idsini getirir
+        var answerDocIds = $("#answerDocTable").find("tr.data-row");
+        var relatedRow = $("#relatedDocTable").find("tr.data-row").length;
+        var signerWorkPlaceId = $("#SignatoryPerson").val();
+
+        var array = [];
+        $.each(answerDocIds,
+            function () {
+                array.push($(this).attr("data-docid"));
+            });
+
+        if (@SessionHelper.AnswerDocId != -1) {
+            if (answerDocIds.length === 0) {
+                toastr.warning("Zəhmət olmasa cavab sənədini seçin.");
+                if ($("#radioIsMain").val() === "on") {
+                    $("#radioIsMain").prop("checked", false);
+                }
+                return;
+            }
+        }else if (@SessionHelper.RelatedDocId != -1) {
+            if (relatedRow === 0) {
+                if ($("#radioIsMain").val() === "on") {
+                    $("#radioIsMain").prop("checked", false);
+                }
+                toastr.warning("Zəhmət olmasa əlaqəli sənədi seçin.");
+                return;
+            }
+        }
+
+        Swal.fire({
+            title: 'Əsas faylın seçilməsi',
+            type: 'info',
+            showCancelButton: true,
+            allowOutsideClick: false,
+            cancelButtonText: 'Ləğv et',
+            confirmButtonText: 'Təsdiqlə'
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: '/az/File/SetMainFile' +
+                        '?fileInfoId=' + fileInfoId +
+                        '&signerWorkPlaceId=' + signerWorkPlaceId +
+                        '&answerDocIds=' + JSON.stringify(array),
+                    type: 'POST',
+                    beforeSend:function (){
+                        window.ShowLoading();
+                    },
+                    success: function (data) {
+                        if (data === true) {
+                            SAlert.success("Əsas fayl kimi təyin olundu");
+                            $('#fakeButton').click(); // table yenilenir
+                        }
+                        else {
+                            console.log($("#radioIsMain").val());
+                            if ($(element).prop("checked")) {
+                                $(element).prop("checked", false);
+                            }
+                            $('#fakeButton').click();
+
+                            SAlert.failed();
+                        }
+                    },
+                    error: function (textStatus) {
+                        console.log('ERRORS: ' + textStatus);
+                    },
+                    complete: function() {
+                         window.CloseLoading();
+                    },
+                    cache: false,
+                    processData: false, // Don't process the files
+                    contentType: false // Set content type to false as jQuery will tell the server its a query string request
+                });
+
+            }
+            else if (result.dismiss == 'cancel') {
+                if ($(element).prop("checked")) {
+                    $(element).prop("checked", false);
+                }
+                $('#fakeButton').click();
+            }
+            });
+}
+</script>

@@ -1,0 +1,104 @@
+﻿@using AzDoc.App_LocalResources
+@using Model.DB_Views
+@using AzDoc.Helpers
+@{
+    var browse = RLang.Browse;
+}
+
+<div class="editGroup">
+    <h4>@RLang.EDocuments</h4>
+
+    <div class="col-sm-6" style="padding: 20px; margin-top: 2px">
+        <div class="custom-file" style="width: 100%">
+            <input type="file" name="files" class="custom-file-input"
+                   accept=".pdf,.jpg,.png,.doc, .docx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" id="btnBrowse">
+            <label class="custom-file-label" for="btnBrowse" data-browse="@RLang.Browse">...</label>
+        </div>
+
+        <div style="margin-top: 10px; margin-bottom: 30px; font-size: small;">
+            <span>Qeyd : Yalniz Word, Excel, PDF, JPG, PNG fayllar yüklənə bilər</span>
+        </div>
+
+        <input type="button" id="fakeButton" hidden />
+        <input type="hidden" name="mainFileInfoId" value="" />
+        <input type="hidden" value="" name="hFileInfoId" />
+        <span id="spanToken" style="display: none">@(ViewBag.Token)</span>
+        <input type="hidden" value="@ViewData["t"]" name="tapCount" />
+        <input type="hidden" name="ConfirmDelete" value="@RLang.ConfirmDelete" />
+        <input id="hidden" value="@browse" hidden="hidden" /> @*buttonun  textinin dili*@
+        <input type="hidden" name="FileIsMainConfirm" value="@RLang.FileIsMainConfirm" />
+        <input type="hidden" id="hiddenActionName" />
+        <div class="modal fade" id="extenModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">@RLang.Warning</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            <span id="modalContent"></span>
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">@RLang.Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div id="divAttachDocTree">
+            @Html.Partial("~/Views/File/CallBackUploadFilesPartial.cshtml", new List<VW_DOC_FILES>())
+        </div>
+    </div>
+
+    <div>
+        @if (new[] { 3, 12, 18 }.Contains(SessionHelper.DocTypeId))
+        {
+            @Html.Partial("/Views/Viza/_AgreementScheme.cshtml")
+        }
+    </div>
+</div>
+
+<div class="row mb-5 pb-5 mt-4">
+    <div class="col-12 text-center">
+        <button id="prev-step-2" type="button" class="mBtn mBtn-sec mr-2 prev-step">
+            @RLang.PrevStep
+        </button>
+        <button class="mBtn mBtn-pr defaultBtn next-step nextBtn" style="width: 175px" type="button" id="ParentButton">
+            <i class="far fa-save" style="font-size: 1.3em"></i>&nbsp;@RLang.Save
+        </button>
+    </div>
+</div>
+
+
+
+<script>
+    @{
+        var action = string.IsNullOrWhiteSpace(ViewContext.RouteData.Values["action"].ToString())?"":ViewContext.RouteData.Values["action"].ToString();
+    }
+
+    $('#hiddenActionName').val('@action');
+
+    $('#fakeButton').on('click',
+        function () {
+            var token = $("#spanToken").html();
+            var url = '/az/File/CallBackUploadFilesPartial';
+            if ('@action' == 'EditDocument')
+                url = url + window.location.search;
+            else
+                url = url + '?token=' + token;
+            $.ajax({
+                url: url,
+                type: 'get',
+                dataType: 'html',
+                success: function (data) {
+                    $('#divAttachDocTree').html(data);
+                }
+            });
+        });
+</script>

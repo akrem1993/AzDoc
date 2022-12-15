@@ -1,0 +1,480 @@
+﻿
+@using OutgoingDoc.Enum
+@model DocumentViewModel
+@{
+    Layout = null;
+    var countAuthor = 1;
+    var countRelDoc = 1;
+    var countAnsDoc = 1;
+    var count = 1;
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+
+}
+
+<style>
+
+    .isChecked {
+        background: #ddd;
+    }
+
+    .check {
+        pointer-events: none;
+    }
+
+    /*.tr-header > th, #tr > td {
+        border: #ccc solid 1px;
+        text-align: center !important;
+        vertical-align: middle;
+    }*/
+
+    #ShortContent {
+        height: 100px !important;
+    }
+
+    .btn-light {
+        color: #212529;
+        background-color: #f8f9fa;
+        border-color: #cccccc !important;
+    }
+
+    .tableRelated {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+        text-align: left !important;
+        height: 200px;
+        display: block;
+        overflow: scroll
+    }
+
+    /*.tr-header-related > th, #tr > td {
+        border: #ccc solid 1px;
+        text-align: left !important;
+        vertical-align: middle;
+    }*/
+
+    .form-control, .btn {
+        font-size: 0.8rem !important;
+    }
+
+    .card-body {
+        padding: 0.5rem !important;
+    }
+</style>
+
+<link href="~/Content/jquery-editable-select/jquery-editable-select.min.css?v=@AppVersion.Version" rel="stylesheet" />
+
+
+<div class="editGroup">
+    <h4>@RLang.BasicInfo</h4>
+    <div class="input-group input-group-sm">
+        <div class="col-sm-4" style="padding-left: 0;">
+            <label class="font-weight-bold">Sənədin növü <span style="color:red;font-weight:bold">*</span> </label>
+            @Html.DropDownListFor(model => model.TypeOfDocument.Id,
+                new SelectList(Model.TypeOfDocuments, "Id", "Name", Model.DocumentModel?.TypeOfDocumentId), "Seç", new
+                {
+                    @class = "selectpicker",
+                    @id = "TypeOfDocument",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+                    @data_required = "Sənədin növünü daxil edin"
+                })
+        </div>
+        <div class="col-sm-5" style="padding-left: 0;">
+            <label class="font-weight-bold">İmza edən şəxs  <span style="color:red;font-weight:bold">*</span> </label>
+            @Html.DropDownListFor(model => model.SignatoryPerson.Id,
+                new SelectList(Model.SignatoryPersons, "Id", "Name", Model.DocumentModel?.SignatoryPersonId), "Seç", new
+                {
+                    @id = "SignatoryPerson",
+                    @class = "selectpicker",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+                    @data_required = "İmza edən şəxsi daxil edin"
+                })
+        </div>
+    </div>
+
+    <div class="input-group">
+        <div class="col-sm-4" style="padding-left: 0;">
+            <label class="font-weight-bold">Qeydiyyat tarixi <span style="color:red;font-weight:bold">*</span></label>
+            @Html.TextBoxFor(model => model.DocumentModel.DocEnterDate, "{0:yyyy-MM-dd}", new
+            {
+                @type = "date",
+                @class = "form-control",
+                @data_live_search = "true",
+                @id = "DocEnterDate",
+                @data_required = "Qeydiyyat tarixini daxil edin"
+            })
+        </div>
+        <div class="col-sm-5" style="padding-left: 0;">
+            <label class="font-weight-bold">Göndərilmə forması <span style="color:red;font-weight:bold">*</span></label>
+            @Html.DropDownListFor(model => model.SendForm.Id,
+                new SelectList(Model.SendForms, "Id", "Name", Model.DocumentModel?.SendFormId), "Seç", new
+                {
+                    @class = "selectpicker",
+                    @id = "ReceivedForm",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+                    @data_required = "Göndərilmə formasını daxil edin"
+                })
+        </div>
+    </div>
+</div>
+
+<div class="input-group">
+    <div class="col-sm-12" style="padding-left: 0;">
+        <table class="table table-bordered table-sm table-hover" id="tbWhomAddress">
+            <thead>
+                <tr>
+                    <th scope="col">Kimə ünvanlanıb-Nazirlik üzrə</th>
+                    <th scope="col" style=" border-left: 0!important;width: 20px"></th>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.DropDownListFor(model => model.WhomAddress.Id,
+                            new SelectList(Model.WhomAddresses, "Id", "Name"), "Seç", new
+                            {
+                                @class = "selectpicker",
+                                @id = "WhomAddress",
+                                @data_live_search = "true",
+                                @data_width = "100%"
+                            })
+                    </td>
+                    <td style="width: 20px">
+                        <button type="button" class="btn btn-default btn-sm" id="addWhomAddress" title="Əlavə et" onclick='addWhomAddressed(this)'>
+                            <i class="fas fa-plus-square icon-size" style="color: green"></i>
+                        </button>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.DocumentModel?.JsonWhomAddress ?? Enumerable.Empty<WhomAddressedModel>())
+                {
+                    <tr id="tr" class="data-row rowSelector" data-WhomAddress='@item.WhomAddressId' data-ExecutionStatus='@item.TypeOfAssignmentId'>
+                        <td>
+                            @item.WhomAddress
+                        </td>
+
+                        <td style="width:100px">
+                            <a href='javascript:void(0);' onclick='deleteRowDataTable(this)' id='deleteRowDataTable' class='remove'><span class='fas fa-trash-alt btn' style='color:red'></span></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="editGroup">
+    @*@if(Model.DocumentModel?.AnswerByOutDocModels != null)
+        {*@
+    <h4>Kimə ünvanlanıb <span style="color: red;font-weight: bold">*</span></h4>
+    <div class="input-group input-group-sm">
+        <input type="text" id="searchAuthor" class="form-control custom" placeholder="Axtar..." title="Kimə ünvanlanıb">
+        <input type="hidden" name="next4" value="4" />
+        <div class="input-group-append">
+            <a href="#addNewAuthorModal" id="labelForAddNewAuthorModal" class="btn btn-info" data-toggle="modal" style="display: none;float: right">Yeni müəllif əlavə et</a>
+        </div>
+    </div>
+
+    <table id="dataTableOrgAuthor" style=" margin-top: 10px;width: 0 !important;" class="table table-hover mTable" aria-readonly="true">
+        <thead>
+            <tr class="tr-header">
+                <th scope="col" class="thead">№</th>
+                <th scope="col" class="thead">Təşkilat</th>
+                <th scope="col" class="thead">Müəllif</th>
+                <th scope="col" class="thead">Şöbə</th>
+                <th scope="col" class="thead">Vəzifə</th>
+                <th scope="col" class="thead"></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model.DocumentModel?.AuthorModels ?? Enumerable.Empty<AuthorModel>())
+            {
+                <tr id="tr" class="data-row rowSelector" data-AuthorId="@item.AuthorId"
+                    data-AuthorOrganizationId="@item.AuthorOrganizationId"
+                    data-OrganizationName="@item.OrganizationName"
+                    data-FullName="@item.FullName"
+                    data-PositionName="@item.PositionName">
+
+                    <td style="font-weight: bold"><span id="countNo">@(countAuthor++)</span></td>
+                    <td>@(item.OrganizationName ?? "---")</td>
+                    <td>@(item.FullName ?? "---")</td>
+                    <td>@(item.AuthorDepartmentName ?? "---")</td>
+                    <td>@(item.PositionName ?? "---")</td>
+                    <td><a href="javascript:void(0);" onclick="deleteRowAuthor(@item.AuthorId, this)" id="deleteRowDataTable" class="remove"><span class='fas fa-trash-alt btn' style='color: red'></span></a></td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+
+</div>
+<div class="editGroup">
+    <h4>Əlaqəli sənəd</h4>
+    <div class="input-group input-group-sm">
+        <input type="text" id="searchRelatedDoc" class="form-control custom" placeholder="Sənədi axtar..." title="Əlaqəli sənəd">
+        <input type="hidden" name="next5" value="5" />
+    </div>
+
+    <table id="relatedDocTable" class="table table-hover mTable" style="margin-top:10px; width:0!important;border-collapse: unset;" aria-readonly="true">
+        <thead>
+            <tr class="tr-header">
+
+                <th scope="col" class="thead">Daxil olma nömrəsi</th>
+                <th scope="col" class="thead">Hardan daxil olub</th>
+                <th scope="col" class="thead">Sil</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.DocumentModel?.RelatedDocModels ?? Enumerable.Empty<RelatedDocModel>())
+            {
+                <tr id="tr" class="data-row @(SessionHelper.CurrentDocId==-1? "rowSelector" :"")" data-DocId='@item.DocId'>
+                    <td style='text-align: center !important'>
+                        <a href="/az/Document/GetDocView?token=@(CustomHelpers.CustomHelper.Encrypt($"{SessionHelper.WorkPlaceId}-{DateTime.Now:dd.MM.yyyyHH:mm:ss}-{item.DocId}"))" target="_blank">@item.DocEnterno</a>
+                    </td>
+                    <td style='text-align:center!important'>@(item.DocumentInfo ?? "---")</td>
+                    <td style='text-align:center!important'><a href="javascript:void(0);" onclick="deleteRowRelated(@item.RelatedId, this)" data-relatedType="1" id="deleteRowDataTable" class="remove"><span class='fas fa-trash-alt btn' style='color: red'></span></a></td>
+                </tr>
+            }
+            @foreach (var item in Model.DocumentModel?.RelatedDocumentByOutDocModels ?? Enumerable.Empty<RelatedDocumentByOutDocModel>())
+            {
+                <tr id="tr" class="data-row @(SessionHelper.CurrentDocId==-1? "rowSelector" :"")" data-DocId='@item.DocId'>
+                    @*<td style="text-align:center!important"><span id="countNo">@(count++)</span></td>*@
+                    <td style="text-align:center!important"><a href="/az/Document/GetDocView?token=@(CustomHelpers.CustomHelper.Encrypt($"{SessionHelper.WorkPlaceId}-{DateTime.Now:dd.MM.yyyyHH:mm:ss}-{item.DocId}"))" target="_blank">@item.DocEnterno</a></td>
+                    <td style="text-align:center!important">@item.DocumentInfo</td>
+                    <td style="text-align:center!important">
+                        <a href="javascript:void(0);" onclick="deleteRowRelated(@item.DocId, this)" data-relatedType="1" id="deleteRowDataTable" class="remove">
+                            <span class='fas fa-trash-alt icon-size' style='color: red'></span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+@if (Model.DocumentModel?.AnswerByOutDocModels != null)
+{
+    <div class="editGroup">
+        <h4>Cavab sənədi</h4>
+
+        <div class="input-group input-group-sm">
+            <input type="text" id="searchAnswerDocument" class="form-control custom" placeholder="Sənədi axtar..." title="Cavab sənədi">
+            <input type="hidden" name="next6" value="6" />
+        </div>
+        <table id="answerDocTable" class="table table-hover mTable" style="margin-top: 10px; width: 0 !important;" aria-readonly="true">
+            <thead>
+                <tr class="tr-header">
+
+                    <th scope="col" class="thead">Daxil olma nömrəsi</th>
+                    <th scope="col" class="thead">Hardan daxil olub</th>
+                    <th scope="col" class="thead">Nəticə</th>
+                    <th scope="col" class="thead">Sil</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model.DocumentModel?.AnswerByOutDocModels ?? Enumerable.Empty<AnswerByOutDocModel>())
+                {
+                    <tr id="tr" class="data-row rowSelector" name="answerDoc" data-DocId='@item.DocId' data-resultid="">
+
+                        <td style="text-align: center!important"><a href="/az/Document/GetDocView?token=@TokenHelper.CreateToken(item.DocId)" target="_blank">@item.DocEnterno</a></td>
+                        <td>@item.DocumentInfo</td>
+                        @if (item.DocDoctypeId == 2 || item.DocDoctypeId==27)
+                        {
+                            <td>
+                                @Html.DropDownListFor(model => model.Result.Id,
+                                    new SelectList(Model.ResultList, "Id", "Name", item.ResultId ?? -1), "Seç", new
+                                    {
+                                        @class = "selectpicker",
+                                        @id = "resultList",
+                                        @data_live_search = "true",
+                                        @data_width = "100%",
+                                        @onchange = "GetSelectValue(this)",
+                                        @data_required = "Zehmet olmasa nəticəni daxil edin"
+                                    })
+                            </td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        <td style="width: 20px;text-align: center">
+                            <button type="button" class="btn btn-default btn-sm" title="Sil" data-relatedType="2" onclick='deleteRowRelated(@item.RelatedId,this)'>
+                                <i class="fas fa-trash-alt icon-size" style="color: red"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                }
+            </tbody>
+        </table>
+
+    </div>
+}
+
+<div class="editGroup">
+    <h4>Qısa məzmun <span style="color: red;font-weight: bold">*</span></h4>
+    @Html.TextAreaFor(model => model.DocumentModel.ShortContent, new
+        {
+            @placeholder = "",
+            @type = "text",
+            @class = "form-control",
+            @id = "ShortContent",
+            @data_required = "Qıza məzmunu daxil edin"
+        })
+</div>
+
+<div class="row mb-5 pb-5 mt-4">
+    <div class="col-12 text-center">
+        <button type="button" class="mBtn mBtn-sec mr-2" onclick="window.history.go(-1); return false;">
+            @RLang.PrevStep
+        </button>
+        <button id="next-step-2" type="button" class="mBtn mBtn-pr next-step">
+            @RLang.NextStep
+        </button>
+
+    </div>
+</div>
+
+<div class="mModal">
+    <div class="modal fade" id="addNewAuthorModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Müəllifi əlavə etmə paneli</span>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <input type="text" name="surname" class="form-control inputSelector" placeholder="Soyadı">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <input type="text" name="firstName" class="form-control inputSelector" placeholder="@RLang.Name">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <input type="text" name="fatherName" class="form-control inputSelector" placeholder="Atasının adı">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <select name="organizationName" class="form-control custom inputSelector required" placeholder="@RLang.OrganizationNameEnter"></select>
+                                <input type="hidden" name="next1" value="1" />
+                                <input type="hidden" class="inputSelector" name="organizationId" value="" />
+                            </div>
+
+                            <div class="form-group">
+                                <select name="departmentName" class="form-control custom inputSelector" placeholder="Qurumu"></select>
+                                <input type="hidden" name="next2" value="2" />
+                                <input type="hidden" class="inputSelector" name="departmentId" value="" />
+                            </div>
+
+                            <div class="form-group">
+                                <select name="positionName" class="form-control custom inputSelector required" placeholder="Vəzifə"></select>
+                                <input type="hidden" name="next3" value="3" />
+                                <input type="hidden" class="inputSelector" name="positionId" value="" />
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="addressName" class="form-control inputSelector" placeholder="Ünvan">
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Ləğv et</button>
+
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="addNewAuthorButton" class="mBtn mBtn-pr defaultBtn" style="width: 100%">@RLang.Save</button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* Kime unvanlanib--movcud istifadecinin daxil edilmesi *@
+<div class="mModal">
+    <div class="modal fade" id="addAuthorModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Kimə ünvanlanıb</span>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <input type="hidden" name="hiddenauthorid" class="form-control inputSelector" value="">
+                                <input type="hidden" name="hiddenorgid" class="form-control inputSelector" value="">
+                                <label name="hidden1" class="form-control inputSelector" placeholder="Qurum"></label>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <input type="text" name="surname1" class="form-control inputSelector" placeholder="Soyadı">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <input type="text" name="firstName1" class="form-control inputSelector" placeholder="@RLang.Name">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <input type="text" name="fatherName1" class="form-control inputSelector" placeholder="Atasının adı">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <select name="positionName1" class="form-control custom inputSelector required" placeholder="Vəzifəsini daxil edin"></select>
+                                <input type="hidden" name="next3" value="3" />
+                                <input type="hidden" class="inputSelector" name="positionId1" value="" />
+                            </div>
+                            <div class="form-group">
+                                <input type="text" name="addressName1" class="form-control inputSelector" placeholder="Ünvanı daxil edin">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Ləğv et</button>
+
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="addExistAuthorButton" class="mBtn mBtn-pr defaultBtn" style="width: 100%">@RLang.Save</button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $("#dataTableOrgAuthor").find(".data-row").length === 0
+        ? $("#dataTableOrgAuthor").hide()
+        : $("#dataTableOrgAuthor").show();
+
+    $("#relatedDocTable").find(".data-row").length === 0
+        ? $("#relatedDocTable").hide()
+        : $("#relatedDocTable").show();
+</script>
+
+<script src="~/Scripts/jquery-editable-select/jquery-editable-select.min.js?v=@AppVersion.Version"></script>

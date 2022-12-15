@@ -1,0 +1,390 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<link href="~/Content/fontawesome/css/all.min.css" rel="stylesheet" />
+<link href="~/Content/fontawesome/css/v4-shims.min.css" rel="stylesheet" />
+
+
+@{
+    Html.RenderPartial("PanelViewPartial");
+}
+@Html.AntiForgeryToken()
+<div class="col-md-12" id="DocGrid" style="padding-top: 10px; height: 86vh">
+    @Html.Partial("GridViewPartial")
+</div>
+
+
+
+<div id="popover-content-ActionName"></div>
+
+
+<!-- Modal -->
+<div class="mModal">
+    <div class="modal fade" id="doubleClickModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document" style="max-width: 75% !important">
+            <div class="modal-content" style="background: #ffffff">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Beynəlxalq münasibətlər</span>
+                </div>
+                <div class="modal-header3">
+                    <div class="row no-gutters" style="border-bottom:1px solid #8080805e; margin: 0 1rem">
+                        <div class="col-12">
+                            <a class="individual active">
+                                Elektron sənəd
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+
+                    <form class="indForm" id="ElectronicDocument"></form>
+
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" data-dismiss="modal">@RLang.Close</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@Html.Partial("SendForInformation")
+
+@section scripts{
+    <script>
+        $(document).on("click",".popoverAction",function() {
+            var actionId = this.id;
+            var elementDocId = $("#DocActionsPopover").attr('class');
+            if (elementDocId == null || elementDocId < 1)
+                return;
+            console.log('go to operation');
+            DocumentOperation(actionId, elementDocId);
+        });
+
+
+
+        function DocumentOperation(actionId, docId) {
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            if (actionId == 1) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/@lang/Smdo/Operation/SendDocument',
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    dataType: 'json',
+                    data: { __RequestVerificationToken: token, description: null },
+                    success: function() {
+                        window.location = '/@lang/Smdo';
+                    }
+                });
+            }
+
+            if (actionId == 2) {
+                $.ajax({
+                    url: "/@lang/Smdo/Document/CheckSFTPServer",
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function(result) {
+                        if (result) {
+                            window.location = '/@lang/Smdo/Document/EditDocument';
+                        } else {
+                            toastr.warning("@RLang.SftpWarning");
+                        }
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+
+            if (actionId == 3) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/@lang/ServiceLetters/Operation/RecognizedDocument',
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    dataType: 'json',
+                    data: { __RequestVerificationToken: token, description: null },
+                    success: function() {
+                        window.location = '/@lang/Smdo';
+                    }
+                });
+            }
+
+            if (actionId == 4) {
+                var select = $("#Person"); //RAZILASMA SXEMI ACILANDA MESUL SEXSI DOLDURUR
+                select.empty().append($("<option value='-1' selected disabled>Seçin</option>").val("-1"));
+                var markup = "";
+                $.ajax({
+                    type: "GET",
+                    url: "/@lang/Document/SendForInformation",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function (response) {
+                        $("#tbSendForInformation").find("tr.data-row").remove();
+                        $("#sendForInformationModal").modal().show();
+                        $.each(response, function () {
+                            if (this.FormTypeId != 2) {
+                                select.append($("<option></option>").val(this.Id).html(this.Name));
+                            } else {
+                                if (((this.PositionGroupLevel == 1) || (this.PositionGroupLevel == 2) || (this.PositionGroupLevel == 3)) && (this.DirectionConfirmed==1)) {
+                                    markup= "<tr class='data-row '" +
+                                        "data-PersonId='" +
+                                        this.Id +
+                                        "'>" +
+                                        '<td>' +
+                                        this.Name +
+                                        '</td>' +
+                                        '<td style="width:20px">' +
+
+                                        '</td>' +
+                                        '</tr>';
+                                } else {
+                                     markup = "<tr class='data-row '" +
+                                        "data-PersonId='" +
+                                        this.Id +
+                                        "'>" +
+                                        '<td>' +
+                                        this.Name +
+                                        '</td>' +
+                                        '<td style="width:20px">' +
+                                        "<a href='javascript:void(0);' onclick='deleteSenForInformation("+this.Id+",this)' id='deleteRowDataTable' class='remove'><span class='fas fa-trash-alt btn' style='color:red'></span></a>" +
+                                        '</td>' +
+                                        '</tr>';
+                                }
+
+
+                                $("#tbSendForInformation").append(markup);
+                            }
+
+                        });
+                        $('.selectpicker').selectpicker('refresh');
+
+                    },
+                    complete: function () {
+                        window.CloseLoading();
+                    }
+                });
+
+            }
+            if (actionId == 8) {
+                $.ajax({
+                    url: '/@lang/Direction/DirectionModal',
+                    type: 'GET',
+                    dataType: 'html',
+                    data: { docId: docId },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function(response) {
+                        $('#dynamiccontext').html(response);
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+
+            if (actionId==11) {
+                $.ajax({
+                    url: "/@lang/OrgRequests/Document/CheckSFTPServer",
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function (result) {
+                        if (result) {
+                            window.location= '/@lang/ServiceLetters/Document/AnswerByLetter';
+                        } else
+                        {
+                            toastr.warning("@RLang.SftpWarning");
+                        }
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+
+
+            if (actionId==12) {
+                $.ajax({
+                    url: "/@lang/OrgRequests/Document/CheckSFTPServer",
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function (result) {
+                        if (result) {
+                            window.location= '/@lang/ServiceLetters/Document/RelateDocumentByServiceLetter';
+                        } else {
+                            toastr.warning("@RLang.SftpWarning");
+                        }
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+
+            if (actionId==13) {
+                $.ajax({
+                    url: "/@lang/OrgRequests/Document/CheckSFTPServer",
+                    async: false,
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function (result) {
+                        if (result) {
+                            window.location = '/@lang/outgoing/Document/AnswerByOutgoingDoc';
+                        } else {
+                            toastr.warning("@RLang.SftpWarning");
+                        }
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+            if (actionId==14) {
+                $.ajax({
+                    url: "/@lang/OrgRequests/Document/CheckSFTPServer",
+                    async: false,
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function (result) {
+                        if (result) {
+                            window.location = '/@lang/outgoing/Document/RelatedDocByOutgoingDoc';
+                        } else {
+                            toastr.warning("@RLang.SftpWarning");
+                        }
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+        }
+
+
+
+        function GetPopoverActions(item, boundData) {
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/Smdo/Document/GetDocumentActions',
+                dataType: 'html',
+                data: { docId: boundData.DocId, menuTypeId: 0},
+                success: function(data) {
+                    $(item).popover({
+                        html: true,
+                        content: data,
+                        container: "html",
+                        trigger: "focus"
+                    });
+
+                    $(item).popover('show');
+                }
+            });
+        }
+
+        function DocView(item, boundData) {
+            window.open('/az/Document/GetDocView?docId=' + boundData.DocId, '_blank');
+        }
+
+        function onFilter(sender, args, query) {
+            $('#gridServiceLetters').bindgrid(1);
+        }
+
+        function checkUnread(boundData) {
+            return boundData.ExecutorControlStatus === false;
+        }
+
+        function GridRowDoubleClick(event, rowdata) {
+            $("#globalDocId").val(rowdata.DocId);
+            $.ajax({
+                type: 'GET',
+                url: '/az/Smdo/Document/ElectronicDocument',
+                dataType: 'html',
+                data: { docId: rowdata.DocId },
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                success: function(response) {
+                    $('#ElectronicDocument').html(response);
+                    //$(`[title='${rowdata.DocId}']`).closest('[role="row"]').removeClass('unread');
+                    $("#doubleClickModal").modal();
+                },
+                complete: function () {
+                    window.CloseLoading();
+                }
+            });
+
+        }
+
+        $(function() {
+            var $contextMenu = $("#contextMenu");
+
+            $("body").on("contextmenu",
+                "#gridServiceLetters",
+                function(e) {
+                    $contextMenu.css({
+                        display: "block",
+                        left: e.pageX,
+                        top: e.pageY
+                    });
+                    return false;
+                });
+
+            $('html').click(function() {
+                $contextMenu.hide();
+            });
+
+
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/Smdo/Document/GetDocumentActions',
+                dataType: 'html',
+                data: { docId: boundData.DocId, menuTypeId: 0},
+                success: function(data) {
+                    $(item).popover({
+                        html: true,
+                        content: data,
+                        container: "html",
+                        trigger: "focus"
+                    });
+
+                    $(item).popover('show');
+                }
+            });
+        });
+
+        $("#Period").change(function () {
+
+            $('#gridServiceLetters').setRouteValue({ 'periodId': $(this).val() });
+            $('#gridServiceLetters').bindgrid(1);
+
+        });
+
+
+    </script>
+    <script src="~/Scripts/serviceletters/serviceletters.js?v=@AppVersion.Version"></script>
+}

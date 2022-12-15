@@ -1,0 +1,317 @@
+﻿
+@using AzDoc.Helpers
+@* senedin ləğv paneli *@
+<div class="mModal">
+    <div class="modal fade modalBtn" id="removeDialogModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Sənədi ləğv etməyə əminsiniz ?</span>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group" style="text-align: left!important">
+                                <label for="ctlConfirmCertificates">Sertifikatınızı seçin:</label>
+                                <select class="form-control" name="" id="ctlConfirmCertificates"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <textarea class="form-control" id="confirmNote"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="confirmProgressBarContainer" class="container">
+                                <p id="confirmProgressStatus"></p>
+                                <div class="progress">
+                                    <div id="confirmProgressBar"
+                                         class="progress-bar progress-bar-striped active"
+                                         role="progressbar"
+                                         aria-valuenow="0"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100"
+                                         style="width:0">
+                                        1
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" id="confirmDocBtn" class="mBtn mBtn-pr defaultBtn" style="width: 100%" disabled>Ləğv et</button>
+                        <button type="button" class="btn btn-secondary" id="getConfirmCerts" hidden></button>
+                        <input type="file" class="custom-file-input" id="disposeFiles" multiple hidden>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" style="width: 100%">Bağla</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button type="button" id="confirmation" hidden="hidden"></button>
+
+<script>
+    var filesarray = [];
+    var eimza = eimzaLib();
+    var tokenDocId = $("#spanToken").html();;
+
+    $("#disposeDocConfirmation").on("click",
+        function () {
+            eimza.isSigningServiceWorking().then(onConfirminingWorking, onConfirminingDown);
+            //imzanin melumatlarini getirir
+            $("button#getConfirmCerts").click(function () {
+                reset();
+                $("#confirmProgressBarContainer").hide();
+                eimza.readCertificates().then(onConfirmSuccessReadCertificates, onError);
+            });
+
+        });
+
+    function onConfirminingWorking() {
+        // enable all
+        $("#failinfo").hide();
+        var formData = new FormData();
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: `/az/ESign/GetSignedFile?token=${tokenDocId}`,
+            data: { __RequestVerificationToken: token },
+            beforeSend: window.ShowLoading(),
+            success: function (data) {
+                console.log(data);
+                $("#confirmDocBtn").removeAttr("disabled");
+
+                var blob = new Blob([base64ToArrayBuffer(data.Base64)], { type: "octet/stream" }); //, url = window.URL.createObjectURL(blob);
+
+                //tesdiqleme
+                $("#confirmDocBtn").click(function () {
+                    var note = $("#confirmNote").val().trim();
+
+                    if (note == '') {
+                        toastr.warning('Qeydinizi daxil edin');
+                        return;
+                    }
+
+
+                    var select = document.getElementById("ctlConfirmCertificates");
+                    var certSerialNumber = select.options[select.selectedIndex].value;
+                    var certDetails = select.options[select.selectedIndex].text;
+
+                    var jsonString = `{"${certDetails.split(',').join('", "').split('=').join('": "')}"}`;
+                    var object = JSON.parse(jsonString);
+                    console.log(object);
+
+                    var serialNumber = $.trim(object.SERIALNUMBER);
+
+                    if (serialNumber !== '@SessionHelper.UserFIN' && ($.inArray(serialNumber, exceptFin) === -1)) {
+                        return toastr.warning("Seçdiyiniz sertifikat mövcud istifadəçiyə aid deyil.");
+                    }
+
+                    confirmReset();
+                    changeConfirmProgressBar(1, "Ləğv etmə prosesi başlayıb ....");
+                    formData.append("AuthCertificateSerialNumber", certSerialNumber);
+                    formData.append("file0", blob, data.FileName);
+
+                    eimza.checkEdoc(data.Base64, data.FileName).then(onConfirmSuccess, onError);
+
+                    progressInterval = setInterval(function () {
+                        eimza.getProgress().then(onConfirmProgressSuccess);
+                    },
+                        500);
+                });
+            },
+            complete: function() {
+                window.CloseLoading();
+            }
+        });
+
+        $("button#getConfirmCerts").click();
+    }
+
+    function base64ToArrayBuffer(base64) {
+        var binaryString = window.atob(base64);
+        var binaryLen = binaryString.length;
+        var bytes = new Uint8Array(binaryLen);
+        for (var i = 0; i < binaryLen; i++) {
+            var ascii = binaryString.charCodeAt(i);
+            bytes[i] = ascii;
+        }
+        return bytes;
+    }
+
+    var saveData = (function () {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        return function (data, fileName) {
+            var blob = new Blob([base64ToArrayBuffer(data)], { type: "octet/stream" }),
+                url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+    }());
+
+    function onConfirminingDown() {
+        // hide everything
+        // show error message
+        $("#mainContainer").hide();
+        $("#failinfo").show();
+        $("#failinfo").html(
+            "Yeni Online Imzalayici proqrami yazılmayıb və ya işləmir. Zəhmət olmasa yükləyin."
+        );
+    }
+
+    function confirmReset() {
+        console.log("reset");
+        $("#confirmProgressBarContainer").show();
+        $("#failinfo").hide();
+    }
+
+    function changeConfirmProgressBar(percentage, status) {
+        console.log("changeProgressBar");
+        $("#confirmProgressBar").css("width", percentage + "%");
+        $("#confirmProgressBar").html(percentage + "%");
+
+        $("#confirmProgressStatus").html(status);
+    }
+
+    function onConfirmSuccessReadCertificates(data, status) {
+        console.log("onSuccessReadCertificates");
+        console.log(data);
+
+        if (data.errorCode !== 0) {
+            toastr.warning(data.errorDetails);
+            $("#confirmProgressBarContainer").hide();
+            $("#failedMessage").show();
+            $("#failedMessage").html(data.errorDetails);
+        }
+
+        if (data.certificates) {
+            var options = "";
+            for (var i = 0; i < data.certificates.length; i++) {
+                options +=
+                    '<option value="' +
+                    data.certificates[i].serialNumber +
+                    '">' +
+                    data.certificates[i].subject +
+                    "</option>";
+            }
+            $("#certificatesDiv").show();
+            $("select#ctlConfirmCertificates").html(options);
+        }
+    }
+
+    function onConfirmSuccess(data, status) {
+
+        if (data.statusCode === 0) {
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+
+            $.ajax({
+                url: `/az/DocOperation/DisposeDocument?token=${tokenDocId}`,
+                type: 'POST',
+                dataType: 'json',
+                data: { __RequestVerificationToken: token, note: $("#confirmNote").val() },
+                success: function (data) {
+                    if (data) {
+                        $("#removeDialogModal").modal("hide");
+
+                        setTimeout(function () {
+                            location.reload();
+                        },
+                            2000);
+
+                        Swal.fire({
+                            type: 'success',
+                            title: 'Sənədin ləğvi uğurla başa çatdı.',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+
+                    } else {
+                        toastr.warning("Sənədin ləğvi uğursuz oldu.");
+                    }
+                },
+                error: function (response) {
+                    console.log('error', response);
+                }
+            });
+        } else {
+            toastr.error(data.message);
+            progressInterval = undefined;
+        }
+
+        if (data.errorCode !== 0) {
+            $("#confirmProgressBarContainer").hide();
+            $("#failinfo").show();
+            $("#failinfo").html(data.errorDetails);
+        } else if (
+            data.authCertificateSubject !== undefined &&
+            data.signCertificateSubject !== undefined
+        ) {
+            var certificateData = "";
+            certificateData =
+                certificateData + "<p>" + data.authCertificateSerialNumber + "</p>";
+            certificateData =
+                certificateData + "<p>" + data.authCertificateSubject + "</p>";
+            certificateData =
+                certificateData + "<p>" + data.signCertificateSerialNumber + "</p>";
+            certificateData =
+                certificateData + "<p>" + data.signCertificateSubject + "</p>";
+
+            $("#certSubject").html(certificateData);
+        } else if (data.edocFile !== undefined) {
+            if (data.edocFile.rawData != undefined) {
+                $("#rawData").html(data.edocFile.rawData);
+            } else {
+                $("#rawData").html(data.edocFile);
+            }
+
+            changeConfirmProgressBar(100, "Sənəd müvəffəqiyyətlə ləğv olundu !");
+        }
+
+        if (progressInterval !== undefined) {
+            console.log("clear interval");
+            window.clearInterval(progressInterval);
+        }
+    }
+
+    function onError(err) {
+        toastr.error("Sənədin ləğvi uğursuz oldu." + err);
+        console.log("onError", err);
+    }
+
+    function onConfirmProgressSuccess(data, status) {
+        console.log('onProgressSuccess >> ', data);
+        if (data.progress === null) {
+            changeConfirmProgressBar(100, 'Ləğv prosesi uğurla bitib !');
+        } else if (data.progress.status === true) {
+            changeConfirmProgressBar(data.progress.percentage, data.progress.state);
+        }
+    }
+
+    function dataURLtoFile(dataurl, filename) {
+        var parts = dataurl.split(',');
+        bstr = atob(parts[1]), n = bstr.length, fileBuffer = new Uint8Array(n);
+        while (n--) {
+            fileBuffer[n] = bstr.charCodeAt(n);
+        }
+        return new File([fileBuffer], filename, { type: 'edoc' });
+    }
+</script>

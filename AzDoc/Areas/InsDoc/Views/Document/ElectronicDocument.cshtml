@@ -1,0 +1,235 @@
+﻿@using BLL.Models.DocInfo
+@using InsDoc.Common.Enums
+@using InsDoc.Model.EntityModel
+@using InsDoc.Model.ViewModel
+@model InsDoc.Model.ViewModel.ElectronicDocumentViewModel
+@{
+    Layout = null;
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<style>
+    .col-md-1 {
+        flex: 0 0 4.333333% !important;
+        width: 3.5% !important;
+    }
+
+    .operationIcons {
+        font-size: 1.7em;
+    }
+</style>
+
+<div style="height: 100%">
+    <div class="col-12">
+        <div class="form-group">
+            <div class="input-group">
+                @Html.AntiForgeryToken()
+                <span class="d-none" id="spanToken">@Model.Token</span>
+
+                <div class="col-md-1">
+                    <button type="button" id="DocInfoButton" class="btn btn-light btn-sm">
+                        <i class="fas fa-chevron-circle-down operationIcons" style="color: #005487"></i>
+                    </button>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" id="operationHistoryButton" class="btn btn-light btn-sm" title="Əməliyyat tarixçəsi">
+                        <i class="fas fa-history operationIcons" style="color: #005487"></i>
+                    </button>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" id="taskButton" class="btn btn-light btn-sm" title="Tapşırıq">
+                        <i class="fas fa-tasks operationIcons" style="color: #005487"></i>
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    @Html.DropDownListFor(model => Model.FileInfoId,
+                        new SelectList(Model.DocFiles, "FileInfoId", "FileName"), new
+                        {
+                            @class = "form-control",
+                            @id = "JsonFile"
+                        })
+                </div>
+
+                @Html.Partial("~/Views/Document/ElectronicDocumentActions.cshtml", Model.DocActions)
+
+                @if (Model.FileSignatureStatus == 2)
+                {
+                    <div class="col-md-1">
+                        <img src="~/Areas/Smdo/Scripts/certificateAz.svg" height="35" width="35" title="Sənəd imzalanıb" />
+                    </div>
+                }
+            </div>
+
+            <div class="col-12">
+                <div class="form-group">
+                    <div class="alert alert-light alert-dismissible" id="alertInfo">
+                        <table class="table table-bordered mTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Sənədin nömrəsi</th>
+                                    <th scope="col">Sənədin Tarixi</th>
+                                    <th scope="col">Sənədin qısa məzmunu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    @if (!string.IsNullOrWhiteSpace(Model.DocEnterNo))
+                                    {
+                                        <td>@Model.DocEnterNo</td>
+                                        <td>@(Model.DocEnterDate.Value.ToString("d"))</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@Model.DocDocNo</td>
+                                        <td>@(Model.DocDocDate.Value.ToString("d"))</td>
+                                    }
+
+                                    <td>@Model.Description</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @Html.Partial("~/Views/DocInfo/_DocPlan.cshtml", Model.DocPlan)
+
+                    <div class="alert alert-light alert-dismissible" style="font-size: smaller" id="alertTask">
+
+                        <table class="table table-bordered mTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="thead">Tapşırıq nömrəsi</th>
+                                    <th scope="col" class="thead">Kimə ünvanlanıb</th>
+                                    <th scope="col" class="thead">Tapşırıq</th>
+                                    <th scope="col" class="thead">Tapşırıq dövrü</th>
+                                    <th scope="col" class="thead">İcra dövrü</th>
+                                    <th scope="col" class="thead">İcra müddəti</th>
+                                    <th scope="col" class="thead">İlkin icra tarixi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.DocTasks ?? Enumerable.Empty<DocTask>())
+                                {
+                                    <tr>
+                                        <td align='center'>@item.TaskDocNo</td>
+                                        <td align='left'><i style="font-weight: bold;">@item.TypeOfAssignment :</i> @item.WhomAddress</td>
+                                        <td align='left'>
+                                            @item.Task
+                                        </td>
+                                        @if (@item.TaskCycleId != null)
+                                        {
+                                            <td align='center'>@item.TaskCycleName</td>
+                                            <td align='center'>@item.ExecutionPeriod</td>
+                                            <td align='center'>@item.PeriodOfPerformance</td>
+                                            <td align='center'>@item.OriginalExecutionDate.Value.ToString("d")</td>
+
+                                        }
+                                        else
+                                        {
+                                            <td align='center'>@item.TaskCycleName</td>
+                                            <td align='center'>@item.ExecutionPeriod</td>
+                                            <td align='center'>@item.PeriodOfPerformance</td>
+                                            <td align='center'>@item.OriginalExecutionDate</td>
+                                        }
+                                    </tr>
+
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @Html.Partial("~/Views/Document/DocumentQrCode.cshtml", Model)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12" id="DocViewer">
+        <div class="form-group">
+            @Html.Partial("~/Areas/InsDoc/Views/Document/DocumentDisplay.cshtml")
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="signStatus" data-IsDocConfirm="@(Model.DocDocumentStatusId == (int) DocumentStatus.WaitForConfirming ? "true" : "false")" />
+<input type="hidden" id="fileSignStatus" data-signStatus="@Model.FileSignatureStatus" />
+
+@Html.Partial("/Views/Modals/_CommonModal.cshtml", Model)
+
+<script>
+
+    $('#fakeButton').click();
+
+    $("#sendForInformationButton").click(function () {
+        var token = $("#spanToken").html();
+        SendForInformaton(token);
+    });
+
+    $(".closeBtn").click(function () {
+        $(".modalBtn").modal("hide");
+    });
+
+    $(document).ready(function () {
+        $(".alert").hide();
+
+        $('#DocInfoButton').on("click",function() {
+            $("#alertOperationHistory").hide();
+            $("#alertTask").hide();
+            if ($("#alertInfo").css("display") == "none")
+            {
+                $("#alertInfo").show('medium');
+            }
+            else
+            {
+                $("#alertInfo").hide();
+            }
+        });
+
+        $('#operationHistoryButton').on("click",function() {
+            $("#alertInfo").hide();
+            $("#alertTask").hide();
+            if ($("#alertOperationHistory").css("display") == "none")
+            {
+                $("#alertOperationHistory").show('medium');
+
+            }
+            else {
+                $("#alertOperationHistory").hide();
+            }
+        });
+
+        $('#taskButton').on("click", function() {
+            $("#alertInfo").hide();
+            $("#alertOperationHistory").hide();
+            if ($("#alertTask").css("display") == "none") {
+                $("#alertTask").show('medium');
+
+            } else {
+                $("#alertTask").hide();
+            }
+        });
+
+        $(".close").click(function () {
+            $(".alert").hide();
+        });
+
+        $("#JsonFile").change(function () {
+            var id = $(this).val();
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/InsDoc/Document/DocumentDisplay',
+                dataType: 'html',
+                data: { docInfoId: id},
+                success: function (response) {
+                    $("#DocViewer").html(response);
+                }
+            });
+
+        });
+
+    });
+</script>

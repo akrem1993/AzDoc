@@ -1,0 +1,259 @@
+﻿@using AzDoc.App_LocalResources
+@model BLL.Models.Account.SettingModel
+
+<table class="mTable">
+    <thead>
+    <tr>
+        <th>Bildirişin növü</th>
+        <th>Web</th>
+        <th>Mail</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>
+            Məlumat üçün
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox" checked>
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Məlumat üçün
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            İcra üçün
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Dərkənar layihəsi hazırlamaq üçün
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Dərkənar layihəsinin təsdiqi üçün
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Əsas icraçı dəyişdirildi
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Məlumat üçün
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Məlumat üçün
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Məlumat üçün
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+        <td>
+            <label class="mSwitch">
+                <input type="checkbox">
+                <span class="switch-left">1</span>
+                <span class="switch-right">0</span>
+            </label>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div class="col-12 mt-4 text-center">
+    <button class="mBtn mBtn-pr">
+        <i class="fas fa-save"></i>
+        @RLang.Save
+    </button>
+</div>
+
+
+
+@*if (ViewBag.Message != null)
+    {
+        <script type="text/javascript">
+                window.onload = function () {
+                    alert("@ViewBag.Message");
+                };
+        </script>
+    }*@
+
+
+@*<script type="text/javascript">
+        $function(){
+        var checked = false;
+        if (checked=true) {
+           @Model.Notifications=true;
+            alert(""jkhbbn );
+            }
+            $('#togBtn').prop('checked', checked);
+        });
+    </script>*@
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            url: "/az/Settings/NotifySettingPartial",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (model) {
+                if (model.Notifications == true) {
+                    $("#togBtn").attr("checked","checked");
+                }
+                else {
+                    $("#togBtn").removeAttr("checked");
+                }
+            }
+        });
+    }
+    );
+
+
+
+    $('#NotificationsBtn').click(function () {
+        var isChecked = $("#togBtn").is(":checked");
+        $.ajax({
+            type: "POST",
+            url: "/az/Settings/NotifySettingPartial",
+            dataType: "json",
+            data: { notifications: isChecked },
+            success: function (response) {
+                if (response == true) {
+                    toastr.success("Bildirişlər aktiv edildi");
+                }
+                else {
+                    toastr.warning("Bildirişlər deaktiv edildi");
+                }
+            },
+            error: function (response) {
+                toastr.error(response.responseText);
+            }
+        });
+    });
+</script>
+
+

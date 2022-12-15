@@ -1,0 +1,344 @@
+﻿@using AzDoc.Helpers
+@using BLL.Common.Enums
+@using BLL.Models.Document
+@model BaseElectronDoc
+
+@{
+    var permissions = Permissions.GetAll(RightType.SignerNotEImza);
+}
+
+<div class="mModal">
+    <div class="modal fade modalBtn" id="signatureDialogModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>İmzalama paneli</span>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group" style="text-align: left!important">
+                                <label for="ctlCertificates">Sertifikatınızı seçin:</label>
+                                <select class="form-control" id="ctlCertificates"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <textarea class="form-control" id="signatureNote"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" id="signFile" class="mBtn mBtn-pr defaultBtn" style="width: 100%">Təsdiqlə</button>
+                        <button type="button" class="btn btn-secondary" id="getCerts" hidden></button>
+                        <input type="file" class="custom-file-input" id="files" multiple hidden>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" style="width: 100%">Bağla</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* elekton imzasiz imzalama paneli *@
+<div class="mModal">
+    <div class="modal fade modalBtn" id="notEImzaSignatureModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>İmzanı təsdiq etməyə əminsinizmi ?</span>
+                </div>
+
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+                    <div class="row">
+                        <div class="col-12">
+                            <textarea class="form-control" id="notESignNote"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" id="notEImzaAccept" class="mBtn mBtn-pr defaultBtn" style="width: 100%">Təsdiqlə</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" style="width: 100%">Bağla</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var filesarray = [];
+    var eimza = eimzaLib();
+
+    $("#sign").on("click",
+        function () {
+            var token = $("#spanToken").html();
+
+            $.ajax({
+                type: 'GET',
+                url: '/az/Document/ValidateSign?token=' + token,
+                beforeSend: window.ShowLoading(),
+                success: function () {
+                    var result = '@permissions.Has(RightType.SignerNotEImza)';
+
+                    if (result=='True') {
+                        $('#notEImzaSignatureModal').modal('show');
+                    } else {
+                        $('#signatureDialogModal').modal('show');
+                    }
+
+                },
+                complete: window.CloseLoading()
+            });
+        });
+
+    $('#signatureDialogModal').on('shown.bs.modal',
+        function() {
+            eimza.isSigningServiceWorking()
+                .then(onSigningWorking, onSigningDown);
+        });
+
+    $("#notEImzaAccept").on("click", function () {
+        var spanToken = $("#spanToken").html();
+        var desc = $('#notESignNote').val();
+
+        $.ajax({
+            url: `/az/ESign/SignDocNotESign?token=${spanToken}`,
+            type: 'POST',
+            cache: false,
+            contentType: false,
+            processData: false,
+            data: {  desc: desc},
+            beforeSend: window.ShowLoading(),
+            success: function (data) {
+                if (data) {
+                    $("#notEImzaSignatureModal").modal("hide");
+
+                    var grid = $($("#DocGrid").find("input")[0]).attr("id");
+
+                    setTimeout(function () {
+                        $('#' + grid).bindgrid();
+                    },
+                        3000);
+
+                    Swal.fire({
+                        type: 'success',
+                        title: 'Sənədin imzalanması uğurla başa çatdı.',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                } else {
+                    toastr.warning("Sənədin imzalanması uğursuz oldu.");
+                }
+            },
+            complete: function () {
+                window.CloseLoading();
+            },
+            error: function (response) {
+                console.log('error', response);
+            }
+        });
+    });
+
+    function readSignCertificates() {
+        eimza.readCertificatesFromStore().then(onSuccessReadCertificates, onSignReadCertError);
+    }
+
+    function onSigningWorking() {
+        readSignCertificates();
+
+        var jsObj = {};
+        var file = {};
+        var files = [];
+
+        $("#signFile").click(function () {
+            var select = $("#ctlCertificates");
+            var certSerialNumber = select.val();
+            var certDetails = select.text();
+
+            var jsonString = `{"${certDetails.split(',').join('", "').split('=').join('": "')}"}`;
+            var object = JSON.parse(jsonString);
+            var userFin = $.trim(object.SERIALNUMBER);
+
+            if (userFin !== '@SessionHelper.UserFIN' && ($.inArray(userFin, exceptFin)===-1)) {
+                return toastr.warning("Seçdiyiniz sertifikat mövcud istifadəçiyə aid deyil.");
+            }
+
+            file['name'] = '@Model.MainFileInfo.Name';
+            file['rawData'] = '@Model.MainFileInfo.Base64';
+            files.push(file);
+
+            jsObj['signFormat'] = 'Edoc';
+            jsObj['tsaClientName'] = 'Default';
+            jsObj['signCertificateSerialNumber'] = certSerialNumber;
+            jsObj['files'] = files;
+
+            var jsonObj = JSON.stringify(jsObj);
+            console.log(jsonObj);
+
+            eimza.signLocalFiles(jsonObj).then(onSignSuccess, onSignError);
+        });
+
+        @*$.ajax({
+            type: 'GET',
+            url: `/az/ESign/GetMainFile?token=${token}`,
+            beforeSend: function () { window.ShowLoading() },
+            success: function (data) {
+                console.log(data);
+                //imzalama
+                $("#signFile").click(function () {
+                    var select = $("#ctlCertificates");
+                    var certSerialNumber = select.val();
+                    var certDetails = select.text();
+
+                    var jsonString = `{"${certDetails.split(',').join('", "').split('=').join('": "')}"}`;
+                    var object = JSON.parse(jsonString);
+                    var userFin = $.trim(object.SERIALNUMBER);
+
+                    if (userFin !== '@SessionHelper.UserFIN' && ($.inArray(userFin, exceptFin)===-1)) {
+                        return toastr.warning("Seçdiyiniz sertifikat mövcud istifadəçiyə aid deyil.");
+                    }
+
+                    file['name'] = data.FileName;
+                    file['rawData'] = data.Base64;
+                    files.push(file);
+
+                    jsObj['signFormat'] = 'Edoc';
+                    jsObj['tsaClientName'] = 'Default';
+                    jsObj['signCertificateSerialNumber'] = certSerialNumber;
+                    jsObj['files'] = files;
+
+                    var jsonObj = JSON.stringify(jsObj);
+                    console.log(jsonObj);
+
+                    eimza.signLocalFiles(jsonObj).then(onSignSuccess, onSignError);
+
+                });
+            },
+            complete: function () { window.CloseLoading();}
+        });*@
+    }
+
+    function onSignError(error) {
+        console.log(error);
+    }
+
+    function base64ToArrayBuffer(base64) {
+        var binaryString = window.atob(base64);
+        var binaryLen = binaryString.length;
+        var bytes = new Uint8Array(binaryLen);
+        for (var i = 0; i < binaryLen; i++) {
+            var ascii = binaryString.charCodeAt(i);
+            bytes[i] = ascii;
+        }
+        return bytes;
+    }
+
+    function onSigningDown(data) {
+        console.log('isSigningService dont working');
+        console.log(data);
+        toastr.warning('Elektron imzanın yeni versiyasının(V2) kompyüterinizdə qurulu və ya işlək olmasından əmin olun.');
+    }
+
+    function onSuccessReadCertificates(data, status) {
+        var certificates = data.output.certificates;
+
+        if (data.output.error !== undefined) {
+            return toastr.warning(data.output.error);
+        }
+
+        if (certificates.length > 0) {
+            var options = [];
+
+            for (var i = 0; i < certificates.length; i++) {
+                options.push(new Option(certificates[i].subject, certificates[i].serialNumber));
+            }
+
+            $("select#ctlCertificates").html(options);
+        } else {
+            return toastr.warning('Online imzalayıcı proqramının işlək olmasından və ya imzanızın qoşulu olduğundan əmin olun.');
+        }
+    }
+
+    function onSignSuccess(data, status) {
+        var edoc = data.output.edocFile;
+
+        if (edoc) {
+            var token = $('input[name="__RequestVerificationToken"]').val();
+            var tokenDocId = $("#spanToken").html();
+            var file = dataURLtoFile('data:,' + edoc.rawData, edoc.name);
+
+            var formData = new FormData();
+            formData.append('files', file, file.name);
+            formData.append("description", $('#signatureNote').val());
+            formData.append("__RequestVerificationToken", token);
+
+            $.ajax({
+                url: `/az/ESign/ReceiveSignedDoc?token=${tokenDocId}`,
+                type: 'POST',
+                cache: false,
+                contentType: false,
+                processData: false,
+                data: formData,
+                beforeSend: function () { window.ShowLoading(signMsg); },
+                success: function (data) {
+                    if (data) {
+                        $("#signatureDialogModal").modal("hide");
+
+                        var grid = $($("#DocGrid").find("input")[0]).attr("id");
+
+                        setTimeout(function () {
+                            $(`#${grid}`).bindgrid();
+                        },
+                            3000);
+
+                        Swal.fire({
+                            type: 'success',
+                            title: 'Sənədin imzalanması uğurla başa çatdı.',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                    } else {
+                        toastr.warning("Sənədin imzalanması uğursuz oldu.");
+                    }
+                },
+                complete: function() {
+                    window.CloseLoading();
+                },
+                error: function (response) {
+                    console.log('error', response);
+                }
+            });
+        } else {
+            toastr.error(data.message);
+        }
+    }
+
+    function onSignReadCertError(err) {
+        toastr.warning('Sertifikatınızın oxunulması mümkün olmadı.');
+        console.log("onError", err);
+    }
+
+    function dataURLtoFile(dataurl, filename) {
+        var parts = dataurl.split(',');
+        bstr = atob(parts[1]), n = bstr.length, fileBuffer = new Uint8Array(n);
+        while (n--) {
+            fileBuffer[n] = bstr.charCodeAt(n);
+        }
+        return new File([fileBuffer], filename, { type: 'edoc' });
+    }
+</script>

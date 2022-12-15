@@ -1,0 +1,12 @@
+CREATE TABLE [dbo].[DOC_FORM_DOCTYPE](
+	[FormDocTypeId] int identity NOT NULL,
+	[FormId] int NOT NULL,
+	[DocTypeId] int NOT NULL,
+	[FormDocTypeStatus] bit NULL,
+	[SchemaId] int NOT NULL,
+	[FormDocTypeOrderIndex] int NULL,
+    CONSTRAINT [PK_DOC_FORM_DOCTYPE] PRIMARY KEY ([FormDocTypeId]),
+    CONSTRAINT [FK_DOC_FORM_DOCTYPE_DM_SCHEMA] FOREIGN KEY([SchemaId]) REFERENCES [dbo].[DM_SCHEMA] ([SchemaId]),
+    CONSTRAINT [FK_DOC_FORM_DOCTYPE_DOC_FORM] FOREIGN KEY([FormId]) REFERENCES [dbo].[DOC_FORM] ([FormId]),
+    CONSTRAINT [FK_DOC_FORM_DOCTYPE_DOC_TYPE] FOREIGN KEY([DocTypeId]) REFERENCES [dbo].[DOC_TYPE] ([DocTypeId])
+)

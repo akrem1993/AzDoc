@@ -1,0 +1,145 @@
+﻿@model Admin.Model.ViewModel.EditPositionPartialViewModel
+@using Admin.Model.ViewModel
+
+@{
+    DeptPositionViewModel deptPositionViewModel1 = Model.DeptPositionViewModels.FirstOrDefault(x => x.Id == Model.UserWorkPlace.DepartmentPositionId);
+
+    var test = Model.DeptViewModels.FirstOrDefault(x => x.Id == Model.UserWorkPlace.DepartmentId);
+
+    string status = Model.UserWorkPlace != null && Model.UserWorkPlace.WorkPlaceStatus.HasValue ? Model.UserWorkPlace.WorkPlaceStatus.Value.ToString() : "False";
+
+}
+@using Admin.Model.EntityModel
+
+<style>
+    .disabled {
+        pointer-events: none;
+    }
+    #selectedTreeView {
+        display: flex;
+        align-items: center;
+        color: #757575;
+        font-weight: 500;
+    }
+
+        #selectedTreeView i {
+            font-size: 16px;
+        }
+</style>
+
+
+<div class="row">
+    <div class="col-sm-11">
+        <div class="editGroup">
+
+            <h4>
+                @(deptPositionViewModel1 != null ? deptPositionViewModel1.Name : "Yeni vəzifə")
+            </h4>
+
+            <input type="hidden" name="JsonWorkPlace.Index" value="@Model.PositionIndex" />
+            <input type="hidden" name="JsonWorkPlace[@Model.PositionIndex].WorkPlaceId" value="@Model.UserWorkPlace.WorkplaceId" />
+            <div class="row">
+
+
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label id="selectedTreeView"></label>
+                        <br />
+                        <label for="departmentSelect">Qurum</label>
+                        <input class="DepartmentId" name="JsonWorkPlace[@Model.PositionIndex].DepartmentId" type="hidden" value="@Model.UserWorkPlace.DepartmentId" />
+                        <div class="searchSelectTree mb-3">
+                            <div class="form-control" @*@(Model.IsInitial ? "disabled" : "")*@>
+                                <div class="span"> @(test == null ? "Seç" : test.Name ) </div>
+                            </div>
+                            <div class="downContent treeListContent">
+                                <div class="down">
+                                    <ul>
+                                        @Html.Partial("GetOrgTree2", new StructTree { Structures = Model.Structures, ParentId = Model.Structures.FirstOrDefault()?.ParentID })
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+                <div class="col-sm-4 deptPositionGroup">
+                    <div class="form-group">
+                        <label for="DepartmentPositionName">Vəzifəsi</label>
+                        <select name="JsonWorkPlace[@Model.PositionIndex].DepartmentPositionId" class="form-control selectpicker DepartmentPositionId" data-live-search="true" data-width="100%" @*@(Model.IsInitial ? "disabled" : "")*@>
+                            <option>Seçin</option>
+                            @foreach (DeptPositionViewModel deptPositionViewModel in Model.DeptPositionViewModels)
+                            {
+                                <option value="@deptPositionViewModel.Id" @(Model.UserWorkPlace.DepartmentPositionId == deptPositionViewModel.Id ? "selected" : "")>@deptPositionViewModel.Name</option>
+                            }
+
+                        </select>
+                    </div>
+
+                </div>
+
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label for="RoleComment">İmtiyazları</label>
+                        <select name="JsonWorkPlace[@Model.PositionIndex].RoleId" class="form-control selectpicker" multiple data-live-search="true" data-width="100%">
+                            <option>Seçin</option>
+                            @foreach (RoleViewModel roleViewModel in Model.Roles)
+                            {
+                                <option value="@roleViewModel.RoleId" @(Model.UserWorkPlace.Roles.Any(x => x.RoleId == roleViewModel.RoleId) ? "selected" : "")>@roleViewModel.RoleName</option>
+                            }
+
+                        </select>
+                    </div>
+
+                </div>
+
+
+                @if (Model.IsInitial)
+                {
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label style="margin:0;">Status</label> <br />
+                            <label class="mSwitch">
+                                <input class="workplaceStatus" workplace-name="@(deptPositionViewModel1?.Name)" workplace-id="@Model.UserWorkPlace.WorkplaceId" status="@status" type="checkbox" @(Model.UserWorkPlace.WorkPlaceStatus.HasValue && Model.UserWorkPlace.WorkPlaceStatus.Value ? "checked" : "")>
+                                <span class="switch-left"><i class="fas fa-lock-open"></i></span>
+                                <span class="switch-right"><i class="fas fa-lock"></i></span>
+                            </label>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+    @if (!Model.IsInitial || Model.PositionIndex == 1)
+    {
+        <div class="col-sm-1">
+            <button type="button" class="form-control @(Model.PositionIndex == 1 ? "addWorkplaceBtn" : "removeWorkplaceBtn")" style="width:45px; margin-top: 17px;"><span class="@(Model.PositionIndex == 1 ? "fa fa-plus" : "fa fa-minus")"></span></button>
+        </div>
+    }
+</div>
+
+
+
+<script>
+
+    $(document).on("keyup", ".form-group .dropdown-menu input", function () {
+
+        var btn = $(this).parents(".col-sm-3").find("button.addNewInputBtn");
+        var noResultElement = $(".dropdown-menu").find("li.no-results");
+        if (noResultElement.length) {
+            btn.prop("disabled", false);
+        }
+        else {
+            btn.prop("disabled", true);
+        }
+    });
+
+
+
+
+</script>

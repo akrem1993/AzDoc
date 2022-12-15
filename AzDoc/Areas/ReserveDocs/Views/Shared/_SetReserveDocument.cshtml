@@ -1,0 +1,113 @@
+﻿
+
+@using AzDoc.App_LocalResources
+@model  List<ReserveNumbers>
+@{
+
+    ViewBag.Title = "_SetReserveDocument";
+    Layout = null;
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+
+}
+
+<div class="mModal">
+    <div class="modal fade" id="setReserveModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="background: #ffffff">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>İcraçının dəyişdirilməsi</span>
+                    <span id="tokenId">@ViewData["DocId"]</span>
+                </div>
+
+                <div class="modal-body">
+                    @using (Html.BeginForm("SetReserveNumber", "Document", new { t = Request["t"] }, FormMethod.Post, new { id = "reserveForm" }))
+                    {
+                        <div class="container-fluid">
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <label for="RequestTypeId">Rezerv nömrə:</label>
+                               
+                                    @Html.DropDownList("ReservedId",
+                                        new SelectList(Model.Select(k => new { Id = k.ReservedId, Text = k.ReserveNumber }), dataValueField: "Id", dataTextField: "Text"),
+                                        "Seç",
+                                        new
+                                             {
+                                            @class = "selectpicker",
+                                            @id = "ReservedId",
+                                            @name = "ReservedId",
+                                            @data_live_search = "true",
+                                            @data_width = "100%"
+                                        })
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Ləğv et</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" name="ReserveSave" @*onclick="saveChange(this)"*@ id="ReserveSave" class="mBtn mBtn-pr defaultBtn" style="width: 100%">@RLang.Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+     
+        $("#setReserveModal").modal();
+        $("#setReserveModal").draggable({
+            handle: ".modal-header"
+        });
+        $('.selectpicker').selectpicker('refresh');
+   
+
+        $("#ReserveSave").click(function () {
+            var formData = $('#reserveForm').getFormData();
+            var token = $('input[name="__RequestVerificationToken"]').val();
+                var requestToken = $("#tokenId").html();
+            console.log($("#tokenId").html());
+            $.ajax({
+                type: 'POST',
+                url: `/@_lang/ReserveDocs/Document/SetReserveNumber?token=${requestToken}`,
+                dataType: 'json',
+                data: { __RequestVerificationToken: token, model: formData },
+                beforeSend: function () {
+                    window.ShowLoading();
+                },
+                success: function(response) {
+                    if (response) {
+                        var nameOfObject = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
+                        if (nameOfObject == 'UnreadDocuments') {
+                            var pageIndex = $('#gridDMS').CachedGrid().config.params.pageIndex;
+                            $('#gridDMS').bindgrid(pageIndex, undefined);
+                            $('#setReserveModal').modal('hide');
+                        }
+
+                    }
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+        });
+    });
+
+    $(".closeBtn").click(function () {
+        $(".modalBtn").modal("hide");
+
+    });
+</script>

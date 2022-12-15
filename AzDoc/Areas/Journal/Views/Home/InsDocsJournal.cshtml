@@ -1,0 +1,450 @@
+﻿
+@using BLL.Common.Enums
+@using AzDoc.Helpers;
+@*@using BLL.Models.Report;*@
+@using Journal.Model.EntityModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+    //var docType = SessionHelper.docTypeId;
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+    <style>
+        button,
+        [type="button"],
+        [type="reset"],
+        [type="submit"] {
+            -webkit-appearance: none !important;
+        }
+
+        [role="gridcell"],
+        [role="row"] {
+            /*height: 40px!important;*/
+        }
+
+        .jqx-grid-cell-left-align {
+            margin-top: 0px !important;
+        }
+    </style>
+
+    var grid = Html.MhmGrid("gridJournalInsDocs", "Document", "Home", routeValues: new { area = "Journal" })
+
+.Columns(cols =>
+{
+
+    cols.Column(c =>
+    {
+        c.SetText("Sənədin nömrəsi");
+        c.SetDataField("DocEnterNo");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(180);
+        c.SetMaxWidth(180);
+        c.IsPinned();
+        c.IsFilterable();
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Sənədin tarixi");
+        c.SetDataField("DocEnterDate");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(180);
+        c.SetMaxWidth(180);
+        c.IsPinned();
+        c.IsFilterable();
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Qısa məzmun");
+        c.SetDataField("DocDescription");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("15%");
+        c.IsFilterable();
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("İmza edən şəxs");
+        c.SetDataField("Signer");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("15%");
+        c.IsFilterable(Filtertype.TextBox);
+    });
+
+
+    cols.Column(c =>
+    {
+        c.SetText("Tapşırıqlar");
+        c.SetDataField("TasksNote");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("15%");
+        c.IsFilterable(Filtertype.TextBox);
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("İcraçı");
+        c.SetDataField("ExecutorName");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("15%");
+        c.IsFilterable();
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Tapşırıqların cavab sənədləri");
+        c.SetDataField("TasksRelatedDocsNote");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("15%");
+        c.IsFilterable(Filtertype.TextBox);
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Əlaqəli sənədlər");
+        c.SetDataField("RelatedNote");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("15%");
+        c.IsFilterable(Filtertype.TextBox);
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Qeyd");
+        c.SetDataField("DeleteNote");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(50);
+        c.SetWidth("15%");
+        c.IsFilterable(Filtertype.Date);
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("");
+        c.SetDataField("DocId");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetWidth(35);
+        c.IsCrud("x", "x");
+        c.SetRenderer("<button></button>",
+        htmlAttributes: new { @class = "fa fa-list btn", type = "button", id = "btnInfo", title = "Tarixcə", data_toggle = "modal", data_target = "#myModalArchive" });
+    });
+})
+.AllowCrud()
+.AllowSorting(false)
+.AllowTooltips(false)
+.AllowPaging(true)
+.AllowFiltering(true)
+.AllowFilterRow(true)
+.AllowColumnOrdering(true)
+.AllowColumnResizing(true)
+.SetOnFilter("onFilter")
+.SetPageSize(35)
+.SetWidth("100%")
+.SetHeight("100%");
+
+}
+
+@{
+    Html.RenderPartial("_PanelViewPartial");
+}
+
+<div class="col-md-12" id="DocGrid" style="padding-top: 10px; height: 86vh">
+    @grid.GetHtml()
+</div>
+
+<link href="~/Content/fontawesome/css/all.min.css?v=@AppVersion.Version" rel="stylesheet" />
+<link href="~/Content/fontawesome/css/v4-shims.min.css?v=@AppVersion.Version" rel="stylesheet" />
+
+<div id="popover-content-ActionName"></div>
+
+<div class="mModal">
+    <div class="modal fade modalBtn" id="myModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header3">
+
+                    <div class="row no-gutters" style="border-bottom:1px solid #8080805e; margin: 0 1rem">
+                        <div class="col-6">
+                            <a href="#" class="individual active" id="hrNote">
+                                Qeyd
+                            </a>
+                        </div>
+
+                        <div class="col-6">
+                            <a href="#" id="hrBlank" class="juridical">
+                                Blank nömrəsi
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-body" style="overflow-y: auto">
+
+                    <div class="row">
+                        <div class="col-12" id="step1">
+                            <textarea class="form-control noteArea" id="txtNote"></textarea>
+                        </div>
+                        <div class="col-12" id="step2" style="display:none; min-height:250px">
+
+                            <div class="row" id="divselectpicker">
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <br />
+                                        <select id="PrevBlankNo" class="form-control selectpicker" data-live-search="true" data-width="100%"></select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div id="divselect">
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <br />
+                                        <input type="number" class="form-control BlankArea" id="txtBlank" maxlength="6" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" id="btnSave" class="mBtn mBtn-pr defaultBtn" style="width: 100%">Yadda saxla</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="btnCancel" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" style="width: 100%">Ləğv et</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mModal">
+    <div class="modal fade modalBtn" id="myModalArchive" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+
+                <div class="modal-body" id="myModalContent" style="max-height: 70vh;overflow-y: auto">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/common/printThis.min.js"></script>
+<script src="~/Scripts/common/tableHTMLExport.js"></script>
+
+<script>
+    $(document).ready(function () {
+        Refresh();
+
+    });
+
+            function Refresh() {
+                $('.selectpicker').selectpicker('refresh');
+            }
+
+            $(document).on('click', '#btnEdit', function (e) {
+
+                const splitString = $(this).parent().attr("title").split(";");
+                var docid = splitString[0];
+
+                $('#txtNote').attr("name", docid);
+                var text = splitString[1];
+                if (text == null) text = '';
+                $('#txtNote').val(text);
+                var blankno = splitString[2];
+                const blanknoOption = blankno.split(",");
+                var select = $('#PrevBlankNo');
+                select.empty().append($("<option selected >Yeni blank nömrəsi</option>").val("-1"));
+                Refresh();
+                for (const element of blanknoOption) {
+                    select.append($("<option></option>").val(element).html(element));
+                }
+
+                $('#hrNote').addClass("active");
+                $("#hrBlank").removeClass("active");
+                $('#step2').css('display', 'none');
+                $('#step1').css('display', 'block');
+
+                Refresh();
+                $('#myModal').modal('show');
+
+            });
+
+            $(document).on('click', '#btnCancel', function (e) {
+                $('#myModal').modal('hide');
+                $('#divselect').modal('hide');
+            });
+
+            $(document).on('click', '#btnSave', function (e) {
+                if ($('#BlankType').val() == -1) {
+                    return toastr.warning('Zəhmət olmasa blank növünü seçin.');
+                }
+
+                if (!$('#txtBlank').val()) {
+                    $('#txtBlank').css('border', '1px solid red');
+                    return toastr.warning('Zəhmət olmasa blank nömrəsini daxil edin.');
+                }
+
+                if ($("#hrNote").hasClass("active")) {
+                     $.ajax({
+                  type: 'POST',
+                 url: '@Url.Action("EditNote", "Home", new { area = "Journal" })',
+                                dataType: 'json',
+                    data: {
+                        note: $('#txtNote').val(),
+                        docid: $('#txtNote').attr("name"),
+                        docType: 12
+                    },
+                                beforeSend: function () {
+                                    window.ShowLoading();
+                                },
+                                success: function () {
+                                },
+                                complete: function () {
+                                    window.CloseLoading();
+                                    $('#myModal').modal('hide');
+                                    location.reload();
+                                }
+                            });
+                }
+                else
+                {
+
+                     $.ajax({
+                         type: 'POST',
+                 url: '@Url.Action("EditBlank", "Home", new { area = "Journal" })',
+                         dataType: 'json',
+                    data: {
+
+                        prevblank: $('#PrevBlankNo').find('option:selected').text(),
+                        newblanktype: parseInt($('#BlankType').val()),
+                        newblankno: parseInt($('#txtBlank').val()),
+                        docid: $('#txtNote').attr("name")
+                    },
+                                beforeSend: function () {
+                                    window.ShowLoading();
+                                },
+                         success: function () {
+                             alert("success");
+                         },
+                         complete: function () {
+
+                                    window.CloseLoading();
+                                    $('#myModal').modal('hide');
+                                    location.reload();
+                                }
+                            });
+                }
+
+            });
+
+
+                    $(document).on('click', '#btnInfo', function (e) {
+                    $.ajax({
+                    url: '/az/Journal/Home/GetNoteArchive' ,
+                    data: {
+                    docId: $(this).parent().attr("title"),
+                    docType: 12
+                    }
+                    }).done(function (msg) {
+                    $('#myModalContent').html(msg);
+                    $('#myModalArchive').modal(options);
+                    $('#myModalArchive').modal('show');
+                    window.CloseLoading();
+                    $('#loader').remove();
+                    })
+                    });
+
+                    $('.mModal').mouseout(function () {
+                    $('.mTable2 tbody tr').removeClass("selected");
+                    });
+
+                    function onFilter(sender, args, query) {
+                    $('#gridJournalInsDocs').bindgrid(1);
+                    }
+
+                    $("#Period").change(function () {
+
+                    $('#gridJournalInsDocs').setRouteValue({ 'year': $(this).val() });
+                    $('#gridJournalInsDocs').bindgrid(1);
+                    $('#loader').remove();
+
+                    });
+
+                    function RefreshPage() {
+                    location.reload();
+                    }
+
+            $("#hrBlank").click(function () {
+                $(this).addClass("active");
+                $("#hrNote").removeClass("active");
+                $('#step1').css('display', 'none');
+                $('#step2').css('display', 'block');
+
+                $.ajax({
+                    url: '/az/Journal/Home/GetBlankType'
+
+                }).done(function (msg) {
+                    $('#divselect').html(msg);
+                    $('#divselect').modal('show');
+                    window.CloseLoading();
+                    $('#loader').remove();
+                })
+
+            });
+
+            $("#hrNote").click(function () {
+                $(this).addClass("active");
+                $("#hrNote").removeClass("active");
+                $('#step2').css('display', 'none');
+                $('#step1').css('display', 'block');
+            });
+
+                $("#PrevBlankNo").change(function () {
+                    $('#txtBlank').val('');
+                    if ($(this).val() != "-1") {
+                        var blankNo = $(this).find('option:selected').text();
+                        var blankType = blankNo.trim().split(' ')[0].trim();
+                        $('#BlankType option').each(function () {
+                            if ($(this).text().trim() == blankType) {
+                                $('#BlankType').selectpicker('val', $(this).val());
+                            }
+                        });
+                        var number = blankNo.substring(blankNo.length - 6, blankNo.length)
+                        if (number == null) number = '';
+                        $('#txtBlank').val(number);
+                    } else {
+                        $('#BlankType').selectpicker('val', -1);
+                    }
+                });
+</script>
+
+<script src="~/Scripts/widgets/jqxmin.min.js"></script>

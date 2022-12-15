@@ -1,0 +1,255 @@
+﻿@using AzDoc.Helpers
+@using Widgets
+
+@{
+    Layout = null;
+
+    var grid = Html.MhmGrid("gridCitizenRequestsApplyAgain",routeValues: new { area = "CitizenRequests", docType = SessionHelper.DocTypeId })
+        .Columns(cols =>
+        {
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetDataField("DocId", FieldType.Number);
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth("30px");
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='fas fa-eye'></i></a>", htmlAttributes: new { @class = "operation-button", fn_onclick = "DocViewFromTable", @title = "Qeydiyyat nəzarət vərəqəsi" });
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Nömrə");
+                c.SetDataField("DocEnterno");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(50);
+                c.SetWidth("12.5%");
+                c.IsPinned();
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Tarix");
+                c.SetDataField("DocEnterdate",fieldType:FieldType.Date,cellFormat:"d");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(50);
+                c.SetWidth("12.5%");
+                c.IsPinned();
+                c.IsFilterable(Filtertype.Date);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Ad");
+                c.SetDataField("AppFirstname");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetWidth("12.5%");
+                c.IsFilterable(Filtertype.Date);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Soyad");
+                c.SetDataField("AppSurname");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetWidth("12.5%");
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Ölkə");
+                c.SetDataField("CountryName");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetWidth("12.5%");
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Rayon");
+                c.SetDataField("RegionName");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetWidth("12.5%");
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Ünvan");
+                c.SetDataField("AppAddress");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Mövzu");
+                c.SetDataField("TopicName");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+            });
+
+
+            cols.Column(c =>
+            {
+                c.SetText("AppLastName");
+                c.SetDataField("AppLastName");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("AppCountryId");
+                c.SetDataField("AppCountryId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("AppRegionId");
+                c.SetDataField("AppRegionId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+                c.SetHidden();
+            });
+            cols.Column(c =>
+            {
+                c.SetText("DocApplytypeId");
+                c.SetDataField("DocApplytypeId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+                c.SetHidden();
+            });
+            cols.Column(c =>
+            {
+                c.SetText("DocTopicType");
+                c.SetDataField("DocTopicType");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("DocTopicId");
+                c.SetDataField("DocTopicId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("AppSosialStatusId");
+                c.SetDataField("AppSosialStatusId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("AppRepresenterId");
+                c.SetDataField("AppRepresenterId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Representer");
+                c.SetDataField("Representer");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("AppPhone");
+                c.SetDataField("AppPhone");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("AppEmail");
+                c.SetDataField("AppEmail");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Token");
+                c.SetDataField("Token");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetWidth("12.5%");
+                c.SetHidden();
+            });
+
+        })
+        .AllowCrud()
+        .SetRowClick("onRowClick")
+        .AllowSorting(false)
+        .AllowTooltips(false)
+        .AllowPaging(false)
+        .AllowFiltering(false)
+        .AllowFilterRow(false)
+        .AllowColumnOrdering(false)
+        .AllowColumnResizing(false)
+        .ColumnCustomizer(false)
+        .SetPageSize(35)
+        .SetWidth("100%")
+        .SetHeight("100%");
+
+}
+
+@grid.GetHtml()
+

@@ -1,0 +1,150 @@
+﻿@model IEnumerable<BLL.Models.BlankNumber.DocBlankTypes>
+@{
+    ViewBag.Title = "_BlankNumberPartial";
+    Layout = null;
+}
+
+<div class="mModal">
+
+    <div class="modal fade show" id="blankModal" tabindex="-1" role="dialog" aria-labelledby="directionModalTitle" aria-hidden="true" style=" display: block;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header"></div>
+                <div class="modal-header2" style="cursor:all-scroll">
+                    <span>Yeni Dərkənar</span>
+                </div>
+                <div class="modal-body">
+                    @using (Html.BeginForm("AddBlankNumber", "BlankNumber", FormMethod.Post, new { id = "blankForm" }))
+                    {
+
+                        <div class="row">
+                            <div class="col-4">
+                                <label for="blankType">Blank növü:</label>
+                                @Html.DropDownList("BlankType",
+ new SelectList(
+           Model.Select(x => new { Value = x.Id, Text = x.BlankType }),
+           "Value",
+           "Text"),
+  new
+  {
+      @class = "selectpicker",
+      @id = "DirectionWorkplaceId",
+      @name = "DirectionWorkplaceId",
+      @data_live_search = "true",
+      @data_width = "100%"
+  })
+                            </div>
+                            <div class="col-6">
+                                <label for="blanknumber">Blank nömrəsi:</label>
+                                @Html.TextBox("BlankNumber", null,
+                               new
+                               {
+                                   @maxlength = "6",
+                                   @placeholder = "",
+                                   @type = "number",
+                                   @class = "form-control",
+                                   @id = "blanknumber"
+                               })
+                            </div>
+                            <div class="col-2">
+                                <button type="button" class="mBtn mBtn-pr defaultBtn mt-4" style="font-size:14px;" onclick="blankNumbers()">Əlavə et</button>
+                            </div>
+                        </div>
+
+                    }
+                    <br />
+
+                    <table class="table table-bordered mTable" id="tableBlankNum" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th scope="row">Blankın növü</th>
+                                <th scope="row">Blankın nömrəsi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec defaultBtn closeBtn" style="font-size:14px;" data-dismiss="modal">Bağla</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-pr defaultBtn" style="font-size:14px;" onclick="blankAdd()">Yadda saxla</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#blankModal").modal();
+        $("#blankModal").draggable({
+            handle: ".modal-header"
+        });
+        $('.selectpicker').selectpicker('refresh');
+
+        var elementDocId = $("#DocActionsPopover").attr('class');
+        console.log(elementDocId);
+
+    });
+    function blankNumbers()
+    {
+        var model = $('#blankForm').getFormData();
+         if (model.BlankNumber.length < '6') {
+            toastr.warning('Zəhmət olmasa blank nömrəsini düzgün daxil edin');
+            return;
+        }
+         var model = $('#blankForm').getFormData();
+        var markup = "<tr><td class='blanktype'>" + model.BlankType + "</td><td class='col-1' id = 'BlankNumber' > " + model.BlankNumber + "</td > <td><a class='btn'><i class='fas fa-times' style='color:red!important;'></i></a></td></tr > ";
+        console.log(markup);
+
+        $('#tableBlankNum tbody').append(markup);
+        $('#tableBlankNum').css("display", "table");
+
+    };
+    $('#tableBlankNum').on('click', 'tr a', function (e) {
+        var lenRow = $('#tableBlankNum tbody tr').length;
+        e.preventDefault();
+        $(this).parents('tr').remove();
+        var rowCount = $('#tableBlankNum tbody tr').length;
+        if (rowCount == 0)
+        {
+            $('#tableBlankNum').css("display", "none");
+
+        }
+
+    });
+
+    function blankAdd()
+    {
+        var table = $('#tableBlankNum tbody');
+        var numbers = new Array();
+        table.find('tr').each(function (i) {
+            var $tds = $(this).find('td'),
+                blankType = $tds.eq(0).text(),
+                blankNumber = $tds.eq(1).text();
+            var number = {};
+            number.BlankType = blankType;
+            number.BlankNumber = blankNumber;
+            numbers.push(number);
+
+        });
+        $.ajax({
+            url: '@Url.Action("AddBlankNumber","BlankNumber")',
+            data: JSON.stringify(numbers),
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            beforeSend: function () { window.ShowLoading(); },
+            success: function (response)            {
+                toastr.success('Blank nömrə əladə evildi!');
+                $("#blankModal").css("display", "none");
+                $(".modal-backdrop").remove();
+            },
+            complete: function () { window.CloseLoading();}
+        });
+
+    }
+</script>

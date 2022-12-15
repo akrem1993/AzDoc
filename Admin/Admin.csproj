@@ -1,0 +1,190 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BC3A6214-0973-4A13-8297-2A03A887602A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Admin</RootNamespace>
+    <AssemblyName>Admin</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'TestRytn|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\TestRytn\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'PreProRytn|AnyCPU'">
+    <OutputPath>bin\PreProRytn\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="LinqKit, Version=1.1.16.0, Culture=neutral, PublicKeyToken=bc217f8844052a91, processorArchitecture=MSIL">
+      <HintPath>..\packages\LinqKit.1.1.16\lib\net45\LinqKit.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3-beta2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.7\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Adapters\DocumentAdapter.cs" />
+    <Compile Include="Adapters\OrganizationStructureAdapter.cs" />
+    <Compile Include="Adapters\RegionAdapter.cs" />
+    <Compile Include="Common\Enums\AdminEnum.cs" />
+    <Compile Include="Model\EntityModel\DeptForTree.cs" />
+    <Compile Include="Model\EntityModel\PositionInfo.cs" />
+    <Compile Include="Model\EntityModel\RelOrgModel.cs" />
+    <Compile Include="Model\EntityModel\StructTree.cs" />
+    <Compile Include="Model\EntityModel\Structure.cs" />
+    <Compile Include="Model\EntityModel\TopicInfo.cs" />
+    <Compile Include="Model\EntityModel\TopicTypeInfo.cs" />
+    <Compile Include="Model\EntityModel\UserGridModel.cs" />
+    <Compile Include="Model\EntityModel\UserStatistics.cs" />
+    <Compile Include="Model\EntityModel\UserWorkplaceForUpdate.cs" />
+    <Compile Include="Model\EntityModel\UserWorkPlaceModel.cs" />
+    <Compile Include="Model\EntityModel\UserWorkPlace.cs" />
+    <Compile Include="Model\FormModel\CreateDeptModel.cs" />
+    <Compile Include="Model\FormModel\CreateOrgModel.cs" />
+    <Compile Include="Model\FormModel\CreateRoleModel.cs" />
+    <Compile Include="Model\FormModel\CreateUserModel.cs" />
+    <Compile Include="Model\ViewModel\AuthorityRelatedModel\AuthorityTransferCreateViewModel.cs" />
+    <Compile Include="Model\ViewModel\AuthorityRelatedModel\AuthorityTransferInfo.cs" />
+    <Compile Include="Model\ViewModel\AuthorityRelatedModel\AuthorityViewModel.cs" />
+    <Compile Include="Model\ViewModel\AuthorityRelatedModel\PassAuthorityTransfer.cs" />
+    <Compile Include="Model\ViewModel\CommonRegionViewModel.cs" />
+    <Compile Include="Model\ViewModel\VillageViewModel.cs" />
+    <Compile Include="Model\ViewModel\CountryViewModel.cs" />
+    <Compile Include="Model\ViewModel\CreateResolutionRoleModel.cs" />
+    <Compile Include="Model\ViewModel\DeleteResolutionModel.cs" />
+    <Compile Include="Model\ViewModel\DeleteResolutionViewModel.cs" />
+    <Compile Include="Model\ViewModel\EditDocument\EditDocumentViewModel.cs" />
+    <Compile Include="Model\ViewModel\ExecutorModel.cs" />
+    <Compile Include="Model\ViewModel\OrgForRenderingCreateViewModel.cs" />
+    <Compile Include="Model\ViewModel\PositionRelatedModels\DepartmentCustomModel.cs" />
+    <Compile Include="Model\ViewModel\PositionRelatedModels\DeptPositionViewModel.cs" />
+    <Compile Include="Model\ViewModel\DeptViewModel.cs" />
+    <Compile Include="Model\ViewModel\EditPositionPartialViewModel.cs" />
+    <Compile Include="Model\ViewModel\OrgViewModel.cs" />
+    <Compile Include="Model\ViewModel\PassDepartmentViewModel.cs" />
+    <Compile Include="Model\ViewModel\PassOrganisationViewModel.cs" />
+    <Compile Include="Model\ViewModel\PositionRelatedModels\PosGroupCustomModel.cs" />
+    <Compile Include="Model\ViewModel\PositionViewModel.cs" />
+    <Compile Include="Model\ViewModel\RegionViewModel.cs" />
+    <Compile Include="Model\ViewModel\RenderOrganisations.cs" />
+    <Compile Include="Model\ViewModel\RoleRelatedModels\RoleDetailsViewModel.cs" />
+    <Compile Include="Model\ViewModel\RoleRelatedModels\OperationCustomModel.cs" />
+    <Compile Include="Model\ViewModel\RoleRelatedModels\RightCustomModel.cs" />
+    <Compile Include="Model\ViewModel\RoleRelatedModels\RightTypesCustom.cs" />
+    <Compile Include="Model\ViewModel\RoleRelatedModels\RoleOperationCustomModel.cs" />
+    <Compile Include="Model\ViewModel\RoleViewModel.cs" />
+    <Compile Include="Model\ViewModel\GenericGridViewModel.cs" />
+    <Compile Include="Model\ViewModel\TopicRelatedModel\TopicTypeViewModel.cs" />
+    <Compile Include="Model\ViewModel\TopicRelatedModel\TopicViewModel.cs" />
+    <Compile Include="Model\ViewModel\TransferUserProfileViewModel.cs" />
+    <Compile Include="Model\ViewModel\UserDetailsWithWorkplaces.cs" />
+    <Compile Include="Model\ViewModel\UserInfoViewModel.cs" />
+    <Compile Include="Model\ViewModel\UserInfoWithOtherData.cs" />
+    <Compile Include="Model\ViewModel\UserLimitationLogs.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BLL\BLL.csproj">
+      <Project>{AA74C4DD-2F79-4326-BE80-D126871ACA12}</Project>
+      <Name>BLL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CustomHelpers\CustomHelpers.csproj">
+      <Project>{7B2A824E-461E-4CDC-A6FC-749D6650EA58}</Project>
+      <Name>CustomHelpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Model\Model.csproj">
+      <Project>{4BA0C8D0-4877-4AE6-B222-D52026000B59}</Project>
+      <Name>Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Repository\Repository.csproj">
+      <Project>{56709464-10F3-4C3D-81C8-D7B1C3023183}</Project>
+      <Name>Repository</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
+</Project>

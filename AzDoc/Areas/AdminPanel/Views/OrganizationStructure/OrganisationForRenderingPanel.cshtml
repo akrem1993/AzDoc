@@ -1,0 +1,102 @@
+﻿@model Admin.Model.ViewModel.RenderOrganisations
+@using AzDoc.Helpers
+@using AzDoc.App_LocalResources
+
+<link href="~/Content/adminPanel/bootstrap-datepicker3.css" rel="stylesheet" />
+
+<link href="~/Content/jquery-editable-select/jquery-editable-select.min.css" rel="stylesheet" />
+
+<div class="mModal">
+    <div class="modal fade" id="editOrganisationForRendering" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document" style="max-width: 60%!important">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <form id="organisationsForRendering" name="organisationsForRendering">
+                        <div class="col-12">
+                            <div class="mainEdit" id="step1" style="padding-top:1px" data-brnum="1">
+                                <div class="editGroup">
+
+                                    @*<h4>@(Model.IsEdit ? "Sənədə bağlı qurumun redaktəsi" : "Sənədə bağlı qurumun yaradılması")</h4>*@
+
+                                    <div class="row">
+
+                                        <input type="hidden" name="Id" value="@Model.Id" />
+                                        <input type="hidden" id="isEdit" value="@Model.IsEdit" />
+
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label for="OrganisationShortname">Ad</label>
+                                                <input type="text" name="OrganisationShortname" class="form-control" id="OrganisationShortname" value="@Model.OrganisationShortname" />
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <label for="OrderIndex">İndeks</label>
+                                                <input type="text" name="OrderIndex" class="form-control" id="OrderIndex" value="@Model.OrderIndex" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                </div>
+                            </div>
+                            <br />
+                        </div>
+
+                        <div class="row mb-5 pb-5 mt-4">
+                            <div class="col-12 text-center">
+                                <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" data-dismiss="modal">Bağla</button>
+                                <button id="submitForm" type="button" class="mBtn mBtn-pr next-step">
+                                    @RLang.Save
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-editable-select/jquery-editable-select.min.js?v=@AppVersion.Version"></script>
+
+<script>
+    $("#submitForm").on("click", function (e) {
+        var isEdit = $("#isEdit").val();
+        var url = isEdit == 1 ? "EditOrganisationsForRendering" : "CreateOrganisationsForRendering";
+        var form = document.forms.namedItem("organisationsForRendering");
+        var oData = new FormData(form);
+        var message = isEdit == 1 ? 'Sənədə bağlı qurum redaktə edildi' : 'Sənədə bağlı qurum yaradıldı';
+        $.ajax({
+            url: `/az/AdminPanel/OrganizationStructure/${url}`,
+            type: 'POST',
+            data: oData,
+            contentType: false,
+            processData: false,
+            success: function (response) {
+                if (response) {
+                    toastr.success(message);
+                    var pageIndex = $('#gridOrganisationsForRendering').CachedGrid().config.params.pageIndex;
+                    $("#gridOrganisationsForRendering").bindgrid(pageIndex);
+                    setTimeout(function () { $('#editOrganisationForRendering').modal("hide"); }, 1000);
+                    return;
+                }
+                else {
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Xəta baş verdi',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                }
+            },
+            beforeSend: function () {
+                window.ShowLoading();
+            },
+            complete: function () {
+                window.CloseLoading();
+            }
+        });
+    });
+</script>                                                                 

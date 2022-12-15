@@ -1,0 +1,291 @@
+﻿@model Admin.Model.ViewModel.PassDepartmentViewModel
+@{
+    ViewBag.Title = "DepartmentIndex";
+}
+
+@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@using DMSModel
+@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+}
+@{
+    Html.RenderPartial("DeptPanelViewPartial");
+}
+@Html.AntiForgeryToken()
+
+<div class="col-md-12" id="DocGrid" style="padding-top: 10px; height: 86vh">
+    @Html.Partial("DeptGridViewPartial")
+</div>
+
+
+<div class="mModal">
+    <div class="modal fade" id="addNewDeptModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Departament əlavə etmə paneli</span>
+                </div>
+
+                <div class="modal-body">
+                    <form id="addDeptForm" name="addDeptForm"></form>
+
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Ləğv et</button>
+
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="deptButtonId" class="mBtn mBtn-pr defaultBtn addNewDeptButton" style="width: 100%">@RLang.Save</button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mModal">
+    <div class="modal fade" id="editDeptModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Departament redaktə etmə paneli</span>
+                </div>
+
+                <div class="modal-body">
+
+                    <form id="editDeptForm" name="editDeptForm"></form>
+
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Ləğv et</button>
+
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-pr defaultBtn editDeptButton" style="width: 100%">@RLang.Save</button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+
+        var orgId = 0;
+
+        $('#addNewOrgModal').on('hidden.bs.modal', function () {
+            //$("#TopOrgId option:selected").prop("selected", false);
+            //$("#TopOrgId option:first").attr('selected', 'selected');
+            //$('.selectpicker').selectpicker('refresh');
+
+            //$("#OrgName").val("");
+
+        });
+
+           $(document).on("click", ".editDeptButton", function ()
+           {
+
+               var form = document.forms.namedItem("editDeptForm");
+               var oData = new FormData(form);
+
+
+                $.ajax({
+                    url: "/@_lang/AdminPanel/OrganizationStructure/EditDepartment",
+                    type: 'POST',
+                    data: oData,
+                    dataType: 'Json',
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response) {
+                            toastr.success("Departament redaktə edildi");
+                            setTimeout(function () {
+                                window.location.reload();
+                            },1000);
+                        }
+                        else {
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Xəta baş verdi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        }
+                    },
+                    error: function (response) {
+                    },
+                    beforeSend: function () {
+                        window.ShowLoading();
+                    },
+                    complete: function () {
+                        window.CloseLoading();
+                    }
+                });
+        });
+        function getDepartment(dept_id)
+        {
+            var values = { deptId: dept_id };
+
+            $.ajax({
+                 url: '/@_lang/AdminPanel/OrganizationStructure/GetDepartmentPartial',
+                 type: 'POST',
+                 data: JSON.stringify(values),
+                 contentType: 'application/json; charset=utf-8',
+                 success: function (response) {
+
+                     if (response.result) {
+
+                         if (dept_id === 0) {
+                             $("#addDeptForm").empty().append(response.partialViewAsString);
+                             $("#addNewDeptModal").modal("show");
+                         }
+                         else
+                         {
+                             $("#editDeptForm").empty().append(response.partialViewAsString);
+                             $("#editDeptModal").modal("show");
+                         }
+                         $('.selectpicker').selectpicker('refresh');
+                         }
+                     else
+                     {
+                         Swal.fire({
+                             type: 'error',
+                             title: 'Xəta baş verdi',
+                             showConfirmButton: false,
+                             timer: 1000
+                         });
+                     }
+                 },
+                 beforeSend: function () {
+                     window.ShowLoading();
+                 },
+                 complete: function () {
+                     window.CloseLoading();
+                 }
+             });
+        }
+        $(document).on("click", "#newDept", function () {
+            getDepartment(0);
+        });
+        $(document).on("click", ".addNewDeptButton", function () {
+            var form = document.forms.namedItem("addDeptForm");
+             var oData = new FormData(form);
+                $.ajax({
+                    url: "/@_lang/AdminPanel/OrganizationStructure/CreateDepartment",
+                    type: 'POST',
+                    data: oData,
+                    dataType: 'Json',
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response) {
+
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Departament əlavə edildi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                            window.location.reload();
+                        }
+                        else {
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Xəta baş verdi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        }
+                    },
+                    error: function (response) {
+                    },
+                    beforeSend: function () {
+                        window.ShowLoading();
+                    },
+                    complete: function () {
+                        window.CloseLoading();
+                    }
+                });
+
+            });
+        function DeptEdit(item, boundData) {
+            // window.location = '/az/AdminPanel/OrganizationStructure/GetEditUser?userId=' + boundData.Id;
+            getDepartment(boundData.Id);
+        }
+        function OrgRemove(item, boundData) {
+            Swal.fire({
+                title: 'Departament silinsinmi?',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Ləğv et',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+             var values = { deptId: boundData.Id};
+             $.ajax({
+                 //url: '/@_lang/AdminPanel/OrganizationStructure/RemoveDepartmentById',
+                 type: 'POST',
+                 data: JSON.stringify(values),
+                 contentType: 'application/json; charset=utf-8',
+                 success: function (response) {
+                     if (response) {
+                         Swal.fire({
+                             type: 'success',
+                             title: 'Departament silindi',
+                             showConfirmButton: false,
+                             timer: 1000
+                         });
+                         window.location.reload();
+
+                     }
+                     else
+                     {
+                         Swal.fire({
+                             type: 'error',
+                             title: 'Xəta baş verdi',
+                             showConfirmButton: false,
+                             timer: 1000
+                         });
+                     }
+                 },
+                 beforeSend: function () {
+                     window.ShowLoading();
+                 },
+                 complete: function () {
+                     window.CloseLoading();
+                 }
+             });
+             }
+                });
+        }
+        function UserView(item, boundData) {
+            window.open('/az/AdminPanel/OrganizationStructure/GetUserView?userId=' + boundData.UserId, '_blank');
+        }
+        function onFilter(sender, args, query) {
+            $('#gridDepartmentStructure').bindgrid(1);
+        }
+    </script>
+    <script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+
+}

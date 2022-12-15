@@ -1,0 +1,6 @@
+﻿<script>
+    $("#editButton").click(function () {
+        var requestToken = $("#spanToken").text();
+        window.location = `/az/Document/EditDocument?token=${requestToken}`;
+    });
+</script>

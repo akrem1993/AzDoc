@@ -1,0 +1,774 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@using Admin.Model.EntityModel
+@using DMSModel
+@model List<Structure>
+@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+}
+<link href="~/Content/adminPanel/orgStyle.css" rel="stylesheet" />
+<script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+
+
+@{
+    <div class="row" style="margin-top:15px;">
+        <div class="col-1">
+            <div class="btn-group" style="margin-left:50px">
+                <button type="button" class="btn btn-secondary"><i class="fas fa-plus">Yeni</i></button>
+                <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#" id="newOrg">Qurum yarat</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" id="newDept">Departament yarat</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-3" style="margin-left:30px">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="\">Ana səhifə</a></li>
+                    <li class="breadcrumb-item"><a href="#">Admin</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Qurumlar</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <div class="pt-3">
+        <input class="form-control" type="text" style="width:20%; margin-left:50px" name="search" placeholder="Axtar" />
+    </div>
+}
+<link href="~/Content/adminPanel/adminTreeStyle.css" rel="stylesheet" />
+@Html.AntiForgeryToken()
+
+<div class="row" style="margin-top:20px;">
+    <div class="col-md-12" id="DocTree" style="height: 86vh">
+
+        <div class="downContent treeListContent" style="max-height:750px;overflow-y:scroll; margin-top:13px;">
+            <div class="drop">
+                <div class="down">
+                    <ul>
+                        @Html.Partial("GetOrgTree2", new StructTree { Structures = Model, ParentId = Model.FirstOrDefault()?.ParentID })
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Org region begin*@
+
+
+
+<div class="mModal">
+    <div class="modal fade" id="addNewOrgModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Müəllifi yaratma paneli</span>
+                </div>
+
+                <div class="modal-body">
+                    <form id="addOrgForm" name="addOrgForm"></form>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Geriyə</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="addNewOrgButton" class="mBtn mBtn-pr defaultBtn addNewOrgButton" style="width: 100%">@RLang.Save</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mModal">
+    <div class="modal fade" id="editOrgModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span></span>
+                </div>
+
+                <div class="modal-body">
+                    <form id="editOrgForm" name="editOrgForm"></form>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Geriyə</button>
+
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="orgButtonId" class="mBtn mBtn-pr defaultBtn editOrgButton" style="width: 100%">@RLang.Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="mModal">
+    <div class="modal fade" id="addNewDeptModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Departament əlavə etmə paneli</span>
+                </div>
+                <div class="modal-body">
+                    <form id="addDeptForm" name="addDeptForm"></form>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Geriyə</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="deptButtonId" class="mBtn mBtn-pr defaultBtn addNewDeptButton" style="width: 100%">@RLang.Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mModal">
+    <div class="modal fade" id="editDeptModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span class="test">Departament redaktə etmə paneli</span>
+                </div>
+                <div class="modal-body">
+                    <form id="editDeptForm" name="editDeptForm"></form>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Geriyə</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-pr defaultBtn editDeptButton" style="width: 100%">@RLang.Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="customContextMenu">
+    <div class="menuContent">
+        <ul class="contextul"></ul>
+    </div>
+</div>
+
+
+@section scripts
+{
+    <script>
+        $(document).on("keydown",
+            ".page-content input",
+            function(e) {
+                if (e.keyCode === 13) {
+                    var input = $(this).val().toLocaleLowerCase('az');
+                    if (input !== '') {
+                        var massiv = $(".page-content .treeListContent span.test");
+                        $(".bg-warning").removeClass("bg-warning").parents(".down").slideUp().siblings("i")
+                            .addClass("fa-angle-right").removeClass("fa-angle-down");
+                        $(".treeListContent").children().children(".down").slideDown();
+                        for (var i = 0; i < massiv.length; i++) {
+                            if ($(massiv[i]).text().toLocaleLowerCase('az').indexOf(input) !== -1) {
+                                $(massiv[i]).addClass("bg-warning");
+                                $(massiv[i]).parents(".down").slideDown();
+                                $(massiv[i]).parents(".down").prev().prev().removeClass("fa-angle-right")
+                                    .addClass("fa-angle-down");
+                            }
+                        }
+                    }
+                }
+            });
+        var orgId = '';
+        var structId = '';
+        var structType = '';
+        $(document).on("contextmenu",
+            "span.test",
+            function(event) {
+                event.preventDefault();
+                structType = $(this).attr("struct-type");
+                structId = $(this).attr("struct-id");
+                orgId = $(this).attr("org-id");
+                $(".contextul").empty();
+                var html = '';
+                var array = [{ structType: -2, optionText: "Redaktə et" }, { structType: -1, optionText: "Sil" }];
+                if (structType === '0') { //qurum
+                    var struct1 = { structType: 0, optionText: "Qurum əlavə et" };
+                    var struct2 = { structType: 4, optionText: "Departament əlavə et" };
+                    var struct3 = { structType: 5, optionText: "Şöbə əlavə et" };
+                    var struct4 = { structType: 15, optionText: "Mövzu əlavə et" };
+                    array.unshift(struct1);
+                    array.unshift(struct2);
+                    array.unshift(struct3);
+                    array.unshift(struct4);
+                    
+                } else if (structType === '1') { //rehberlik
+                    var struct12 = { structType: 4, optionText: "Departament əlavə et" };
+                    var struct13 = { structType: 5, optionText: "Şöbə əlavə et" };
+                    array.unshift(struct12);
+                    array.unshift(struct13);
+                } else if (structType === '4') { //departament
+                    var struct22 = { structType: 4, optionText: "Departament əlavə et" };
+                    var struct23 = { structType: 5, optionText: "Şöbə əlavə et" };
+                    array.unshift(struct22);
+                    array.unshift(struct23);
+                } else if (structType === '5') { // sobe
+
+                    var struct33 = { structType: 6, optionText: "Sektor əlavə et" };
+                    array.unshift(struct33);
+                } else if (structType === '6') // sektor
+                {
+                    console.log("sektor");
+                }
+
+                html = generateContexMenuContent(array);
+                $(".contextul").append(html);
+
+
+                $(".customContextMenu").slideDown(100).css({
+                    top: event.pageY + "px",
+                    left: event.pageX + "px"
+                });
+                $(document).bind("mousedown",
+                    function(e) {
+                        if (!$(e.target).parents(".customContextMenu").length > 0) {
+                            $(".customContextMenu").slideUp(100);
+                        }
+                    });
+            });
+        $(document).on("click",
+            "li.forMenu",
+            function(event) {
+
+                var structTypeForTop = $(this).attr("struct-type");
+
+                var structIdForTop = $(this).attr("org-id");
+                console.log(structIdForTop);
+                if (structTypeForTop === '0') {
+                    getOrganisation(0, structId);
+                } else if (structTypeForTop === '15') {
+                    window.location.href = '/@_lang/AdminPanel/OrganizationStructure/GetCreateTopicType';
+                }  else if (structTypeForTop === '-1') // -1  = sil
+                {
+                    if (structType === "0") {
+                        OrgRemove(structId);
+                    } else {
+                        DeptRemove(structId);
+                    }
+                } else if (structTypeForTop === "-2") //  -1  = redakte
+                {
+                    if (structType === "0") { // org
+
+                        getOrganisation(structId);
+                    } else //dept
+                    {
+                        getDepartment(structId);
+                    }
+
+                } else {
+                    getDepartment(0, structId, structTypeForTop, orgId);
+                }
+            });
+
+
+        function generateContexMenuContent(menuElements) {
+            var html = '';
+
+            for (var i = 0; i < menuElements.length; i++) {
+                var struct = menuElements[i];
+                html = html +'<li class="forMenu" data-id="1" struct-type="' +struct.structType + '" ' +
+                    'org-id="'+(struct.orgId || '')+'">' +
+                        '<a tabindex = "-1">' + struct.optionText +'</a >' +
+                    '</li >';
+            }
+            return html;
+
+        }
+
+        $(document).on("click",
+            ".treeListContent .drop>i.fas",
+            function() {
+                var angle = $(this);
+
+
+                if ($(this).hasClass("fa-angle-right")) {
+                    $(this).removeClass("fa-angle-right");
+                    $(this).addClass("fa-angle-down");
+                } else {
+                    $(this).addClass("fa-angle-right");
+                    $(this).removeClass("fa-angle-down");
+                }
+
+
+                @*if ($(this).attr("has-department") == 'True' && $(this).attr("has-opened") == 'False')
+            {
+             angle.attr("has-opened", "True");
+             var org_id = $(this).attr("struct-id");
+
+             var values = { orgId: org_id};
+             $.ajax({
+                 url: '/@_lang/AdminPanel/OrganizationStructure/GetDepartmentTreeByOrgId',
+                 type: 'POST',
+                 data: JSON.stringify(values),
+                 contentType: 'application/json; charset=utf-8',
+                 success: function (response) {
+                     angle.siblings(".down").children(":first").prepend(response.Data);
+                 },
+                 beforeSend: function () {
+                 },
+                 complete: function () {
+                     //angle.next().next().slideToggle('fast');
+                 }
+             });
+
+            }*@
+                $(this).next().next().slideToggle('fast');
+            });
+        $(document).on("click",
+            ".editOrgButton",
+            function() {
+                var form = document.forms.namedItem("editOrgForm");
+                var oData = new FormData(form);
+
+
+
+                $.ajax({
+                    url: "/@_lang/AdminPanel/OrganizationStructure/EditOrganisation",
+                    type: 'POST',
+                    data:  oData,
+                    dataType: 'Json',
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response) {
+
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Qurum redaktə edildi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                            window.location.reload();
+
+                        } else {
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Xəta baş verdi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        }
+
+
+                    },
+                    error: function(response) {
+                    },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            });
+        $(document).on("click",
+            ".addNewOrgButton",
+            function() {
+
+                var form = document.forms.namedItem("addOrgForm");
+                var oData = new FormData(form);
+
+
+                $.ajax({
+                    url: "/@_lang/AdminPanel/OrganizationStructure/CreateOrganisation",
+                    type: 'POST',
+                    data: oData,
+                    dataType: 'Json',
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response) {
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Qurum əlavə edildi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                            window.location.reload();
+
+                        } else {
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Xəta baş verdi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        }
+                    },
+                    error: function(response) {
+                    },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+
+            });
+
+        function OrgRemove(id) {
+
+
+            Swal.fire({
+                title: 'Qurum silinsinmi?',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Geriyə',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+
+                    var values = { orgId: id };
+
+                    $.ajax({
+                        url: '/@_lang/AdminPanel/OrganizationStructure/RemoveOrganisationById',
+                        type: 'POST',
+                        data: JSON.stringify(values),
+                        contentType: 'application/json; charset=utf-8',
+                        success: function(response) {
+
+                            if (response) {
+
+
+                                Swal.fire({
+                                    type: 'success',
+                                    title: 'Qurum silindi',
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                                //window.location.reload();
+                                $("li#" + id + "_org").remove();
+                            } else {
+                                Swal.fire({
+                                    type: 'error',
+                                    title: 'Xəta baş verdi',
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                            }
+                        },
+                        beforeSend: function() {
+                            window.ShowLoading();
+                        },
+                        complete: function() {
+                            window.CloseLoading();
+                        }
+                    });
+
+                }
+            });
+        }
+
+        function DeptRemove(id) {
+
+
+            Swal.fire({
+                title: 'Departament silinsinmi?',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Geriyə',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+
+                    var values = { deptId: id };
+                    $.ajax({
+                        url: '/@_lang/AdminPanel/OrganizationStructure/RemoveDepartmentById',
+                        type: 'POST',
+                        data: JSON.stringify(values),
+                        contentType: 'application/json; charset=utf-8',
+                        success: function(response) {
+
+                            if (response) {
+
+
+                                Swal.fire({
+                                    type: 'success',
+                                    title: 'Departament silindi',
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                                //window.location.reload();
+                                $("li#" + id + "_dept").remove();
+                            } else {
+                                Swal.fire({
+                                    type: 'error',
+                                    title: 'Xəta baş verdi',
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                            }
+                        },
+                        beforeSend: function() {
+                            window.ShowLoading();
+                        },
+                        complete: function() {
+                            window.CloseLoading();
+                        }
+                    });
+
+                }
+            });
+        }
+
+
+        /*Yeni organisation elave etmek ve ya edit etmek ucun FUNKSIYA (id-nin veziyyetine bagli olaraq (0 ve ya not null))*/
+        function getOrganisation(org_id, updateStructTop) {
+            var values = { orgId: org_id };
+            $.ajax({
+                url: '/@_lang/AdminPanel/OrganizationStructure/GetOrganisationPartial',
+                type: 'POST',
+                data: JSON.stringify(values),
+                contentType: 'application/json; charset=utf-8',
+                success: function(response) {
+
+                    if (response.result) {
+
+                        if (org_id === 0) {
+                            $("#addOrgForm").empty().append(response.partialViewAsString);
+                            $("#addNewOrgModal").modal("show");
+
+
+                            $("option:selected").prop("selected", false);
+                            $("#TopOrgId option[value=" + updateStructTop + "]").attr('selected', 'selected');
+
+                        } else {
+                            $("#editOrgForm").empty().append(response.partialViewAsString);
+                            $("#editOrgModal").modal("show");
+                        }
+                        $('.selectpicker').selectpicker('refresh');
+                    } else {
+                        Swal.fire({
+                            type: 'error',
+                            title: 'Xəta baş verdi',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                    }
+                },
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+        }
+
+
+        function getDepartment(dept_id, structTopValue, structType, orgId) {
+            var values = { deptId: dept_id };
+
+            $.ajax({
+                url: '/@_lang/AdminPanel/OrganizationStructure/GetDepartmentPartial',
+                type: 'POST',
+                data: JSON.stringify(values),
+                contentType: 'application/json; charset=utf-8',
+                success: function(response) {
+                    if (response.result) {
+                        if (dept_id === 0) {
+                            $("#addDeptForm").empty().append(response.partialViewAsString);
+                            $("#addNewDeptModal").modal("show");
+                            $("option:selected").prop("selected", false);
+                            $("#TopDeptId option[value=" + structTopValue + "]").attr('selected', 'selected');
+                            $("#DeptTypeId option[value=" + structType + "]").attr('selected', 'selected');
+
+
+                            $("#TopOrgId option[value=" + orgId + "]").attr('selected', 'selected');
+                            // $("Select").attr('disabled', true);
+                        } else {
+                            $("#editDeptForm").empty().append(response.partialViewAsString);
+                            $("#editDeptModal").modal("show");
+                        }
+
+                        $('.selectpicker').selectpicker('refresh');
+
+                    } else {
+                        Swal.fire({
+                            type: 'error',
+                            title: 'Xəta baş verdi',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                    }
+                },
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+        }
+
+        $(document).on("click",
+            ".editDeptButton",
+            function() {
+
+                var form = document.forms.namedItem("editDeptForm");
+                var oData = new FormData(form);
+
+
+                $.ajax({
+                    url: "/@_lang/AdminPanel/OrganizationStructure/EditDepartment",
+                    type: 'POST',
+                    data: oData,
+                    dataType: 'Json',
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response) {
+                            toastr.success("Departament redaktə edildi");
+                            setTimeout(function() {
+                                    window.location.reload();
+                                },
+                                1000);
+
+
+                        } else {
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Xəta baş verdi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        }
+
+
+                    },
+                    error: function(response) {
+                    },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            });
+
+        $(document).on("click",
+            ".addNewDeptButton",
+            function() {
+
+
+                $('select:disabled').each(function() {
+                    $(this).removeAttr('disabled');
+                });
+
+
+                var form = document.forms.namedItem("addDeptForm");
+                var oData = new FormData(form);
+
+
+                $.ajax({
+                    url: "/@_lang/AdminPanel/OrganizationStructure/CreateDepartment",
+                    type: 'POST',
+                    data: oData,
+                    dataType: 'Json',
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response) {
+
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Departament əlavə edildi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                            window.location.reload();
+                        } else {
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Xəta baş verdi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        }
+                    },
+                    error: function(response) {
+                    },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            });
+
+
+        $("#newOrg").on("click",
+            function() {
+                getOrganisation(0);
+            });
+
+        $(document).on("click",
+            "#newDept",
+            function() {
+                getDepartment(0);
+            });
+
+
+        //BU FUNKSIYA BIRBASA GRIDIN ICERISINDEN CAGIRILIR
+        function OrgEdit(item, boundData) {
+            getOrganisation(boundData.Id);
+        }
+
+
+        //$(document).on("click", ".editStructure", function () {
+        //    var structure_type = $(this).attr("struct-type");
+        //    var structure_id = $(this).attr("struct-id");
+
+        //    if (structure_type === '0') {
+        //        getOrganisation(structure_id);
+        //    }
+        //    else
+        //    {
+        //        getDepartment(structure_id);
+        //    }
+
+        //});
+
+
+    </script>
+
+
+}

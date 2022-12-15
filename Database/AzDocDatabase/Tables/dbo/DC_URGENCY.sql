@@ -1,0 +1,6 @@
+CREATE TABLE [dbo].[DC_URGENCY](
+	[Id] int identity NOT NULL,
+	[Name] nvarchar(100) NOT NULL,
+	[Status] bit NOT NULL CONSTRAINT DfDC_URGENCYStatus DEFAULT 1,
+    CONSTRAINT PkDC_URGENCYId PRIMARY KEY ([Id])
+	)

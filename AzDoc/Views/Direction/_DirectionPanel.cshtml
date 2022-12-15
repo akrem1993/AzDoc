@@ -1,0 +1,471 @@
+﻿@using AzDoc.Helpers
+@using Widgets
+@model BLL.Models.Direction.Direction.DocumentModel
+
+
+@{
+    ViewBag.Title = "_DirectionPanel";
+    var grid = Html.MhmGrid("gridMy", "DirectionGrid", "Direction", routeValues: new { docId = Model.DocId })
+           .SetWidth("100%")
+           .ColumnCustomizer(false)
+           .Columns(cols =>
+           {
+               cols.Column(c =>
+               {
+                   c.SetText("");
+                   c.SetDataField("ChangeType");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.IsFilterable();
+                   c.SetWidth(35);
+                   c.SetHidden();
+
+               });
+               cols.Column(c =>
+               {
+                   c.SetText("");
+                   c.SetDataField("DirectionTypeId");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.IsFilterable();
+                   c.SetWidth(35);
+                   c.SetHidden();
+
+               });
+               cols.Column(c =>
+               {
+                   c.SetText("");
+                   c.SetDataField("DirectionDocId");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.IsFilterable();
+                   c.SetWidth(35);
+                   c.SetHidden();
+
+               });
+               cols.Column(c =>
+               {
+                   c.SetText("");
+                   c.SetDataField("DirectionConfirmed");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.IsFilterable();
+                   c.SetWidth(35);
+                   c.SetHidden();
+
+               });
+               cols.Column(c =>
+               {
+                   c.SetText("");
+                   c.SetDataField("DirectionWorkplaceId");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.IsFilterable();
+                   c.SetWidth(35);
+                   c.SetHidden();
+
+               });
+               cols.Column(c =>
+               {
+                   c.SetText("");
+                   c.SetDataField("DirectionSendStatus");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.IsFilterable();
+                   c.SetWidth(35);
+                   c.SetHidden();
+
+               });
+               cols.Column(c =>
+               {
+                   c.SetText("");
+                   c.SetDataField("DirectionCreatorWorkplaceId");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.IsFilterable();
+                   c.SetWidth(35);
+                   c.SetHidden();
+
+               });
+               cols.Column(c =>
+               {
+                   c.SetText("");
+                   c.SetDataField("DirectionId");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.IsFilterable();
+                   c.SetWidth(35);
+                   c.SetHidden();
+
+               });
+               cols.Column(c =>
+               {
+                   c.SetText("Müəllif");
+                   c.SetDataField("DirectionPersonFullName");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.SetCellsAlign(TextAlign.Left);
+           //c.SetWidth(200);
+           c.SetWidth("20%");
+                   c.SetMinWidth(100);
+           //c.SetMaxWidth(200);
+           c.IsPinned();
+                   c.IsFilterable();
+               });
+               cols.Column(c =>
+               {
+                   c.SetText("Tarix");
+                   c.SetDataField("DirectionDate", FieldType.Date, "d");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.SetCellsAlign(TextAlign.Left);
+                   c.SetMinWidth(50);
+           //c.SetMaxWidth(130);
+           c.SetWidth("10%");
+                   c.IsPinned();
+                   c.IsFilterable();
+               });
+               cols.Column(c =>
+               {
+                   c.SetText("Əsas icraçı");
+                   c.SetDataField("MainExecutor");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.SetCellsAlign(TextAlign.Left);
+           //c.SetWidth(200);
+           c.SetWidth("20%");
+                   c.SetMinWidth(100);
+           //c.SetMaxWidth(200);
+           c.IsPinned();
+                   c.IsFilterable();
+               });
+               cols.Column(c =>
+               {
+                   c.SetText("Müştərək icraçılar");
+                   c.SetDataField("CommonExecutors");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.SetCellsAlign(TextAlign.Left);
+                   c.SetMinWidth(15);
+                   c.SetWidth("30%");
+                   c.IsFilterable();
+               });
+       //Edit
+       cols.Column(c =>
+               {
+                   c.SetText("");
+                   c.SetCustomRenderFunction("customRenderOperation");
+                   c.SetHeaderAlign(TextAlign.Center);
+                   c.SetCellsAlign(TextAlign.Left);
+                   c.SetMinWidth(150);
+                   c.SetWidth("20%");
+           //c.SetMaxWidth(100);
+           c.IsFilterable();
+               });
+
+           });
+}
+
+
+
+<link href="~/Content/direction/direction.css?v=@AppVersion.Version" rel="stylesheet" />
+
+<script>
+    var directionEditConfig = {
+        directionEdit: {
+            url:
+                '@Url.Action("DirectionEditPanel", "Direction",new { area="", t = Request["t"],operation=1/*yeni derkenar*/ })',
+            data: { docId: @Model.DocId, directionId: -@SessionHelper.WorkPlaceId}
+        },
+        confirmChanging: {
+            url:
+                '@Url.Action("ConfirmExecutorChanging", "Direction")',
+
+        },
+        confirmDateChanging: {
+            url:
+                '@Url.Action("ConfirmDatehanging", "Direction")',
+
+        },
+        saveChangingDate: {
+            url:
+                '@Url.Action("ConfirmDatehanging", "Direction")',
+        },
+        saveChanging: {
+            url: '@Url.Action("ConfirmExecutorChanging", "Direction")',
+        },
+        directionSendAuthor: {
+            url: '@Url.Action("DirectionSendAuthor", "Direction", new { t = @Request["t"] })',
+            data: { token: $('input[name="__RequestVerificationToken"]').val() }
+        },
+        deleteDirection: {
+            url: '@Url.Action("DirectionDelete", "Direction")',
+            urlresult: '@Url.Action("DirectionModal", "Direction",new { area="", t = Request["t"] })',
+            data: { token: $('input[name="__RequestVerificationToken"]').val() }
+        },
+        directionConfirm: {
+            url: '@Url.Action("DirectionConfirm", "Direction")',
+            data: { token: $('input[name="__RequestVerificationToken"]').val() }
+
+        },
+        directionUnConfirm: {
+            url: '@Url.Action("DirectionUnConfirm", "Direction")',
+            data: { token: $('input[name="__RequestVerificationToken"]').val() }
+
+        },
+        directionEditPanelSec: {
+            url: '@Url.Action("DirectionEditPanel", "Direction", new { t = @Request["t"],operation=2/*redakte*/ })',
+            data: { docId:@Model.DocId }
+        }
+
+      
+        
+    }
+    //$(".modal-content button.close").click(function () {
+    //    $("#directionModal").css("display", "none");
+    //    //$(".modal-backdrop").css("z-index", "1040");
+    //    $("#dynamiccontext").find(".modal-backdrop").remove();
+    //})
+ 
+
+    function customRenderOperation(Id, dataField, t, s, prop, boundData)
+    {
+
+        var container = $(`<div class='btn-container'>`);
+        boundData.DirectionConfirmed != 0 ? $('.direct').removeClass('disabled') : $('.direct').addClass('disabled');
+        if (@SessionHelper.WorkPlaceId == boundData.DirectionWorkplaceId)
+        {
+            if (boundData.DirectionConfirmed == 0) {
+
+                container.append($(`<a class='btnDecoration operation-button' title='Təsdiqlə' id='btnConfirm' onclick=\"DirectionConfirm(` + boundData.DirectionId + `,this)\"><i class="fas fa-check btn"></i></a>`));
+            }
+            //else { container.append($(`<a class=' btnDecoration operation-button' title='Təsdiq edilib' disabled><i class="fas fa-check btn"></i></a>`)); }
+        }
+        else
+        {
+            if (boundData.DirectionSendStatus == false ) {
+                var dicid = boundData.DirectionId;
+                container.append($(`<a class='btnDecoration operation-button' title='Göndər' onclick=\"DirectionSendAuthor(` + dicid + `,this)\"><i class="fas fa-paper-plane btn"></i></a >`));
+            }
+            //else {
+
+            //    container.append($(`<a class=' btnDecoration operation-button' title='Göndərilib' disabled><i class="fas fa-paper-plane btn"></i></a>`));
+            //}
+
+        }
+        if ((@SessionHelper.WorkPlaceId == boundData.DirectionCreatorWorkplaceId && (boundData.DirectionSendStatus == false && boundData.DirectionConfirmed == 0))
+            || (@SessionHelper.WorkPlaceId == boundData.DirectionWorkplaceId && (boundData.DirectionSendStatus == false || boundData.DirectionConfirmed == 0))) {
+            container.append($(`<a class='btnDecoration operation-button' title='Redaktə et' href=\"javascript:DirectionEditPanelSec(` + boundData.DirectionId + `)\"><i class="far fa-edit btn" ></i></a>`));
+        }
+        else if (boundData.DirectionConfirmed == 0) {
+
+            //  container.append($(`<a class='btnDecoration operation-button' title='Redaktə et' href=\"javascript:DirectionEditPanelSec(` + boundData.DirectionId + `)\"><i class="far fa-edit "></i></a>`));
+        }
+
+        if (@SessionHelper.WorkPlaceId == boundData.DirectionWorkplaceId)
+        {
+            if (boundData.DirectionConfirmed == 0 && boundData.DirectionWorkplaceId != boundData.DirectionCreatorWorkplaceId) {
+                container.append($(`<a class='btnDecoration operation-button' title='İmtina et'  onclick=\"DirectionUnConfirm(` + boundData.DirectionId + `,this)\"><i class="fas fa-times btn" style="color:red!important"></i></a>`));
+            }
+
+        }
+        if ((boundData.DirectionConfirmed == 0 && @SessionHelper.WorkPlaceId== boundData.DirectionWorkplaceId)
+            || (@SessionHelper.WorkPlaceId == boundData.DirectionCreatorWorkplaceId && (boundData.DirectionSendStatus == false && boundData.DirectionConfirmed == 0)))
+        {
+            if (boundData.DirectionConfirmed == 0) {
+                container.append($(`<a class='btnDecoration operation-button' title='Sil'  onclick=\"DeleteDirection(` + boundData.DirectionId + `,this)\"><i class="fas fa-trash-alt btn" style="color:red!important"></i></a>`));
+            }
+
+        }
+        if (boundData.ChangeType != null)
+        {
+            if (boundData.ChangeType == 1) {
+                container.append($(`<a class='btnDecoration operation-button'   href= \"javascript:ConfirmChanging(` + boundData.DirectionId + `)\"  title='İcraçını dəyiş'><i class="fas fa-user-edit btn"></i></a>`));
+            }
+            if (boundData.ChangeType == 2) {
+                container.append($(`<a class='btnDecoration operation-button'   href= \"javascript:ConfirmDateChanging(` + boundData.DirectionId + `)\"  title='İcra müddətini dəyiş'><i class="fas fa-calendar-check btn"></i></a>`));
+            }
+        }
+
+        return $('<div>').append(container.clone()).html();
+    }
+
+
+
+
+
+</script>
+
+@Html.AntiForgeryToken()
+<div class="mModal">
+    <div class="modal-backdrop" style="background-color:#0000003b;  z-index: 1066;">
+        <div class="modal fade show" id="directionModal" tabindex="-1" role="dialog" aria-labelledby="directionModalTitle" aria-hidden="true" style=" display: block;">
+            <div class="modal-dialog modal-dialog-centered" style="display:flex;justify-content:center;max-width:66% !important" role="document">
+                <div class="modal-content">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div class="modal-header"></div>
+                    <div class="modal-header2" style="cursor:all-scroll">
+                        <span>Yeni Dərkənar</span>
+                    </div>
+                    <div class="modal-body" @*id="mbody"*@>
+                        <div class="row" style="padding: 15px;">
+                            <div class="col-md-3">
+                                <button type="button" class="mBtn mBtn-pr direct" style="font-size:14px;" onclick="directionEdit()">Yeni Dərkənar</button>
+                            </div>
+                        </div>
+                        @grid.GetHtml()
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mModal">
+    <div class="modal hide fade" id="changeExConfirm" role="dialog" tabindex="-1" data-focus-on="input:first" style="    z-index: 1120!important;">
+        <div class="modal-dialog" style="width: 30% !important">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>İcraçının dəyişməsi</span>
+                </div>
+                @using (Html.BeginForm("ConfirmExecutorChanging", "Direction", new { t = Request["t"] }, FormMethod.Post, new { id = "changeExecutorForm" }))
+                {
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    @Html.DropDownList("CommandType",
+                                    new SelectList(
+                                    new List<Object>
+                                        {
+                                        new { value = 1 , text = "Razıyam"  },
+                                        new { value = 2 , text = "Razı deyiləm" },
+                                        }, "value", "text"), new { @class = "form-control" })
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <label style="font-size:14px;">Əvvəlki icraçı:</label>
+
+                            </div>
+                            <div class="col-8"> <label style="font-size:14px;" id="OldExecutor"></label></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <label style="font-size:14px;">Yeni icraçı:</label>
+
+                            </div>
+                            <div class="col-8">  <label style="font-size:14px;" id="NewExecutor"></label></div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-4">
+                                <label style="font-size:14px;">Əsas icraçının qeydi:</label>
+
+                            </div>
+                            <div class="col-8">
+                                <label style="font-size:14px;" id="executorNote" rows="3"></label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label style="font-size:14px;" for="comment">Qeyd:</label>
+                                    @Html.TextArea(("ExecutorResolutionNote"), new
+                 {
+                     @placeholder = "",
+                     @type = "text",
+                     @class = "form-control",
+                     @id = "ShortContent",
+                     @data_required = "Qıza məzmunu daxil edin"
+                 })
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button name="DirectionSave" class="mBtn mBtn-pr" value="Save" type="button" onclick="SaveChanging(this)">
+                                <i class="far fa-save"></i>&nbsp;Yadda Saxla
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="mModal">
+    <div class="modal hide fade" id="changeDateConfirm" role="dialog" tabindex="-1" data-focus-on="input:first" style="    z-index: 1120!important;">
+        <div class="modal-dialog" style="width: 30% !important">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>İcra müddətinin dəyişməsi</span>
+                </div>
+                @using (Html.BeginForm("ConfirmDatehanging", "Direction", new { t = Request["t"] }, FormMethod.Post, new { id = "changeDateForm" }))
+                {
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    @Html.DropDownList("CommandType",
+                                    new SelectList(
+                                    new List<Object>
+                                        {
+                                        new { value = 1 , text = "Razıyam"  },
+                                        new { value = 2 , text = "Razı deyiləm" },
+                                        }, "value", "text"), new { @class = "form-control" })
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <label style="font-size:14px;">Əvvəlki icra müddəti:</label>
+
+                            </div>
+                            <div class="col-8">  <label style="font-size:14px;" id="OldPlannedDate"></label></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4">
+                                <label style="font-size:14px;">Yeni icra müddəti:</label>
+
+                            </div>
+                            <div class="col-8">   <label style="font-size:14px;" id="NewPlannedDate"></label></div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-4">
+                                <label style="font-size:14px;">Əsas icraçının qeydi:</label>
+
+                            </div>
+                            <div class="col-8">
+                                <label id="ExecutorNote" style="font-size:14px;" rows="3"></label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label for="comment" style="font-size:14px;">Qeyd:</label>
+                                    @*<textarea class="form-control" rows="5" id="comment"></textarea>*@
+                                    @Html.TextArea(("ExecutorResolutionNote"), new
+                 {
+                     @placeholder = "",
+                     @type = "text",
+                     @class = "form-control",
+                     @id = "ShortContent",
+                     @data_required = "Qıza məzmunu daxil edin"
+                 })
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button name="DirectionSave" class="mBtn mBtn-pr" value="Save" type="button" onclick="SaveChangingDate(this)">
+                                <i class="far fa-save" style="font-size: 1.3em"></i>&nbsp;Yadda Saxla
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
+<script src="~/Scripts/direction/direction.js?v=@AppVersion.Version"></script>

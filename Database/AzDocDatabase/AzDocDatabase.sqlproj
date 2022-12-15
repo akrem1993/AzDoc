@@ -1,0 +1,591 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>AzDocDatabase</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{d011e725-3f8f-41fd-a739-0ee7ee8a42fe}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql140DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>AzDocDatabase</RootNamespace>
+    <AssemblyName>AzDocDatabase</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Schemas" />
+    <Folder Include="Tables" />
+    <Folder Include="Tables\Smdo" />
+    <Folder Include="Functions" />
+    <Folder Include="Functions\dbo" />
+    <Folder Include="Tables\dbo" />
+    <Folder Include="UserDefinedTypes" />
+    <Folder Include="UserDefinedTypes\Admin" />
+    <Folder Include="UserDefinedTypes\CitizenRequests" />
+    <Folder Include="UserDefinedTypes\dbo" />
+    <Folder Include="UserDefinedTypes\DmsInsdoc" />
+    <Folder Include="UserDefinedTypes\OrgRequests" />
+    <Folder Include="UserDefinedTypes\ServiceLetters" />
+    <Folder Include="Views" />
+    <Folder Include="Views\CitizenRequests" />
+    <Folder Include="Views\dbo" />
+    <Folder Include="Views\OrgRequests" />
+    <Folder Include="Views\OutgoingDoc" />
+    <Folder Include="Views\ServiceLetters" />
+    <Folder Include="Views\Smdo" />
+    <Folder Include="Procedures" />
+    <Folder Include="Procedures\Admin" />
+    <Folder Include="Procedures\CitizenRequests" />
+    <Folder Include="Procedures\Dbo" />
+    <Folder Include="Procedures\DmsInsdoc" />
+    <Folder Include="Procedures\OrgRequests" />
+    <Folder Include="Procedures\OutgoingDoc" />
+    <Folder Include="Procedures\Report" />
+    <Folder Include="Procedures\Resolution" />
+    <Folder Include="Procedures\ServiceLetters" />
+    <Folder Include="Procedures\Smdo" />
+    <Folder Include="Procedures\WaitingDocs" />
+    <Folder Include="Tables\WaitingDocs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Schemas\Admin.sql" />
+    <Build Include="Tables\Smdo\DtsChecks.sql" />
+    <Build Include="Tables\Smdo\DtsSigners.sql" />
+    <Build Include="Tables\Smdo\DtsSteps.sql" />
+    <Build Include="Tables\Smdo\DtsStepType.sql" />
+    <Build Include="Tables\Smdo\ReceivedDocDetails.sql" />
+    <Build Include="Tables\Smdo\ReceivedDocs.sql" />
+    <Build Include="Tables\Smdo\ReceivedXmlStatus.sql" />
+    <Build Include="Tables\Smdo\RelatedDoc.sql" />
+    <Build Include="Tables\Smdo\SmdoAckStatus.sql" />
+    <Build Include="Tables\Smdo\SmdoDocs.sql" />
+    <Build Include="Tables\Smdo\SmdoDocsFile.sql" />
+    <Build Include="Tables\Smdo\SmdoDocStatus.sql" />
+    <Build Include="Tables\Smdo\SmdoLogData.sql" />
+    <Build Include="Functions\dbo\fnGetApplicantAddress.sql" />
+    <Build Include="Functions\dbo\fnGetChiefByDepartmentID.sql" />
+    <Build Include="Functions\dbo\fnGetDepartmentChief.sql" />
+    <Build Include="Functions\dbo\fnGetDepartmentChiefAppeal.sql" />
+    <Build Include="Functions\dbo\fnGetDepartmentChiefInViza.sql" />
+    <Build Include="Functions\dbo\fnGetFeedBackNotificationCount.sql" />
+    <Build Include="Functions\dbo\fnGetPersonnelbyPersonnelId.sql" />
+    <Build Include="Functions\dbo\fnGetPersonnelbyWorkPlaceId.sql" />
+    <Build Include="Functions\dbo\fnGetPersonnelDetailsbyWorkPlaceId.sql" />
+    <Build Include="Functions\dbo\fnGetPersonPositionName.sql" />
+    <Build Include="Functions\dbo\fnGetRegion.sql" />
+    <Build Include="Functions\dbo\fnIsPersonnelAdminByWorkPlace.sql" />
+    <Build Include="Functions\dbo\fnIsPersonnHelperByWorkPlace.sql" />
+    <Build Include="Functions\dbo\fnPropertyByWorkPlaceId.sql" />
+    <Build Include="Functions\dbo\FUN_VACATION_CHANGE_PERSON.sql" />
+    <Build Include="Functions\dbo\GET_ADDRESSINFO.sql" />
+    <Build Include="Functions\dbo\GET_LAST_VIZA.sql" />
+    <Build Include="Functions\dbo\GET_MAIN_EXECUTOR_WORKPLACEID.sql" />
+    <Build Include="Functions\dbo\GET_PERSON.sql" />
+    <Build Include="Functions\dbo\GET_SESSION.sql" />
+    <Build Include="Functions\dbo\GET_SIGN_FILE.sql" />
+    <Build Include="Functions\dbo\GetDocSignerWorkplace.sql" />
+    <Build Include="Functions\dbo\GetDocumentType.sql" />
+    <Build Include="Functions\dbo\GetMessageByCode.sql" />
+    <Build Include="Functions\dbo\GetPermission.sql" />
+    <Build Include="Functions\dbo\SPLITSTRING.sql" />
+    <Build Include="Functions\dbo\STRINGSPLIT.sql" />
+    <Build Include="Functions\dbo\SYSDATETIME.sql" />
+    <Build Include="Tables\dbo\AC_LANGUAGE.sql" />
+    <Build Include="Tables\dbo\AC_MENU.sql" />
+    <Build Include="Tables\dbo\DC_AGENCY.sql" />
+    <Build Include="Tables\dbo\DC_APPLICATION.sql" />
+    <Build Include="Tables\dbo\DC_COUNTRY.sql" />
+    <Build Include="Tables\dbo\DC_DEPARTMENT.sql" />
+    <Build Include="Tables\dbo\DC_DEPARTMENT_POSITION.sql" />
+    <Build Include="Tables\dbo\DC_DEPARTMENTTYPE.sql" />
+    <Build Include="Tables\dbo\DC_DOCUMENTTYPE.sql" />
+    <Build Include="Tables\dbo\DC_EDUCATIONLEVEL.sql" />
+    <Build Include="Tables\dbo\DC_FAMILYSTATUS.sql" />
+    <Build Include="Tables\dbo\DC_NATION.sql" />
+    <Build Include="Tables\dbo\DC_NORMTYPE.sql" />
+    <Build Include="Tables\dbo\DC_NOTIFICATIONSETTINGS.sql" />
+    <Build Include="Tables\dbo\DC_NOTIFICATIONTYPE.sql" />
+    <Build Include="Tables\dbo\DC_OPERATION.sql" />
+    <Build Include="Tables\dbo\DC_OPERATIONTYPE.sql" />
+    <Build Include="Tables\dbo\DC_ORGANIZATION.sql" />
+    <Build Include="Tables\dbo\DC_ORGANIZATIONTYPE.sql" />
+    <Build Include="Tables\dbo\DC_PERSONELL_VACATION.sql" />
+    <Build Include="Tables\dbo\DC_PERSONNEL.sql" />
+    <Build Include="Tables\dbo\DC_PERSONNEL_SIGN.sql" />
+    <Build Include="Tables\dbo\DC_PHONETYPE.sql" />
+    <Build Include="Tables\dbo\DC_POSITION.sql" />
+    <Build Include="Tables\dbo\DC_POSITION_GROUP.sql" />
+    <Build Include="Tables\dbo\DC_RANK.sql" />
+    <Build Include="Tables\dbo\DC_REGION.sql" />
+    <Build Include="Tables\dbo\DC_REQUEST.sql" />
+    <Build Include="Tables\dbo\DC_REQUEST_TEST.sql" />
+    <Build Include="Tables\dbo\DC_REQUESTANSWER.sql" />
+    <Build Include="Tables\dbo\DC_REQUESTANSWER_TEST.sql" />
+    <Build Include="Tables\dbo\DC_REQUESTFILES.sql" />
+    <Build Include="Tables\dbo\DC_REQUESTFILES_TEST.sql" />
+    <Build Include="Tables\dbo\DC_REQUESTSTATUS.sql" />
+    <Build Include="Tables\dbo\DC_REQUESTTYPE.sql" />
+    <Build Include="Tables\dbo\DC_REPEATPERIOD.sql" />
+    <Build Include="Tables\dbo\DC_REPRESENTER.sql" />
+    <Build Include="Tables\dbo\DC_RESOLUTION_RIGHT.sql" />
+    <Build Include="Tables\dbo\DC_RIGHT.sql" />
+    <Build Include="Tables\dbo\DC_RIGHT_TYPE.sql" />
+    <Build Include="Tables\dbo\DC_ROLE.sql" />
+    <Build Include="Tables\dbo\DC_ROLE_OPERATION.sql" />
+    <Build Include="Tables\dbo\DC_SEX.sql" />
+    <Build Include="Tables\dbo\DC_SIGN_TYPE.sql" />
+    <Build Include="Tables\dbo\DC_SOCIALSTATUS.sql" />
+    <Build Include="Tables\dbo\DC_TREE.sql" />
+    <Build Include="Tables\dbo\DC_URGENCY.sql" />
+    <Build Include="Tables\dbo\DC_USER.sql" />
+    <Build Include="Tables\dbo\DC_USER_FILTER.sql" />
+    <Build Include="Tables\dbo\DC_VACATION.sql" />
+    <Build Include="Tables\dbo\DC_VACATION_TYPE.sql" />
+    <Build Include="Tables\dbo\DC_WORKPLACE.sql" />
+    <Build Include="Tables\dbo\DC_WORKPLACE_ROLE.sql" />
+    <Build Include="Tables\dbo\DC_YURIDICALFORM.sql" />
+    <Build Include="Tables\dbo\debugTable.sql" />
+    <Build Include="Tables\dbo\DM_ACTION.sql" />
+    <Build Include="Tables\dbo\DM_ORG_SCHEMA.sql" />
+    <Build Include="Tables\dbo\DM_ORGGROUP_SCHEMA.sql" />
+    <Build Include="Tables\dbo\DM_ORGGROUP_TYPE.sql" />
+    <Build Include="Tables\dbo\DM_SCHEMA.sql" />
+    <Build Include="Tables\dbo\DM_STEP.sql" />
+    <Build Include="Tables\dbo\DM_STEP_USER.sql" />
+    <Build Include="Tables\dbo\DMS_APP_VERSION.sql" />
+    <Build Include="Tables\dbo\DMSColumns.sql" />
+    <Build Include="Tables\dbo\DMSControls.sql" />
+    <Build Include="Tables\dbo\DMSTableRelation.sql" />
+    <Build Include="Tables\dbo\DMSTables.sql" />
+    <Build Include="Tables\dbo\DOC_ACTION_NAME.sql" />
+    <Build Include="Tables\dbo\DOC_ACTION_POSITION.sql" />
+    <Build Include="Tables\dbo\DOC_ACTION_TYPE.sql" />
+    <Build Include="Tables\dbo\DOC_ADRTYPE.sql" />
+    <Build Include="Tables\dbo\DOC_AGREEMENTTYPE.sql" />
+    <Build Include="Tables\dbo\DOC_APPLIERTYPE.sql" />
+    <Build Include="Tables\dbo\DOC_APPLYTYPE.sql" />
+    <Build Include="Tables\dbo\DOC_AUTHOR.sql" />
+    <Build Include="Tables\dbo\DOC_CONTROL.sql" />
+    <Build Include="Tables\dbo\DOC_DESCRIPTION.sql" />
+    <Build Include="Tables\dbo\DOC_DIRECTION_TEMPLATE.sql" />
+    <Build Include="Tables\dbo\DOC_DIRECTIONTYPE.sql" />
+    <Build Include="Tables\dbo\DOC_DOCFORM.sql" />
+    <Build Include="Tables\dbo\DOC_DOCUMENT_TYPE.sql" />
+    <Build Include="Tables\dbo\DOC_DOCUMENTSTATUS.sql" />
+    <Build Include="Tables\dbo\DOC_DOCUMENTSTATUS_DOCTYPE.sql" />
+    <Build Include="Tables\dbo\DOC_DUPLICATE.sql" />
+    <Build Include="Tables\dbo\DOC_EXCHANGE.sql" />
+    <Build Include="Tables\dbo\DOC_EXECUTIONSTATUS.sql" />
+    <Build Include="Tables\dbo\DOC_FORM.sql" />
+    <Build Include="Tables\dbo\DOC_FORM_DOCTYPE.sql" />
+    <Build Include="Tables\dbo\DOC_QUESTION.sql" />
+    <Build Include="Tables\dbo\DOC_NOTIFICATIONTYPE.sql" />
+    <Build Include="Tables\dbo\DOC_NUMBER.sql" />
+    <Build Include="Tables\dbo\DOC_NUMBERS.sql" />
+    <Build Include="Tables\dbo\DOC_OPERATION.sql" />
+    <Build Include="Tables\dbo\DOC_PERIOD.sql" />
+    <Build Include="Tables\dbo\DOC_POOL.sql" />
+    <Build Include="Tables\dbo\DOC_RECEIVED_FORM.sql" />
+    <Build Include="Tables\dbo\DOC_RESULT.sql" />
+    <Build Include="Tables\dbo\DOC_SENDSTATUS.sql" />
+    <Build Include="Tables\dbo\DOC_SENDSTATUS_TYPE.sql" />
+    <Build Include="Tables\dbo\DOC_SIGNATURESTATUS.sql" />
+    <Build Include="Tables\dbo\DOC_SIGNATURETYPE.sql" />
+    <Build Include="Tables\dbo\DOC_STEP.sql" />
+    <Build Include="Tables\dbo\DOC_TAKENMEASURE.sql" />
+    <Build Include="Tables\dbo\DOC_TASK.sql" />
+    <Build Include="Tables\dbo\DOC_TASK_CYCLE.sql" />
+    <Build Include="Tables\dbo\DOC_TOPIC.sql" />
+    <Build Include="Tables\dbo\DOC_TOPIC_TYPE.sql" />
+    <Build Include="Tables\dbo\DOC_TYPE.sql" />
+    <Build Include="Tables\dbo\DOC_TYPE_EXCHANGE.sql" />
+    <Build Include="Tables\dbo\DOC_TYPE_GROUP.sql" />
+    <Build Include="Tables\dbo\DOC_VIEWSTATUS.sql" />
+    <Build Include="Tables\dbo\DOC_VIZASTATUS.sql" />
+    <Build Include="Tables\dbo\DocLog1.sql" />
+    <Build Include="Tables\dbo\DocOperationHierarchy.sql" />
+    <Build Include="Tables\dbo\DocOperationsLog.sql" />
+    <Build Include="Tables\dbo\DocOperationStatus.sql" />
+    <Build Include="Tables\dbo\DocOperationTypes.sql" />
+    <Build Include="Tables\dbo\DOCS.sql" />
+    <Build Include="Tables\dbo\DOCS_ADDITION.sql" />
+    <Build Include="Tables\dbo\DOCS_ADDITIONDATA.sql" />
+    <Build Include="Tables\dbo\DOCS_ADDRESSINFO.sql" />
+    <Build Include="Tables\dbo\DOCS_APPLICATION.sql" />
+    <Build Include="Tables\dbo\DOCS_AUTHOR_NOTES.sql" />
+    <Build Include="Tables\dbo\DOCS_DELETED.sql" />
+    <Build Include="Tables\dbo\DOCS_DIRECTIONCHANGE.sql" />
+    <Build Include="Tables\dbo\DOCS_DIRECTIONS.sql" />
+    <Build Include="Tables\dbo\DOCS_EDIT_WORKPLACE.sql" />
+    <Build Include="Tables\dbo\DOCS_EXECUTOR.sql" />
+    <Build Include="Tables\dbo\DOCS_EXECUTORINFO.sql" />
+    <Build Include="Tables\dbo\DOCS_FILE.sql" />
+    <Build Include="Tables\dbo\DOCS_FILEINFO.sql" />
+    <Build Include="Tables\dbo\DOCS_FILESIGN.sql" />
+    <Build Include="Tables\dbo\DOCS_FILETICKETS.sql" />
+    <Build Include="Tables\dbo\DOCS_MODERATOR.sql" />
+    <Build Include="Tables\dbo\DOCS_READSTATUS.sql" />
+    <Build Include="Tables\dbo\DOCS_RELATED.sql" />
+    <Build Include="Tables\dbo\DOCS_RELATED_VIZA.sql" />
+    <Build Include="Tables\dbo\DOCS_RELATEDTYPE.sql" />
+    <Build Include="Tables\dbo\DOCS_STEP.sql" />
+    <Build Include="Tables\dbo\DOCS_VIZA.sql" />
+    <Build Include="Tables\dbo\LogApp.sql" />
+    <Build Include="Tables\dbo\TempDocLog.sql" />
+    <Build Include="Tables\dbo\TempDocLogMigrate.sql" />
+    <Build Include="Tables\dbo\tempdocs_executor.sql" />
+    <Build Include="UserDefinedTypes\Admin\UdttWorkPlaces.sql" />
+    <Build Include="UserDefinedTypes\CitizenRequests\UdttAuthor.sql" />
+    <Build Include="UserDefinedTypes\dbo\RightsType.sql" />
+    <Build Include="UserDefinedTypes\dbo\UdttAnswer.sql" />
+    <Build Include="UserDefinedTypes\dbo\UdttApplication.sql" />
+    <Build Include="UserDefinedTypes\dbo\UdttAuthor.sql" />
+    <Build Include="UserDefinedTypes\dbo\UdttDirectionExecutor.sql" />
+    <Build Include="UserDefinedTypes\dbo\UdttPersons.sql" />
+    <Build Include="UserDefinedTypes\dbo\UdttRelated.sql" />
+    <Build Include="UserDefinedTypes\DmsInsdoc\UdttTask.sql" />
+    <Build Include="UserDefinedTypes\OrgRequests\UdttAuthor.sql" />
+    <Build Include="UserDefinedTypes\OrgRequests\UdttTask.sql" />
+    <Build Include="UserDefinedTypes\ServiceLetters\UdttWhomAddress.sql" />
+    <Build Include="Views\CitizenRequests\CitizenRequestsDocs.sql" />
+    <Build Include="Views\dbo\VW_DOC_FILES.sql" />
+    <Build Include="Views\dbo\VW_DOC_INFO.sql" />
+    <Build Include="Views\dbo\VW_DOC_OLD_LAST.sql" />
+    <Build Include="Views\dbo\VW_DOC_OLD_LASTNEW.sql" />
+    <Build Include="Views\dbo\VW_DOC_VIEW.sql" />
+    <Build Include="Views\dbo\VW_DOC_VIEW_OLD.sql" />
+    <Build Include="Views\dbo\VW_DOCS_VIZA.sql" />
+    <Build Include="Views\dbo\VW_ROLES.sql" />
+    <Build Include="Views\OrgRequests\OrgRequestsDocs.sql" />
+    <Build Include="Views\OutgoingDoc\OutgoingDocs.sql" />
+    <Build Include="Views\ServiceLetters\ServiceLettersDocs.sql" />
+    <Build Include="Views\Smdo\GetSmdoDocs.sql" />
+    <Build Include="Procedures\Admin\CreateDepartmenPosition.sql" />
+    <Build Include="Procedures\Admin\CreateDepartment.sql" />
+    <Build Include="Procedures\Admin\CreateOrganization.sql" />
+    <Build Include="Procedures\Admin\CreateRole.sql" />
+    <Build Include="Procedures\Admin\CreateUser.sql" />
+    <Build Include="Procedures\Admin\EditUser.sql" />
+    <Build Include="Procedures\Admin\GetDepartments.sql" />
+    <Build Include="Procedures\Admin\GetDepartmentsById.sql" />
+    <Build Include="Procedures\Admin\GetDepartmentsByIdBackup.sql" />
+    <Build Include="Procedures\Admin\GetDepartmentsByOrgId.sql" />
+    <Build Include="Procedures\Admin\GetOrganisations.sql" />
+    <Build Include="Procedures\Admin\GetOrganisationsById.sql" />
+    <Build Include="Procedures\Admin\GetPositions.sql" />
+    <Build Include="Procedures\Admin\GetPositionsByDeptId.sql" />
+    <Build Include="Procedures\Admin\getRoleInfo.sql" />
+    <Build Include="Procedures\Admin\getRoleInfo1.sql" />
+    <Build Include="Procedures\Admin\GetRoles.sql" />
+    <Build Include="Procedures\Admin\GetRolesById.sql" />
+    <Build Include="Procedures\Admin\GetSectorsByDeptId.sql" />
+    <Build Include="Procedures\Admin\GetUser.sql" />
+    <Build Include="Procedures\Admin\UpdateWorkplaceStatus.sql" />
+    <Build Include="Procedures\Admin\UserInfo.sql" />
+    <Build Include="Procedures\Admin\UserInfoWithDetails.sql" />
+    <Build Include="Procedures\CitizenRequests\GetDocs.sql" />
+    <Build Include="Procedures\CitizenRequests\GetDocumentActions.sql" />
+    <Build Include="Procedures\CitizenRequests\GetDocumentActionsBackup.sql" />
+    <Build Include="Procedures\CitizenRequests\ReturnDirectionExecution.sql" />
+    <Build Include="Procedures\CitizenRequests\ReturnDocumentRequest.sql" />
+    <Build Include="Procedures\CitizenRequests\spAddNewDocumentLoad.sql" />
+    <Build Include="Procedures\CitizenRequests\spDocsOperation.sql" />
+    <Build Include="Procedures\CitizenRequests\spGetApplicant.sql" />
+    <Build Include="Procedures\CitizenRequests\spGetDocs.sql" />
+    <Build Include="Procedures\CitizenRequests\spGetDocs1.sql" />
+    <Build Include="Procedures\CitizenRequests\spGetDocView.sql" />
+    <Build Include="Procedures\CitizenRequests\spGetElectronicDocument.sql" />
+    <Build Include="Procedures\CitizenRequests\spOperationSend.sql" />
+    <Build Include="Procedures\CitizenRequests\spOperationSendBackup.sql" />
+    <Build Include="Procedures\CitizenRequests\spPostActionOperation.sql" />
+    <Build Include="Procedures\Dbo\AddAnswerDocExecutors.sql" />
+    <Build Include="Procedures\Dbo\AddNewAuthor.sql" />
+    <Build Include="Procedures\Dbo\AddSignedFilesInfo.sql" />
+    <Build Include="Procedures\Dbo\createFakeDocument.sql" />
+    <Build Include="Procedures\Dbo\CreateOrChangeFile.sql" />
+    <Build Include="Procedures\Dbo\CreateUser.sql" />
+    <Build Include="Procedures\Dbo\DeleteAnswerDoc.sql" />
+    <Build Include="Procedures\Dbo\GetAuthorInfo.sql" />
+    <Build Include="Procedures\Dbo\GetDocumentActions.sql" />
+    <Build Include="Procedures\Dbo\GetDocView.sql" />
+    <Build Include="Procedures\Dbo\GetNotify.sql" />
+    <Build Include="Procedures\Dbo\GetPermissions.sql" />
+    <Build Include="Procedures\Dbo\LogDocumentOperation.sql" />
+    <Build Include="Procedures\Dbo\LogRequests.sql" />
+    <Build Include="Procedures\Dbo\ReturnDirectionExecution.sql" />
+    <Build Include="Procedures\Dbo\spAddDefaultVizaExecutors.sql" />
+    <Build Include="Procedures\Dbo\spAddDirection.sql" />
+    <Build Include="Procedures\Dbo\spAddDocsFile.sql" />
+    <Build Include="Procedures\Dbo\spAddExecutor.sql" />
+    <Build Include="Procedures\Dbo\spAddExecutorChiefs.sql" />
+    <Build Include="Procedures\Dbo\spAddExecutorChiefsNew.sql" />
+    <Build Include="Procedures\Dbo\spAddFeedBackFile.sql" />
+    <Build Include="Procedures\Dbo\spAddFileInfo.sql" />
+    <Build Include="Procedures\Dbo\spAddLanguage.sql" />
+    <Build Include="Procedures\Dbo\spAddNewVizaExecutors.sql" />
+    <Build Include="Procedures\Dbo\spBuildEntity.sql" />
+    <Build Include="Procedures\Dbo\spChangeFileInfo.sql" />
+    <Build Include="Procedures\Dbo\spChangeOldViza.sql" />
+    <Build Include="Procedures\Dbo\spChangePassword.sql" />
+    <Build Include="Procedures\Dbo\spCreateDocument.sql" />
+    <Build Include="Procedures\Dbo\spDcRequestCount.sql" />
+    <Build Include="Procedures\Dbo\spDcTreeOperation.sql" />
+    <Build Include="Procedures\Dbo\spDefaultAgreementScheme.sql" />
+    <Build Include="Procedures\Dbo\spDeleteDoc.sql" />
+    <Build Include="Procedures\Dbo\spDeleteDocAddition.sql" />
+    <Build Include="Procedures\Dbo\spDeleteDocFile.sql" />
+    <Build Include="Procedures\Dbo\spDocRecognized.sql" />
+    <Build Include="Procedures\Dbo\spFeedBackRequest_TEST.sql" />
+    <Build Include="Procedures\Dbo\spFileInfoUpdate.sql" />
+    <Build Include="Procedures\Dbo\spFileOperations.sql" />
+    <Build Include="Procedures\Dbo\spForgotPassword.sql" />
+    <Build Include="Procedures\Dbo\spGetActionName.sql" />
+    <Build Include="Procedures\Dbo\spGetDcTree.sql" />
+    <Build Include="Procedures\Dbo\spGetDcWorkPlace.sql" />
+    <Build Include="Procedures\Dbo\spGetDocCount.sql" />
+    <Build Include="Procedures\Dbo\spGetDocGroupTreeName.sql" />
+    <Build Include="Procedures\Dbo\spGetDocs.sql" />
+    <Build Include="Procedures\Dbo\spGetDocTypeGroup.sql" />
+    <Build Include="Procedures\Dbo\spGetDocTypeGroupOld.sql" />
+    <Build Include="Procedures\Dbo\spGetElectronicDocument.sql" />
+    <Build Include="Procedures\Dbo\spGetFeedBackChat.sql" />
+    <Build Include="Procedures\Dbo\spGetFeedBackTypes.sql" />
+    <Build Include="Procedures\Dbo\spGetFilterable.sql" />
+    <Build Include="Procedures\Dbo\spGetLanguage.sql" />
+    <Build Include="Procedures\Dbo\spGetNotifications.sql" />
+    <Build Include="Procedures\Dbo\spGetPasswordByWorkPlaceId.sql" />
+    <Build Include="Procedures\Dbo\spGetPeriod.sql" />
+    <Build Include="Procedures\Dbo\spGetRequestList.sql" />
+    <Build Include="Procedures\Dbo\spGetRequests_TEST.sql" />
+    <Build Include="Procedures\Dbo\spGetSettings.sql" />
+    <Build Include="Procedures\Dbo\spGetUser.sql" />
+    <Build Include="Procedures\Dbo\spGetUserWorkPlaceId.sql" />
+    <Build Include="Procedures\Dbo\spGetWorkPlaceIdByRequestId.sql" />
+    <Build Include="Procedures\Dbo\spLogin.sql" />
+    <Build Include="Procedures\Dbo\spMenu.sql" />
+    <Build Include="Procedures\Dbo\spNotificationsOperation.sql" />
+    <Build Include="Procedures\Dbo\spPostActionOperation.sql" />
+    <Build Include="Procedures\Dbo\spPostSendForInformation.sql" />
+    <Build Include="Procedures\Dbo\spRole.sql" />
+    <Build Include="Procedures\Dbo\spSendForInformation.sql" />
+    <Build Include="Procedures\Dbo\spSendForInformationBackup.sql" />
+    <Build Include="Procedures\Dbo\spSendForInformationDelete.sql" />
+    <Build Include="Procedures\Dbo\spSendViza.sql" />
+    <Build Include="Procedures\Dbo\spSetFileAsMain.sql" />
+    <Build Include="Procedures\Dbo\spUpdateDirection.sql" />
+    <Build Include="Procedures\Dbo\spUserActionOperation.sql" />
+    <Build Include="Procedures\Dbo\spVizaAdd.sql" />
+    <Build Include="Procedures\Dbo\spVizaDelete.sql" />
+    <Build Include="Procedures\DmsInsdoc\GetDocumentActions.sql" />
+    <Build Include="Procedures\DmsInsdoc\SendVizaToChief.sql" />
+    <Build Include="Procedures\DmsInsdoc\spAddNewDocumentLoad.sql" />
+    <Build Include="Procedures\DmsInsdoc\spCancelDocumentRequest.sql" />
+    <Build Include="Procedures\DmsInsdoc\spDocsOperation.sql" />
+    <Build Include="Procedures\DmsInsdoc\spGetDocs.sql" />
+    <Build Include="Procedures\DmsInsdoc\spGetDocView.sql" />
+    <Build Include="Procedures\DmsInsdoc\spGetElectronicDocument.sql" />
+    <Build Include="Procedures\DmsInsdoc\spGetTask.sql" />
+    <Build Include="Procedures\DmsInsdoc\spOperationConfirmSignature.sql" />
+    <Build Include="Procedures\DmsInsdoc\spOperationSend.sql" />
+    <Build Include="Procedures\DmsInsdoc\spOperationSigner.sql" />
+    <Build Include="Procedures\DmsInsdoc\spOperationTask.sql" />
+    <Build Include="Procedures\DmsInsdoc\spOperationVisaAccept.sql" />
+    <Build Include="Procedures\DmsInsdoc\spPostActionOperation.sql" />
+    <Build Include="Procedures\DmsInsdoc\spReturnDocumentRequest.sql" />
+    <Build Include="Procedures\DmsInsdoc\spSendToConfirmedPerson.sql" />
+    <Build Include="Procedures\DmsInsdoc\spSendVizaToNextGroup.sql" />
+    <Build Include="Procedures\OrgRequests\GetDocs.sql" />
+    <Build Include="Procedures\OrgRequests\GetDocumentActions.sql" />
+    <Build Include="Procedures\OrgRequests\GetDocumentActionsBackup.sql" />
+    <Build Include="Procedures\OrgRequests\GetDocumentActionsBuckUp.sql" />
+    <Build Include="Procedures\OrgRequests\ReturnDirectionExecution.sql" />
+    <Build Include="Procedures\OrgRequests\ReturnDocumentRequest.sql" />
+    <Build Include="Procedures\OrgRequests\spAddNewDocumentLoad.sql" />
+    <Build Include="Procedures\OrgRequests\spDocsOperation.sql" />
+    <Build Include="Procedures\OrgRequests\spGetDocs.sql" />
+    <Build Include="Procedures\OrgRequests\spGetDocs1.sql" />
+    <Build Include="Procedures\OrgRequests\spGetDocView.sql" />
+    <Build Include="Procedures\OrgRequests\spGetDocViewBackup.sql" />
+    <Build Include="Procedures\OrgRequests\spGetElectronicDocument.sql" />
+    <Build Include="Procedures\OrgRequests\spOperationSend.sql" />
+    <Build Include="Procedures\OrgRequests\spPostActionOperation.sql" />
+    <Build Include="Procedures\OutgoingDoc\AddDocumentReserve.sql" />
+    <Build Include="Procedures\OutgoingDoc\GetDocs.sql" />
+    <Build Include="Procedures\OutgoingDoc\GetDocumentActions.sql" />
+    <Build Include="Procedures\OutgoingDoc\SendVizaToChief.sql" />
+    <Build Include="Procedures\OutgoingDoc\spAddNewDocumentLoad.sql" />
+    <Build Include="Procedures\OutgoingDoc\spCancelDocumentRequest.sql" />
+    <Build Include="Procedures\OutgoingDoc\spCancelPostOperation.sql" />
+    <Build Include="Procedures\OutgoingDoc\spCreateReserveDocument.sql" />
+    <Build Include="Procedures\OutgoingDoc\spDocsOperation.sql" />
+    <Build Include="Procedures\OutgoingDoc\spGetActionName.sql" />
+    <Build Include="Procedures\OutgoingDoc\spGetDocs.sql" />
+    <Build Include="Procedures\OutgoingDoc\spGetDocs1.sql" />
+    <Build Include="Procedures\OutgoingDoc\spGetDocView.sql" />
+    <Build Include="Procedures\OutgoingDoc\spGetElectronicDocument.sql" />
+    <Build Include="Procedures\OutgoingDoc\spOperationConfirmSignature.sql" />
+    <Build Include="Procedures\OutgoingDoc\spOperationPost.sql" />
+    <Build Include="Procedures\OutgoingDoc\spOperationPrint.sql" />
+    <Build Include="Procedures\OutgoingDoc\spOperationSend.sql" />
+    <Build Include="Procedures\OutgoingDoc\spOperationSigner.sql" />
+    <Build Include="Procedures\OutgoingDoc\spOperationTask.sql" />
+    <Build Include="Procedures\OutgoingDoc\spOperationVisaAccept.sql" />
+    <Build Include="Procedures\OutgoingDoc\spOperationWhomAddress.sql" />
+    <Build Include="Procedures\OutgoingDoc\spPostActionOperation.sql" />
+    <Build Include="Procedures\OutgoingDoc\spReturnDocumentRequest.sql" />
+    <Build Include="Procedures\OutgoingDoc\spSendToConfirmedPerson.sql" />
+    <Build Include="Procedures\OutgoingDoc\spSendVizaToNextGroup.sql" />
+    <Build Include="Procedures\Report\spGetDasboard.sql" />
+    <Build Include="Procedures\Report\spGetReportDoc.sql" />
+    <Build Include="Procedures\Report\spGetReports.sql" />
+    <Build Include="Procedures\Report\spReportForm1.sql" />
+    <Build Include="Procedures\Report\spReportForm2.sql" />
+    <Build Include="Procedures\Report\spReportNew.sql" />
+    <Build Include="Procedures\Report\spReportNewGetChooseModels.sql" />
+    <Build Include="Procedures\Resolution\AddDirectionNew.sql" />
+    <Build Include="Procedures\Resolution\ChangeExecutionDate.sql" />
+    <Build Include="Procedures\Resolution\ChangeExecutor.sql" />
+    <Build Include="Procedures\Resolution\GetAuthors.sql" />
+    <Build Include="Procedures\Resolution\GetChangedDateTime.sql" />
+    <Build Include="Procedures\Resolution\GetChangedExecutor.sql" />
+    <Build Include="Procedures\Resolution\GetDirectionExecutors.sql" />
+    <Build Include="Procedures\Resolution\GetExecutors.sql" />
+    <Build Include="Procedures\Resolution\GetSendStatus.sql" />
+    <Build Include="Procedures\Resolution\spAddExecutorBulk.sql" />
+    <Build Include="Procedures\Resolution\spDeleteDirection.sql" />
+    <Build Include="Procedures\Resolution\spGetDirectionDocs.sql" />
+    <Build Include="Procedures\Resolution\spGetDirectionInfo.sql" />
+    <Build Include="Procedures\Resolution\spGetDirections.sql" />
+    <Build Include="Procedures\Resolution\spGetDocsInfo.sql" />
+    <Build Include="Procedures\Resolution\spSetPersonWorkplace.sql" />
+    <Build Include="Procedures\Resolution\spUsers.sql" />
+    <Build Include="Procedures\Resolution\spWorkplaceFullInfo.sql" />
+    <Build Include="Procedures\ServiceLetters\GetDocs.sql" />
+    <Build Include="Procedures\ServiceLetters\GetDocumentActions.sql" />
+    <Build Include="Procedures\ServiceLetters\GetDocumentActionsBackup.sql" />
+    <Build Include="Procedures\ServiceLetters\ReturnDirectionExecution.sql" />
+    <Build Include="Procedures\ServiceLetters\ReturnInfoDocument.sql" />
+    <Build Include="Procedures\ServiceLetters\SendVizaToChief.sql" />
+    <Build Include="Procedures\ServiceLetters\spAddNewDocumentLoad.sql" />
+    <Build Include="Procedures\ServiceLetters\spCancelDocumentRequest.sql" />
+    <Build Include="Procedures\ServiceLetters\spDocsOperation.sql" />
+    <Build Include="Procedures\ServiceLetters\spGetDocs.sql" />
+    <Build Include="Procedures\ServiceLetters\spGetDocs1.sql" />
+    <Build Include="Procedures\ServiceLetters\spGetDocView.sql" />
+    <Build Include="Procedures\ServiceLetters\spGetElectronicDocument.sql" />
+    <Build Include="Procedures\ServiceLetters\spOperationConfirmSignature.sql" />
+    <Build Include="Procedures\ServiceLetters\spOperationSend.sql" />
+    <Build Include="Procedures\ServiceLetters\spOperationSigner.sql" />
+    <Build Include="Procedures\ServiceLetters\spOperationVisaAccept.sql" />
+    <Build Include="Procedures\ServiceLetters\spOperationWhomAddress.sql" />
+    <Build Include="Procedures\ServiceLetters\spPostActionOperation.sql" />
+    <Build Include="Procedures\ServiceLetters\spReturnDocumentRequest.sql" />
+    <Build Include="Procedures\ServiceLetters\spSendToConfirmedPerson.sql" />
+    <Build Include="Procedures\ServiceLetters\spSendVizaToNextGroup.sql" />
+    <Build Include="Procedures\Smdo\AddDocSubject.sql" />
+    <Build Include="Procedures\Smdo\AddDtsCheck.sql" />
+    <Build Include="Procedures\Smdo\AddDtsStep.sql" />
+    <Build Include="Procedures\Smdo\AddDtsSubject.sql" />
+    <Build Include="Procedures\Smdo\AddDvcSigners.sql" />
+    <Build Include="Procedures\Smdo\ChangeDocFile.sql" />
+    <Build Include="Procedures\Smdo\ChangeDocStatus.sql" />
+    <Build Include="Procedures\Smdo\CreateDoc.sql" />
+    <Build Include="Procedures\Smdo\CreateReceivedDoc.sql" />
+    <Build Include="Procedures\Smdo\CreateReceivedDocument.sql" />
+    <Build Include="Procedures\Smdo\GetDocumentActions.sql" />
+    <Build Include="Procedures\Smdo\GetDocumentActionsBackup.sql" />
+    <Build Include="Procedures\Smdo\GetDtsChecks.sql" />
+    <Build Include="Procedures\Smdo\GetDtsSteps.sql" />
+    <Build Include="Procedures\Smdo\GetDtsSubject.sql" />
+    <Build Include="Procedures\Smdo\IsDocExist.sql" />
+    <Build Include="Procedures\Smdo\ReturnDirectionExecution.sql" />
+    <Build Include="Procedures\Smdo\ReturnInfoDocument.sql" />
+    <Build Include="Procedures\Smdo\SendVizaToChief.sql" />
+    <Build Include="Procedures\Smdo\SetDvcBase64.sql" />
+    <Build Include="Procedures\Smdo\SetXmlStatus.sql" />
+    <Build Include="Procedures\Smdo\spAddNewDocumentLoad.sql" />
+    <Build Include="Procedures\Smdo\spCancelDocumentRequest.sql" />
+    <Build Include="Procedures\Smdo\spDocsOperation.sql" />
+    <Build Include="Procedures\Smdo\spGetDocs1.sql" />
+    <Build Include="Procedures\Smdo\spGetDocView.sql" />
+    <Build Include="Procedures\Smdo\spGetElectronicDocument.sql" />
+    <Build Include="Procedures\Smdo\spOperationConfirmSignature.sql" />
+    <Build Include="Procedures\Smdo\spOperationSend.sql" />
+    <Build Include="Procedures\Smdo\spOperationSigner.sql" />
+    <Build Include="Procedures\Smdo\spOperationVisaAccept.sql" />
+    <Build Include="Procedures\Smdo\spOperationWhomAddress.sql" />
+    <Build Include="Procedures\Smdo\spPostActionOperation.sql" />
+    <Build Include="Procedures\Smdo\spReturnDocumentRequest.sql" />
+    <Build Include="Procedures\Smdo\spSendToConfirmedPerson.sql" />
+    <Build Include="Procedures\Smdo\spSendVizaToNextGroup.sql" />
+    <Build Include="Procedures\WaitingDocs\GetDocs.sql" />
+    <Build Include="Procedures\WaitingDocs\GetInfo.sql" />
+    <Build Include="Procedures\WaitingDocs\spGetDocView.sql" />
+    <Build Include="Procedures\WaitingDocs\spGetElectronicDocument.sql" />
+    <Build Include="Procedures\WaitingDocs\spMarkAsWaiting.sql" />
+    <Build Include="Procedures\WaitingDocs\spUnMarkWaiting.sql" />
+    <Build Include="Tables\WaitingDocs\DOCS.sql" />
+    <Build Include="Tables\WaitingDocs\DOCS_DIRECTIONS.sql" />
+    <Build Include="Tables\WaitingDocs\DOCS_EXECUTOR.sql" />
+    <Build Include="Tables\WaitingDocs\DOCS_FILE.sql" />
+    <Build Include="Tables\WaitingDocs\DOCS_RELATED.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Schemas\CitizenRequests.sql" />
+    <Build Include="Schemas\DmsInsdoc.sql" />
+    <Build Include="Schemas\OrgRequests.sql" />
+    <Build Include="Schemas\OutgoingDoc.sql" />
+    <Build Include="Schemas\Report.sql" />
+    <Build Include="Schemas\Resolution.sql" />
+    <Build Include="Schemas\ServiceLetters.sql" />
+    <Build Include="Schemas\Smdo.sql" />
+    <Build Include="Schemas\WaitingDocs.sql" />
+  </ItemGroup>
+</Project>

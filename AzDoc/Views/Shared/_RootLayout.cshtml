@@ -1,0 +1,90 @@
+﻿@using AzDoc.Helpers
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0" />
+
+    <title>E-Sənəd Dövriyyəsi</title>
+
+    @Styles.Render("~/bundles/css/bootstrap")
+    <link href="~/Content/fontawesome/css/all.css" rel="stylesheet" />
+    <link href="~/Content/fontawesome/css/v4-shims.min.css" rel="stylesheet" />
+    @Styles.Render("~/bundles/css/toastr")
+    @Styles.Render("~/bundles/css/jquery-ui")
+    @Styles.Render("~/bundles/css/bootstrap-select")
+    <link href="~/Content/widgets/jqx.dms.css?v=@AppVersion.Version" rel="stylesheet" />
+    <link href="~/Content/common/style.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet">
+    <link href="~/Content/datepicker/daterangepicker.min.css" rel="stylesheet" />
+    @Scripts.Render("~/bundles/js/jquery")
+    @Scripts.Render("~/bundles/js/modernizr")
+    <script src="~/Scripts/datepicker/moment.min.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/datepicker/daterangepicker.js?v=@AppVersion.Version"></script>
+    @Scripts.Render("~/bundles/js/popper")
+    @GleamTechHelper.Head;
+</head>
+<body>
+
+    <main>
+        <div id="loader">
+            <div class="loaderContent">
+                <ul class="books_list">
+                    <li class="book_item first"></li>
+                    <li class="book_item second"></li>
+                    <li class="book_item third"></li>
+                    <li class="book_item fourth"></li>
+                    <li class="book_item fifth"></li>
+                    <li class="book_item sixth"></li>
+                </ul>
+                <div class="shelf"></div>
+            </div>
+        </div>
+        @RenderBody()
+    </main>
+
+    <input type="hidden" id="globalDocId" name="name" />
+
+
+    @Scripts.Render("~/bundles/js/bootstrap")
+    @Scripts.Render("~/bundles/js/jquery-ui")
+    @Scripts.Render("~/bundles/js/jqueryval")
+    @Scripts.Render("~/bundles/js/toastr") 
+    @Scripts.Render("~/bundles/js/bootstrap-select")
+    <script async src="~/Scripts/e-sign/eimzaLib.js?v=@AppVersion.Version"></script>
+    @*<script async src="~/Scripts/e-sign/eimzaLib-V2.js?v=@AppVersion.Version"></script>*@
+    <script src="~/Scripts/widgets/jqxmin.min.js?v=@AppVersion.Version"></script>
+    <script async src="~/Scripts/common/ErrorHandlers.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/script.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/CommonScripts.js"></script>
+    <script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+    <script>
+        var exceptFin = [ // imzada sertifikatin seriya nomresine baxilmayan istifadecilerin finleri
+            '2R63AF2',
+            '5ZTMRRB', // rufin
+            '5YE64HD',
+            '2CJY5FF', // nurlan
+            '49K46EL', // sevda
+            '2QP1WXY' // togrul
+        ];
+
+        var controlOrg = [  // nezaretle daxil olan qurumlar
+            '52',
+            '2085',
+            '2206',
+            '16150',
+            '16151',
+            '3',
+            '82',
+            '59',//Elmira Suleymanova(Ombudsman)
+            '3466',//Kamran aliyev
+            '17329',//Səbinə Əliyeva
+            '2273',  //Baş prokuroru yanında Korrupsiyaya qarşı mübarizə baş idarəsi
+            '16089' //Kerem hesenov prezident adminstarsiyasi
+        ];
+    </script>
+    @GleamTechHelper.Js;
+    @RenderSection("scripts", required: false)
+</body>
+</html>

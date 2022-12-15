@@ -1,0 +1,79 @@
+﻿@using Admin.Model.ViewModel.EditDocument
+@using BLL.Models.Document
+@model EditDocumentViewModel
+
+<div class="mModal">
+    <div class="modal fade" id="editDocModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Sənədin redaktəsi</span>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label style="width: 100%;font-size: 20px;text-align:center"><b style="background: gray; color: white">Mövcud sənəd üzərində dəyişikliklər</b> </label>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Sənədin statusu</label>
+                        <input type="hidden" id="editDocId" value="@Model.DocId" />
+                        @Html.DropDownListFor(p => p.Status, new SelectList(Model.StatusList ?? new List<ChooseModel>(), "Id", "Name"), new { @class = "form-control", @Id = "statusList" })
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Nəzarət statusu</label>
+                        <input type="hidden" id="editDocId" value="@Model.DocId" />
+                        @Html.DropDownListFor(p => p.DocUndercontrolStatusId, new SelectList(Model.DocUndercontrolStatusList ?? new List<ChooseModel>(), "Id", "Name"), new { @class = "form-control", @Id = "undercontrolstatusList" })
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Bağla</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="editDocSubmit" class="mBtn mBtn-pr defaultBtn" style="width: 100%">Yadda saxla</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $('#editDocSubmit').click(function () {
+        var statusId = $('#statusList').val();
+        var undercontrolstatusId = $('#undercontrolstatusList').val();
+        if (statusId == '' || statusId == undefined) {
+            return toastr.warning('Zəhmət olmasa sənədin statusunu seçin');
+        }
+        $.ajax({
+            url: '/az/AdminPanel/Documents/EditDoc',
+            type: 'Post',
+            data: {
+                docId: $('#editDocId').val(),
+                statusId: statusId,
+                undercontrolstatusId: undercontrolstatusId,
+            },
+            dataType: "json",
+            success: function (data) {
+                if (data == 1) {
+                    toastr.success('Sənədin statusu dəyişdirildi');
+                    $('#editDocModal').modal('hide');
+                    $("#searchDocument").click();
+                }
+            },
+            beforeSend: function () {
+                window.ShowLoading();
+            },
+            complete: function () {
+                window.CloseLoading();
+            }
+        });
+    });
+</script>
+

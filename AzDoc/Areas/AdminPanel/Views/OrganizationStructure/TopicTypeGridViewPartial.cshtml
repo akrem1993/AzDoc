@@ -1,0 +1,123 @@
+﻿@using AzDoc.Helpers
+@using BLL.Common.Enums
+@using Widgets
+
+@{
+    Layout = null;
+
+    <style>
+        button,
+        [type="button"],
+        [type="reset"],
+        [type="submit"] {
+            -webkit-appearance: none !important;
+        }
+    </style>
+    var grid = Html.MhmGrid("gridTopicTypesStructure", "GetTopicType", "OrganizationStructure", routeValues: new { area = "AdminPanel" })
+               .Columns(cols =>
+               {
+                   cols.Column(c =>
+                   {
+                       c.SetText("");
+                       c.SetDataField("", FieldType.Number);
+                       c.SetHeaderAlign(TextAlign.Center).IsFilterable();
+                       c.SetWidth(35);
+                       c.IsCrud("x", "x");
+                       c.SetRenderer("<a><i class='fas fa-edit'></i></a>",
+                       htmlAttributes: new
+                       {
+                           @class = "operation-button",
+                           fn_onclick = "TopicTypeEdit",
+                           title = "Mövzunun redaktəsi"
+                       });
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("");
+                       c.SetDataField("TopicTypeId", FieldType.Number);
+                       c.SetHeaderAlign(TextAlign.Center).IsFilterable();
+                       c.SetWidth(35);
+                       c.IsCrud("x", "x");
+                       c.SetRenderer("<a><i class='fas fa-trash'></i></a>",
+                       htmlAttributes: new
+                       {
+                           @class = "operation-button",
+                           fn_onclick = "TopicTypeRemove",
+                           title = "Mövzunun silinməsi"
+                       });
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>Mövzu</b>");
+                       c.SetDataField("TopicTypeName");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.IsFilterable();
+                       c.SetMinWidth(410);
+
+
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>Qurum</b>");
+                       c.SetDataField("OrganizationShortname");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.IsFilterable();
+                       c.SetMinWidth(400);
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>İndeks</b>");
+                       c.SetDataField("TopicTypeOrderIndex");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Center);
+                       c.IsFilterable();
+                       c.SetMaxWidth(190);
+
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>Vətəndaş</b>");
+                       c.SetDataField("CitizenTopic");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Center);
+                       c.IsFilterable();
+                       c.SetMaxWidth(150);
+
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>Təşkilat</b>");
+                       c.SetDataField("OrgTopic");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Center);
+                       c.IsFilterable();
+                       c.SetMaxWidth(150);
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>Əməkdaş</b>");
+                       c.SetDataField("ColleagueTopic");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Center);
+                       c.IsFilterable();
+                       c.SetMaxWidth(150);
+                   });
+               })
+               .AllowCrud()
+               .AllowSorting(false)
+               .AllowTooltips(false)
+               .AllowPaging(true)
+               .AllowFiltering(true)
+               .AllowFilterRow(true)
+               .AllowColumnOrdering(true)
+               .AllowColumnResizing(true)
+               .SetPageSize(35)
+               .SetWidth("100%")
+               .SetOnFilter("onFilter")
+               .SetHeight("100%");
+
+
+}
+@grid.GetHtml()

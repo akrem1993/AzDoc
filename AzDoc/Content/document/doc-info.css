@@ -1,0 +1,106 @@
+﻿
+.DocTitle {
+    height: 50px;
+    background-color: #f3f2f2;
+    line-height: 3;
+    border: 1px solid black;
+    border-bottom: none;
+    border-top: none;
+    border-collapse: collapse;
+}
+
+.removeBorder {
+    border-top-style: hidden !important;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+div.docview > table {
+    border: 1px solid black;
+}
+
+div.docview > div.row > div.col-lg-12 > table > tbody > tr > td {
+    border-top: none;
+    border: 1px solid black;
+}
+
+
+
+~#OldExecutor# 	~#NewExecutor# 	~#DirectionChangeInsertDate# 	~#DirectionChangeNote# 	~#DirectionChangeConfirmNote# 	~#DirectionChangeStatus# > tr > th {
+    border: 1px solid black;
+}
+
+th {
+    font-weight: normal;
+    background-color: #D3D3D3;
+}
+
+table.table-bordered {
+    border: 1px solid black;
+    margin-top: 20px;
+}
+
+    table.table-bordered > thead > tr > th {
+        border: 1px solid black;
+    }
+
+    table.table-bordered > tbody > tr > td {
+        border: 1px solid black;
+    }
+
+.custom-table-cell {
+    border: 1px solid black !important;
+}
+
+.page-header-color {
+    color: white;
+}
+
+.header-row {
+    background-color: #0040ff;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+/*styles to print*/
+/*@media print {
+    .printbtn {
+        display: none;
+    }
+
+    a[href]:after {
+        display: none;
+        visibility: hidden;
+    }
+
+    th {
+        background-color: #D3D3D3 !important;
+        -webkit-print-color-adjust: exact;
+    }
+
+    h3, h4 {
+        font-weight: bold;
+    }
+
+    .header-row {
+        background-color: white;
+        color: black;
+        border: 8px solid #D3D3D3;
+        border-style: double;
+        font-weight: bold;
+        -webkit-print-color-adjust: exact;
+    }
+
+    table {
+        page-break-inside: auto
+    }
+
+    div {
+        page-break-inside: avoid;
+    }
+    th {
+        display: table-header-group
+    }
+}*/

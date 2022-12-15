@@ -1,0 +1,132 @@
+﻿@using BLL.Models.Report
+@using AzDoc.Helpers
+
+@model ReportAllDocsBodyViewModel
+
+@if (Model?.AllDocs != null && Model.Pager.TotalItems > 0)
+{
+    int count = (Model.Pager.CurrentPage - 1) * Model.Pager.PageSize;
+
+    <div class="row">
+
+        <div class="col-12 mt-3" style="max-height: 60vh; overflow-y: auto">
+            <table class=" tableFixHead table table-striped table-sm mTable mTable2" id="tableReportExecution">
+                <thead>
+                    <tr>
+                        <th>Sıra sayı №</th>
+                        <th>Qeydiyyat nömrəsi</th>
+                        <th>Qeydiyyat tarixi</th>
+                        <th>İcra müddəti</th>
+                        <th>İcra müddəti(təqvim günü)</th>
+                        <th>Uzadılma barədə qeyd</th>
+                        <th>Sənədin statusu</th>
+                        <th>Sənədin nömrəsi</th>
+                        <th>Sənədin tarixi</th>
+                        <th>Haradan daxil olub</th>
+                        <th>Kimdən daxil olub (Vətəndaşın adı, soyadı, ata adı)</th>
+                        <th>Vətəndaşın sosial statusu</th>
+                        <th>Müraciətin forması</th>
+                        <th>Müraciətin növü</th>
+                        <th>Mövzu</th>
+                        <th>Alt Mövzu</th>
+                        <th class="complainedOfDocStructure">Şikayət olunan qurum</th>
+                        <th class="complainedOfDocSubStructure">Şikayət olunan alt qurum</th>
+                        <th>Sənədin qısa məzmunu</th>
+                        <th>İcraçı struktur bölmə</th>
+                        <th>Cavab sənədinin nömrəsi</th>
+                        <th>Cavab sənədinin tarixi</th>
+                        <th class="docResultColumn">Müraciətlərə baxılmasının vəziyyəti</th>
+                        <th>Rayon/Şəhər</th>
+                        <th>Kənd</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var doc in Model.AllDocs)
+                    {
+                        count++;
+                        <tr>
+                            <td>@count</td>
+                            <td><a href="/az/Document/GetDocView?token=@doc.TokenForDocId" target="_blank">@doc.DocEnterno</a></td> @*//senedin qeydiyyat nomresi*@
+                            <td>@doc.DocEnterDate.ToString("dd.MM.yyyy")</td> @*//senedin daxil olma tarixi*@
+                            @*//icra muddeti*@
+                            @if (doc.PlannedDate.HasValue)
+                            {
+                                <td>@doc.PlannedDate.Value.ToString("dd.MM.yyyy")</td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+                            <td>@doc.ExecutionDays</td> @*// icra muddeti(teqvim gunu)*@
+                            <td>@doc.DirectionChangeNote</td> @*Uzadılma barədə qeyd*@
+
+                            <td>@doc.DocumentStatusName</td> @*//senedin statusu*@
+                            <td>@doc.DocDocno</td>    @*//senedin nomresi*@
+                            <td>@(doc.DocDocDate.HasValue ? doc.DocDocDate.Value.ToString("dd.MM.yyyy"): "")</td> @*//senedin tarixi*@
+                            <td>@doc.EntryFromWhere</td> @*//haradan daxil olub*@
+                            <td>@doc.EntryFromWhoCitizenName</td> @*//kimden daxil olub*@
+                            <td>@doc.SocialName</td> @*//vetendasin sosial statusu*@
+                            <td>@doc.FormName</td> @*//muracietin formasi*@
+                            <td>@doc.ApplyTypeName</td> @*// muracietin novu*@
+                            <td>@doc.TopicTypeName</td> @*// movzu*@
+                            <td>@doc.TopicName</td> @*//alt movzu*@
+                            <td class="complainedOfDocStructure">@doc.ComplainedOfDocStructure</td>    @*//sikayet olunan qurum*@
+                            <td class="complainedOfDocSubStructure">@doc.ComplainedOfDocSubStructure</td>    @*//skayet olunan alt qurum*@
+
+                            @*//senedin qisa mezmunu*@
+                            <td title="@doc.DocDescription">
+                                @if (doc.DocDescription?.Length >= 30)
+                                {
+                                    @($"{doc.DocDescription.Substring(0, 30)} ...")
+                                }
+                                else
+                                {
+                                    @doc.DocDescription;
+                                }
+                            </td>
+                            <td>@doc.ExecutorsDepartments</td> @*/icraci struktur bolme*@
+
+                            @*//cavab senedin nomresi*@
+                            @if (doc.ReplyDocNumbersForView.Count > 0)
+                            {
+                                <td>
+                                    @foreach (var item in doc.ReplyDocNumbersForView)
+                                    {
+                                        <a style="margin-right:10px;" href="/az/Document/GetDocView?token=@item.Key" target="_blank">@item.Value;</a>
+                                    }
+                                </td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+                            <td>@(doc.ReplyDocDate.HasValue ? doc.ReplyDocDate.Value.ToString("dd.MM.yyyy") : "")</td>     @*/Cavab sənədinin tarixi*@
+
+                            <td class="docResultColumn">@doc.DocResultName</td>    @*//Müraciətlərə baxılmasının vəziyyəti*@
+                            <td>@doc.RegionName</td> @*//Rayon/Şəhər*@
+                            <td>@doc.VillageName</td> @*//Kend*@
+
+                        </tr>
+                     }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    Html.RenderPartial("_Pager", new BLL.Models.Report.Paging.PagerPartialModel() { Pager = Model.Pager });
+}
+else
+{
+    <div class="row">
+        <div class="col-12 text-center mt-2 ">
+            <span id="docsCount" style="color:red;font-size:30px;">Axtarışa uyğun məlumat tapılmadı.</span>
+        </div>
+    </div>
+}
+<div class="row" style="padding-top:70px;">
+    <div class="col-12 text-right mt-2">
+        <span id="docsCount" style="color: #7fa8b6">Tapılan məlumat sayı : @Model.Pager.TotalItems</span>
+    </div>
+</div>
+

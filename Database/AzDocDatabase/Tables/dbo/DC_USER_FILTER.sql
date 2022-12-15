@@ -1,0 +1,10 @@
+CREATE TABLE [dbo].[DC_USER_FILTER](
+	[Id] int identity NOT NULL,
+	[WorkplaceId] int NOT NULL,
+	[DocTypeId] int NOT NULL,
+	[Name] nvarchar(50) NOT NULL,
+	[Filter] nvarchar(500) NOT NULL,
+    CONSTRAINT [PK_DC_USER_FILTER] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_DC_USER_FILTER_DC_WORKPLACE] FOREIGN KEY([WorkplaceId]) REFERENCES [dbo].[DC_WORKPLACE] ([WorkplaceId]),
+    CONSTRAINT [FK_DC_USER_FILTER_DOC_TYPE] FOREIGN KEY([DocTypeId]) REFERENCES [dbo].[DOC_TYPE] ([DocTypeId])
+)

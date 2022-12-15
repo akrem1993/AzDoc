@@ -1,0 +1,6 @@
+CREATE TABLE [dbo].[DC_RIGHT](
+	[RightId] int NOT NULL,
+	[RightName] nvarchar(200) NOT NULL,
+	[RightStatus] bit NOT NULL CONSTRAINT [DF__DC_RIGHT__RightS__2882FE7D]  DEFAULT 1,
+ CONSTRAINT [PK_DC_RIGHT] PRIMARY KEY ([RightId])
+)

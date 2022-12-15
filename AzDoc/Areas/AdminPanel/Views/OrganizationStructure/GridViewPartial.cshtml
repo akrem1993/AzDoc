@@ -1,0 +1,186 @@
+﻿@using AzDoc.Helpers
+@using BLL.Common.Enums
+@using Widgets
+
+@{
+    Layout = null;
+
+    <style>
+        button,
+        [type="button"],
+        [type="reset"],
+        [type="submit"] {
+            -webkit-appearance: none !important;
+        }
+    </style>
+    var grid = Html.MhmGrid("gridOrganizationStructure", "User", "OrganizationStructure", routeValues: new { area = "AdminPanel" })
+               .Columns(cols =>
+               {
+                   cols.Column(c =>
+                   {
+                       c.SetText("");
+                       c.SetDataField("UserId", FieldType.Number);
+                       c.SetHeaderAlign(TextAlign.Center).IsFilterable();
+                       c.SetWidth(35);
+                       c.IsCrud("x", "x");
+                       c.SetRenderer("<a><i class='fas fa-edit'></i></a>",
+                       htmlAttributes: new
+                       {
+                           @class = "operation-button",
+                           fn_onclick = "UserEdit",
+                           title = "İstifadəçi məlumatlarının dəyişdirilməsi"
+                       });
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("");
+                       c.SetDataField("", FieldType.Number);
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetWidth(35);
+                       c.IsCrud("x", "x");
+                       c.SetRenderer("<a><i class='fas fa-eye'></i></a>", htmlAttributes: new
+                       {
+                           @class = "operation-button",
+                           fn_onclick = "UserView",
+                           title = "İstifadəçi haqqında məlumatlar"
+                       });
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("Adı");
+                       c.SetDataField("PersonnelName");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.SetMinWidth(100);
+                       c.SetMaxWidth(130);
+                       c.IsFilterable();
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("Soyadı");
+                       c.SetDataField("PersonnelSurname");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.SetMinWidth(120);
+                       c.SetMaxWidth(130);
+                       c.IsFilterable();
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("Ata adı");
+                       c.SetDataField("PersonnelLastname");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.SetMinWidth(100);
+                       c.SetMaxWidth(130);
+                       c.IsFilterable();
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("İstifadəçi adı");
+                       c.SetDataField("UserName");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.SetMinWidth(150);
+                       c.SetMaxWidth(150);
+                       c.IsFilterable();
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("Vəzifə");
+                       c.SetDataField("DepartmentPositionName");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.IsFilterable();
+                       c.SetMinWidth(300);
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("Qurum");
+                       c.SetDataField("OrganizationShortname");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.IsFilterable();
+                       c.Width = "320";
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("Alt Qurum");
+                       c.SetDataField("SubOrgName");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Center);
+                       c.IsFilterable();
+                       c.Width = "280";
+
+                   });
+
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("Departament");
+                       c.SetDataField("DepartmentName");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Center);
+                       c.IsFilterable();
+                       c.Width = "280";
+
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("Şöbə");
+                       c.SetDataField("BranchName");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Center);
+                       c.IsFilterable();
+                       c.Width = "280";
+
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("Sektor");
+                       c.SetDataField("SectorName");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Center);
+                       c.IsFilterable();
+                       c.Width = "280";
+
+                   });
+
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("Status");
+                       c.SetDataField("UserStatus");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.SetMinWidth(70);
+                       c.SetMaxWidth(130);
+                       c.IsFilterable(Filtertype.CheckedList, filterItems: CacheHelper.GetUserStatuses(), filterField: "DocDocumentstatusId");
+
+                   });
+
+               })
+               .AllowCrud()
+               .AllowSorting(false)
+               .AllowTooltips(false)
+               .AllowPaging(true)
+               .AllowFiltering(true)
+               .AllowFilterRow(true)
+               .AllowColumnOrdering(true)
+               .AllowColumnResizing(true)
+               .SetOnFilter("onFilter")
+               .SetPageSize(35)
+               .SetWidth("100%")
+               .SetHeight("100%");
+
+
+}
+@grid.GetHtml()

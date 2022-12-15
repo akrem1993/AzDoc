@@ -1,0 +1,220 @@
+﻿@using BLL.Common.Enums
+@using AzDoc.Helpers
+@using Widgets
+
+@{
+    Layout = null;
+
+    var grid = Html.MhmGrid("gridRegions", "GetRegions", "Region", routeValues: new { area = "AdminPanel" })
+        .Columns(cols =>
+        {
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='fas fa-plus'></i></a>", htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    fn_onclick = "AddNewRegion",
+                    title = "Yeni şəhər(rayon)"
+                });
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='far fa-edit'></i></a>", htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    fn_onclick = "EditRegion",
+                    title = "Mövcud şəhərin(rayon) redaktə olunması"
+                });
+            });
+
+            cols.Column(c =>
+            {
+                c.SetDataField("RegionId");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Şəhər(rayon) adı</b>");
+                c.SetDataField("RegionName");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable(Filtertype.TextBox);
+                c.SetMaxWidth(200);
+            });
+            cols.Column(c =>
+            {
+                c.SetText("<b>Şəhər(rayon) kodu</b>");
+                c.SetDataField("RegionCode");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable(Filtertype.TextBox);
+                c.SetMaxWidth(200);
+            });
+
+            //cols.Column(c =>
+            //{
+            //    c.SetText("<b>Ölkə</b>");
+            //    c.SetDataField("RegionCountryCode");
+            //    c.SetHeaderAlign(TextAlign.Center);
+            //    c.SetCellsAlign(TextAlign.Left);
+            //    c.IsFilterable(Filtertype.TextBox);
+            //    c.SetHidden();
+            //    c.SetWidth(150);
+            //});
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Şəhərin(rayon) statusu</b>");
+                c.SetDataField("RegionStatus");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable(Filtertype.CheckedList, filterItems: "[{\"text\": \"Aktiv\", \"value\":\"1\"}, {\"text\": \"Deaktiv\", \"value\":\"0\"}]", filterField: "RegionStatus");
+                c.SetWidth(250);
+            });
+
+        })
+
+.AllowSorting(true)
+.AllowTooltips(true)
+.AllowPaging(true)
+.AllowFiltering(true)
+.AllowFilterRow(true)
+.AllowColumnOrdering(true)
+.AllowColumnResizing(true)
+.ColumnCustomizer(false)
+.SetOnFilter("onFilterRegion")
+.SetPageSize(35)
+.SetWidth("1334px")
+.SetHeight("500px");
+}
+
+@grid.GetHtml()
+
+<div class="modal fade" id="regionModal" tabindex="-1" role="dialog" aria-labelledby="regionModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" id="regionModalLabel">Yeni şəhər(rayon) yarat</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="/az/AdminPanel/Region/AddRegionAsync" id="AddRegionForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <input type="hidden" id="regionId" name="RegionId" />
+                    <div class="form-group">
+                        <label for="regionCountry">Ölkəni seçin <span style="font-weight:bold; color:red">*</span></label>
+                        <select class="form-control selectpicker" name="RegionCountryCode" id="regionCountry" data-live-search="true" data-width="100%"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="regionName">Şəhərin(rayon) adı <span style="font-weight:bold; color:red">*</span></label>
+                        <input type="text" class="form-control" id="regionName" data-required="adı daxil edin" name="RegionName" placeholder="ölkənin adını daxil edin">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="checkbox" id="regionStatus" name="RegionStatus" checked="checked">
+                        <label for="regionStatus">Şəhərin(rayon) statusu</label><br>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 d-flex justify-content-center">
+                    <button type="submit" class="btn btn-success">Yadda saxla</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-danger">Bağla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function appendCountiesToSelect(selected) {
+        var countries = $.parseJSON('@Html.Raw(CacheHelper.GetFilter(DocFilter.AdminCountries))');
+        var select = $('#regionCountry');
+        console.log(countries);
+        var isEqual = false;
+        $(countries).each(function (index, element) {
+            isEqual = (element.value == selected);
+            $(select).append(new Option(element.text, element.value, isEqual, isEqual));
+
+            if (isEqual) {
+                $(select).selectpicker('refresh');
+            }
+        });
+
+        $(select).selectpicker('refresh');
+    }
+
+    function AddNewRegion(item, data) {
+        appendCountiesToSelect(931);
+        $('#regionModal').modal('show');
+    }
+
+    $('#AddRegionForm').submit(function (e) {
+        e.preventDefault(); // varsayilan eventleri engellemek
+
+        var form = new FormData(this);
+        var regionName = form.get('RegionName');
+        var regionStatus = $(this).find("input[name='RegionStatus']").prop('checked') == true ? 1 : 0;
+
+        form.set('RegionStatus', regionStatus);
+
+        if (regionName == '' || regionName == undefined) {
+            return toastr.warning('Şəhərin(rayon) adını daxil edin');
+        }
+        var regionId = $('#regionId').val();
+        var url = `/az/AdminPanel/Region/${regionId == '' || regionId == undefined ? 'AddRegionAsync' : 'EditRegionAsync'}`;
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: form,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                toastr.success('Məlumat uğurla əlavə olundu');
+                $('#regionModal').modal('hide');
+                $('#gridRegions').bindgrid(1);
+            }
+        });
+
+    });
+
+    $('#regionModal').on('hidden.bs.modal', function (e) {
+        $('#AddRegionForm').trigger('reset');
+        $('#regionCountry').empty();
+        $('#regionId').val('');
+    })
+
+    function EditRegion(item, data) {
+        $.ajax({
+            type: 'GET',
+            url: '/az/AdminPanel/Region/EditRegionAsync',
+            data: { regionId: data.RegionId },
+            //processData: false,
+            contentType: false,
+            success: function (data) {
+                appendCountiesToSelect(data.RegionCountryCode);
+                $('#regionId').val(data.RegionId);
+                $('#regionName').val(data.RegionName);
+                $('#regionStatus').prop('checked', data.RegionStatus == 1 ? true : false);
+                $('#regionModal').modal('show');
+            }
+        });
+
+    }
+    //function DeleteRegion(item, data) {
+
+    //}
+</script>

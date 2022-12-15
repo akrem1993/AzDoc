@@ -1,0 +1,344 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@{
+    Layout = "~/Views/Shared/_RootLayout.cshtml";
+
+    var isAdmin = SessionHelper.Roles.Any(x => x.RoleId == 230);
+    var isSubAdmin = SessionHelper.Roles.Any(x => x.RoleId == 266);
+}
+
+<html>
+<head>
+    @*<link href="~/Content/shared/leftmenu/leftmenu.css" rel="stylesheet" />*@
+</head>
+
+<body>
+
+<input type="hidden" id="globalPageIndex"/>
+
+<div class="page-wrapper chiller-theme @((SessionHelper.DefaultLeftMenu == false) ? "" : "toggled") ">
+
+<div class="leftMenu">
+<i class="fas fa-thumbtack"></i>
+<div class="logo">
+    <a href="#">
+        <img src="~/Content/images/azdoc.png" alt=""/>
+    </a>
+</div>
+<div class="menu">
+    <ul>
+        <li>
+            <a href="~/az/UnreadDocuments">
+                <i class="fas fa-file-alt"></i>
+                <span>Oxunmamış sənədlər</span>
+            </a>
+        </li>
+        <li class="drop">
+            <a href="#">
+                <i class="fas fa-file-download"></i>
+                <span>Daxil olan</span>
+            </a>
+            <div class="down">
+                <ul>
+                    <li>
+                        <a href="~/az/OrgRequests">
+                            <span>Təşkilat müraciətləri</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="~/az/CitizenRequests">
+                            <span>Vətəndaş müraciətləri</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="~/az/ColleagueRequests">
+                            <span>Əməkdaş müraciətləri</span>
+                        </a>
+                    </li>
+                    @if (SessionHelper.Roles.Any(r => r.RoleId == 231))
+                    {
+                        <li>
+                            <a href="~/az/Journal/Home/RequestsIndex?docType=1">
+                                <span>
+                                    Daxil olan təşkilat müraciətlərinin qeydə alınması e-kitabı
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="~/az/Journal/Home/RequestsIndex?docType=2">
+                                <span>
+                                    Daxil olan vətəndaş müraciətlərinin qeydə alınması e-kitabı
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="~/az/Journal/Home/RequestsIndex?docType=27">
+                                <span>
+                                    Daxil olan əməkdaş müraciətlərinin qeydə alınması e-kitabı
+                                </span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </li>
+        <li class="drop">
+            <a href="#">
+                <i class="fas fa-paper-plane"></i>
+                <span>Göndərilən</span>
+            </a>
+            <div class="down">
+                <ul>
+                    <li>
+                        <a href="@Url.Action("Index", "Document", new {area = "OutGoingDoc", docType = 12})">
+                            <span>Xaric olunan sənədlər</span>
+                        </a>
+                    </li>
+                    @if (SessionHelper.Roles.Any(r => r.RoleId == 231))
+                    {
+                        <li>
+                           <a href="~/az/Journal/Home/RequestsIndex?docType=12">
+                                <span>Göndərilən sənədlərin qeydə alınması e-kitabı</span>
+                            </a>
+                        </li>
+                    }
+
+                </ul>
+            </div>
+        </li>
+        <li class="drop">
+            <a href="#">
+                <i class="fas fa-university"></i>
+                <span>Struktur daxili</span>
+            </a>
+            <div class="down">
+                <ul>
+                    <li>
+                        <a href="~/az/ServiceLetters">
+                            <span>Xidməti məktublar</span>
+                        </a>
+                    </li>
+                    @*<li>
+                        <a href="#">
+                            <span>Təşkilati sənədlər</span>
+                        </a>
+                    </li>*@
+                    <li>
+                        <a href="~/az/InsDoc">
+                            <span>Sərəncamverici sənədlər</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="~/az/Journal/Home/RequestsIndex?docType=3">
+                            <span>
+                                Daxil olan sərəncamverici sənədlərin qeydə alınması e-kitabı
+                            </span>
+                        </a>
+                    </li>
+                    @*<li>
+                        <a href="#">
+                            <span>Məlumat-arayış sənədləri</span>
+                        </a>
+                    </li>*@
+                    @*<li>
+                        <a href="#">
+                            <span>Tapşırıqlar</span>
+                        </a>
+                    </li>*@
+                </ul>
+            </div>
+        </li>
+        @*@if (new int[] { 2, 23, 430, 431, 24, 480, 270, 5017 }.Contains(SessionHelper.WorkPlaceId))
+        {*@
+        <li>
+            <a href="~/az/Report/Home">
+                <i class="fas fa-chart-pie"></i>
+
+                <span>Hesabatlar</span>
+            </a>
+        </li>
+        @*}*@
+        @*<li>
+            <a href="#">
+                <i class="fas fa-download"></i>
+                <span>Yükləmələr</span>
+            </a>
+        </li>*@
+        @if (new[] {4948, 2, 340, 130, 393, 329}.Contains(SessionHelper.UserId))
+        {
+            <li class="drop">
+                <a href="#">
+                    <i class="fas fa-globe"></i>
+                    <span>Beynəlxalq münasibətlər</span>
+                </a>
+                <div class="down">
+                    <ul>
+                        <li>
+                            <a href="~/az/Smdo">
+                                <span>Göndərilənlər</span>
+                                <i class="fas fa-angle-double-up"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="~/az/Smdo/Document/IndexReceived">
+                                <span>Daxil olan</span>
+                                <i class="fas fa-angle-double-down"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+        }
+        @*<li>
+            <a href="~/az/WaitingDocs">
+                <i class="fas fa-file-alt"></i>
+                <span>Gözləmədə olan sənədlər</span>
+            </a>
+        </li>*@
+        @if (new[] {8660, 24}.Contains(SessionHelper.WorkPlaceId))
+        {
+            <li>
+                <a href="~/az/ReserveDocs">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Rezerv sənədlər</span>
+                </a>
+            </li>
+        }
+
+        @if (isAdmin)
+        {
+            @Html.Partial("_AdminMenu")
+        }
+
+        @if (isSubAdmin && !isAdmin)
+        {
+            @Html.Partial("_SubAdminMenu")
+        }
+    </ul>
+</div>
+<div class="menuFooter text-center">
+    <div class="profile">
+        <div class="row no-gutters">
+            <div class="exit col-3 item">
+                <a href="@Url.RouteUrl("Logout")">
+                    <i class="fas fa-power-off"></i>
+                </a>
+            </div>
+            <div class="col-3 item">
+                <a href="/az/Settings/Index">
+                    <i class="fas fa-cogs"></i>
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- sidebar-wrapper  -->
+
+<main class="page-content" style="margin-bottom: 50px">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="row align-items-center" style="height: 100%">
+        <div class="col-6 profileInfo">
+            <div class="profilePhoto d-inline-block">
+                <img src="~/Content/images/user.jpg">
+            </div>
+            <div class="positionInfo d-inline-block">
+                <span>@SessionHelper.PersonFullName, @SessionHelper.DepartmentPositionName</span>
+                @{
+#if DEBUG
+                <bold style = "color:orangered" > @AppVersion.DbSource </bold>
+#endif
+                }
+
+            </div>
+        </div>
+        <div class="col-6 text-right">
+            <div class="sessionTime">
+                <span id="span-expire-time" minutes="@Session.Timeout" seconds="0" data-sessiontimeout='@Session.Timeout' class="user-role" title="Sessiyanın bitmə vaxtı">
+                    <h6 style="margin: 0">
+                        <i id="session-status-icon" class="fa fa-circle-notch fa-spin" style="color: #75ab41"></i>
+                        <span id="span-expire-time-text">@Session.Timeout:00</span>
+                    </h6>
+                </span>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- page-content" -->
+</div>
+
+<div id="dynamiccontext"></div>
+</body>
+</html>
+<div class="mModal">
+    <div class="modal fade" id="SessionModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Diqqət!</span>
+                </div>
+
+                <div class="modal-body">
+                    <p id="modalSessionİnfo">...</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button onclick="PingRefreshSession()" type="button" class="mBtn mBtn-sec mr-5 defaultBtn" id="refreshSession"><span class="fa fa-check"></span> Bəli</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(".sidebar-dropdown > a").click(function () {
+        $(".sidebar-submenu").slideUp(150);
+
+        if ($(this).parent().hasClass("active")) {
+            $(".sidebar-dropdown").removeClass("active");
+            $(this).parent().removeClass("active");
+        }
+        else {
+            $(".sidebar-dropdown").removeClass("active");
+            $(this).next(".sidebar-submenu").slideDown(150);
+            $(this).parent().addClass("active");
+        }
+    });
+    $("#close-sidebar").click(function () {
+        $(".page-wrapper").removeClass("toggled");
+        setTimeout(resizeWindow, 800);
+        PinnedMenu(false);
+    });
+    $("#show-sidebar").click(function () {
+        $(".page-wrapper").addClass("toggled");
+        setTimeout(resizeWindow, 800);
+        PinnedMenu(true);
+    });
+    function resizeWindow() {
+        $(window).resize();
+    }
+    function PinnedMenu(value) {
+        $.get('/az/Settings/SetVariable', { value: value }, function (data) { });
+    }
+
+</script>
+
+<script src="~/Scripts/common/SessionHandler.js?v=@AppVersion.Version"></script>
+
+@section scripts
+{
+    @RenderSection("scripts", false)
+}

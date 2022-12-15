@@ -1,0 +1,352 @@
+﻿@using AzDoc.Helpers;
+@using Widgets
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+
+    <style>
+        button,
+        [type="button"],
+        [type="reset"],
+        [type="submit"] {
+            -webkit-appearance: none !important;
+        }
+
+        .container {
+            margin-left: 0px;
+        }
+    </style>
+
+
+    var grid = Html.MhmGrid("gridResolution", "DeleteResolution", "Documents", routeValues: new { area = "AdminPanel" })
+
+.Columns(cols =>
+{
+
+
+    cols.Column(c =>
+    {
+        c.SetText("Sənədin nömrəsi");
+        c.SetDataField("DocEnterNo");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(250);
+        c.SetMaxWidth(300);
+        c.IsPinned();
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Dərkənarı yaradan");
+        c.SetDataField("DirectionName");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(250);
+        c.SetMaxWidth(300);
+        c.IsPinned();
+
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Icraçı");
+        c.SetDataField("ExecutorName");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(250);
+        c.SetMaxWidth(300);
+        c.IsPinned();
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("Icra növü");
+        c.SetDataField("SendStatus");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetCellsAlign(TextAlign.Left);
+        c.SetMinWidth(250);
+        c.SetMaxWidth(300);
+        c.IsPinned();
+    });
+
+    cols.Column(c =>
+    {
+        c.SetText("");
+        c.SetDataField("Id");
+        c.SetHeaderAlign(TextAlign.Center);
+        c.SetWidth(35);
+        c.IsCrud("x", "x");
+        c.SetRenderer("<button></button>",
+        htmlAttributes: new { @class = "fa fa-trash btn", type = "button", id = "btnDelete", title = "Sil", data_toggle = "modal", data_target = "#deleteDialogModal" });
+    });
+})
+.AllowCrud()
+.AllowSorting(false)
+.AllowTooltips(false)
+.AllowPaging(true)
+.AllowFiltering(false)
+.AllowFilterRow(false)
+.AllowColumnOrdering(true)
+.AllowColumnResizing(true)
+.SetOnFilter("")
+.SetPageSize(35)
+.SetWidth("100%")
+.SetHeight("100%");
+
+}
+
+
+
+<div class="col">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="\">Ana səhifə</a></li>
+            <li class="breadcrumb-item"><a href="#">Admin</a></li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Mövcud sənəd üzrə dəyişiklik
+            </li>
+        </ol>
+    </nav>
+</div>
+
+
+<div class="col-12 modal-header3 mt-4">
+    <div class="row no-gutters" style="border-bottom:1px solid #8080805e; margin: 0 1rem">
+        <div class="col-4">
+            <a href="#" class="individual active" id="hrdelete">
+                Dərkənarın və ya icraçının silinməsi
+            </a>
+        </div>
+
+        <div class="col-4">
+            <a href="#" id="hradd">
+                Dərkənar hazırlama hüququnun verilməsi
+            </a>
+        </div>
+        <div class="col-4">
+            <a href="#" id="execdeladd">
+                Icraçının əlavə edilməsi və silinməsi
+            </a>
+        </div>
+        @*<div class="col-4">
+                <a href="#" id="hredit" class="juridical">
+                    Sənədin redaktə edilməsi
+                </a>
+            </div>*@
+    </div>
+
+
+
+</div>
+
+<form id="postionForm" name="postionForm">
+    <div class="col-12 mainContent ">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            <div class="editGroup">
+
+
+                <div class="row">
+
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="txtDocEnterNo">Sənəd nömrəsi</label>
+                            <input type="text" class="form-control" id="txtDocEnterNo" />
+                        </div>
+                    </div>
+                    <div class="col-sm-3" style="text-align:left;">
+                        <div class="form-group">
+
+                            <br />
+                            <button type="button" class="mBtn mBtn-pr " id="btnSearch">
+                                Axtar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="mainEdit contentItem" id="step2" style="padding-top:1px; display:none;" data-brnum="1">
+            <div class="editGroup">
+                @Html.Action("SelectUser")
+            </div>
+        </div>
+        <div class="mainEdit contentItem" id="step4" style="padding-top:1px; display:none;" data-brnum="1">
+            <div class="editGroup">
+                @Html.Action("SelectUser2")
+            </div>
+        </div>
+        @*<div class="mainEdit contentItem" id="step3" style="padding-top:1px; display:none;" data-brnum="1">
+                <div class="editGroup">
+                    @Html.Action("EditDoc")
+                </div>
+            </div>*@
+    </div>
+    @*</div>*@
+
+    <div class="col-md-12" id="DocGrid" style="padding-top: 10px; height: 86vh; display:none">
+        @grid.GetHtml()
+    </div>
+
+</form>
+<link href="~/Content/fontawesome/css/all.min.css?v=@AppVersion.Version" rel="stylesheet" />
+<link href="~/Content/fontawesome/css/v4-shims.min.css?v=@AppVersion.Version" rel="stylesheet" />
+
+
+<div id="popover-content-ActionName"></div>
+
+
+<div class="mModal">
+    <div class="modal fade modalBtn" id="deleteDialogModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+
+                </div>
+                <div class="modal-header2">
+                    <h4 class="modal-title" id="myModalLabel">Məlumatı silmək istədiyinizə əminsinizmi ?</h4>
+                </div>
+
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+                    <div class="row">
+                        <div class="col-12">
+                            @*<textarea class="form-control" id="cancelNote"></textarea>*@
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" id="cancelBtn" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" style="width: 100%">Xeyr</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="saveBtn" class="mBtn mBtn-pr defaultBtn" style="width: 100%">Bəli</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/Scripts/common/printThis.min.js"></script>
+<script src="~/Scripts/common/tableHTMLExport.js"></script>
+
+<script>
+
+
+
+    $('#btnSearch').click(function () {
+        $('#DocGrid').css('display', 'block');
+        ResfreshGrid();
+    })
+
+    function ResfreshGrid() {
+        $('#gridResolution').setRouteValue({ 'docEnterNo': $('#txtDocEnterNo').val() });
+        $('#gridResolution').bindgrid(1);
+    }
+
+    function RefreshPage() {
+        location.reload();
+    }
+
+    $(document).on('click', '#btnDelete', function (e) {
+        $('#deleteDialogModal').modal('show');
+        $("#saveBtn").attr('value', $(this).parent().attr("title"));
+    })
+
+    $("#cancelBtn").click(function () {
+        $("#deleteDialogModal").modal("hide");
+    });
+
+    $("#saveBtn").click(function () {
+        const splitString = $("#saveBtn").val().split(";");
+        var directionid = splitString[0];
+        var executorworkplaceid = splitString[1];
+        var docid = splitString[2];
+        var sendstatus = splitString[3];
+        var operationtype = 0;
+        if (executorworkplaceid != '0') operationtype = 1;
+         $.ajax({
+          type: 'POST',
+         url: '@Url.Action("DeleteResolutionInfo", "Documents", new { area = "AdminPanel" })',
+                        dataType: 'json',
+             data: {
+                 docid: docid,
+                 executorworkplaceid: executorworkplaceid,
+                 directionid: directionid,
+                 operationtype: operationtype,
+                 sendstatus: sendstatus
+            },
+                        beforeSend: function () {
+                            window.ShowLoading();
+                        },
+                        success: function () {
+                            alert("Əməliyyat uğurla tamamlandı.");
+
+                        },
+                        complete: function () {
+                            window.CloseLoading();
+                            $('#deleteDialogModal').modal('hide');
+                            ResfreshGrid();
+                        }
+                    });
+    });
+
+    $("#hrdelete").click(function () {
+        $(this).addClass("active");
+        $("#hradd").removeClass("active");
+        $("#hredit").removeClass("active");
+        $("#execdeladd").removeClass("active");
+        $('#step1').css('display', 'block');
+        $('#step2').css('display', 'none');
+        $('#step3').css('display', 'none');
+        $('#step4').css('display', 'none');
+        $('#DocGrid').css('display', 'none');
+    });
+
+    $("#hradd").click(function () {
+        $(this).addClass("active");
+        $("#hrdelete").removeClass("active");
+        $("#hredit").removeClass("active");
+        $("#execdeladd").removeClass("active");
+        $('#step1').css('display', 'none');
+        $('#step2').css('display', 'block');
+        $('#step3').css('display', 'none');
+        $('#step4').css('display', 'none');
+        $('#DocGrid').css('display', 'none');
+    });
+
+
+    $("#hredit").click(function () {
+        $(this).addClass("active");
+        $("#hrdelete").removeClass("active");
+        $("#hradd").removeClass("active");
+        $("#execdeladd").removeClass("active");
+        $('#step1').css('display', 'none');
+        $('#step2').css('display', 'none');
+        $('#step3').css('display', 'block');
+        $('#step4').css('display', 'none');
+        $('#DocGrid').css('display', 'none');
+    });
+    $("#execdeladd").click(function () {
+        $(this).addClass("active");
+        $("#hrdelete").removeClass("active");
+        $("#hredit").removeClass("active");
+        $("#hradd").removeClass("active");
+        $('#step1').css('display', 'none');
+        $('#step2').css('display', 'none');
+        $('#step3').css('display', 'none');
+        $('#step4').css('display', 'block');
+        $('#DocGrid').css('display', 'none');
+    });
+</script>
+<script src="~/Scripts/widgets/jqxmin.min.js"></script>
+
+
+

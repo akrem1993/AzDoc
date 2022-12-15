@@ -1,0 +1,259 @@
+﻿.treeListContent {
+    margin: 40px 0px;
+}
+
+    .treeListContent .drop {
+        display: block;
+        padding: 10px 3px;
+        background: white;
+        border-radius: 10px;
+        position: relative;
+        -webkit-box-shadow: 0px 0px 10px 0px #80808096;
+        box-shadow: 0px 0px 10px 0px #80808096;
+        cursor: pointer;
+    }
+
+        .treeListContent .drop a {
+            color: #646464;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .treeListContent .drop > a {
+            display: inline-block;
+        }
+
+        .treeListContent .drop i.fa-angle-down,
+        .treeListContent .drop i.fa-angle-right {
+            -webkit-transform: translateY(-10px);
+            transform: translateY(-10px);
+            color: #4f6870;
+            cursor: pointer;
+            position: absolute;
+            top: 3px;
+            padding-right: 3px;
+            z-index: 10;
+
+        }
+
+        .treeListContent .drop .down {
+            position: relative;
+            -webkit-transform: translateX(10px);
+            transform: translateX(10px);
+        }
+
+            .treeListContent .drop .down ul {
+                -webkit-transform: translate(0, 10px);
+                transform: translate(0, 10px);
+            }
+
+                .treeListContent .drop .down ul li {
+                    display: block;
+                    position: relative;
+                    cursor: auto;
+                    border-left: 2px solid #4f6870;
+                    padding: 0px 10px 10px 20px;
+                }
+
+                    .treeListContent .drop .down ul li a {
+                        -webkit-transition: all 0.3s;
+                        transition: all 0.3s;
+                        -webkit-transition-timing-function: linear;
+                        transition-timing-function: linear;
+                        font-size: 14px;
+                        display: inline-block;
+                        -webkit-transform: translateY(-10px);
+                        transform: translateY(-10px);
+                    }
+
+                        .treeListContent .drop .down ul li a:hover {
+                            -webkit-transform: translate(5px, -10px);
+                            transform: translate(5px, -10px);
+                            color: #4f6870;
+                        }
+
+                    .treeListContent .drop .down ul li:last-of-type {
+                        border: none;
+                    }
+
+                    .treeListContent .drop .down ul li:first-of-type::after {
+                        content: "";
+                        position: absolute;
+                        width: 2px;
+                        height: 14px;
+                        background: #4f6870;
+                        top: -12px;
+                        left: -2px;
+                    }
+                        .treeListContent>.drop>.down>ul>li:first-child::after{
+                            display: none;
+                        }
+                        .treeListContent .drop .down ul li::before {
+                            content: "";
+                            position: absolute;
+                            width: 16px;
+                            height: 2px;
+                            background: #4f6870;
+                            top: 0px;
+                            left: 0px;
+                        }
+            .treeListContent .drop .down .drop {
+                background: initial;
+                border-radius: initial;
+                -webkit-box-shadow: initial;
+                box-shadow: initial;
+            }
+
+                .treeListContent .drop .down .drop .down {
+                    display: none;
+                }
+
+                    .treeListContent .drop .down .drop .down .drop .down .drop .down {
+                        width:  88%;
+                    }
+
+                .treeListContent .drop .down .drop > a {
+                    margin-bottom: 0;
+                    text-indent: 14px;
+                }
+
+    .treeListContent .parentDrop::after {
+        content: none !important;
+    }
+    .treeListContent .addNewAct .buttons {
+        position: absolute;
+        top: 0px;
+        right: -60px;
+    }
+
+.searchingGroup {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%;
+}
+
+    .searchingGroup input {
+        margin-right: 15px;
+    }
+
+.searchSelectTree {
+    position: relative;
+}
+
+    .searchSelectTree .form-control {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        color: #212529;
+        -webkit-transition: all 0.2s;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+        .searchSelectTree .form-control::after {
+            display: inline-block;
+            margin-left: 0.255em;
+            vertical-align: 0.255em;
+            content: "";
+            border-top: 0.3em solid;
+            border-right: 0.3em solid transparent;
+            border-bottom: 0;
+            border-left: 0.3em solid transparent;
+            margin-left: auto;
+        }
+
+        .searchSelectTree .form-control:hover {
+            background-color: #e2e6ea;
+            border-color: #dae0e5;
+        }
+
+    .searchSelectTree .downContent {
+        margin: 0 !important;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        display: none;
+        min-width: 10rem;
+        padding: 10px 25px;
+        color: #212529;
+        text-align: left;
+        list-style: none;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 0.25rem;
+        width: 100%;
+        max-height: 215px;
+        overflow: auto;
+    }
+
+        .searchSelectTree .downContent ul {
+            -webkit-transform: translateY(10px);
+            transform: translateY(10px);
+        }
+
+            .searchSelectTree .downContent ul li {
+                display: block;
+                position: relative;
+                cursor: auto;
+                border-left: 2px solid #4f6870;
+                padding: 0px 10px 10px 20px;
+            }
+
+                .searchSelectTree .downContent ul li a {
+                    -webkit-transition: all 0.3s;
+                    transition: all 0.3s;
+                    -webkit-transition-timing-function: linear;
+                    transition-timing-function: linear;
+                    font-size: 14px;
+                    display: inline-block;
+                    -webkit-transform: translateY(-10px);
+                    transform: translateY(-10px);
+                }
+
+                    .searchSelectTree .downContent ul li a:hover {
+                        -webkit-transform: translate(5px, -10px);
+                        transform: translate(5px, -10px);
+                        color: #4f6870;
+                    }
+
+                .searchSelectTree .downContent ul li:last-of-type {
+                    border: none;
+                }
+
+                .searchSelectTree .downContent ul li:first-of-type::after {
+                    content: "";
+                    position: absolute;
+                    width: 2px;
+                    height: 14px;
+                    background: #4f6870;
+                    top: -10px;
+                    left: -2px;
+                }
+
+                .searchSelectTree .downContent ul li::before {
+                    content: "";
+                    position: absolute;
+                    width: 16px;
+                    height: 2px;
+                    background: #4f6870;
+                    top: 0px;
+                    left: 0px;
+                }
+
+        .searchSelectTree .downContent .drop {
+            background: initial;
+            border-radius: initial;
+            -webkit-box-shadow: initial;
+            box-shadow: initial;
+        }
+
+            .searchSelectTree .downContent .drop > a {
+                margin-bottom: 0;
+                text-indent:13px;
+            }

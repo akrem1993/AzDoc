@@ -1,0 +1,6 @@
+CREATE TABLE [dbo].[DC_SOCIALSTATUS](
+	[SocialId] int identity NOT NULL,
+	[SocialName] nvarchar(100) NULL,
+	[SocialStatus] bit NOT NULL CONSTRAINT [DF__DC_SOCIAL__Socia__5CC1BC92]  DEFAULT 1,
+ CONSTRAINT [PK_DC_SOCIALSTATUS] PRIMARY KEY ([SocialId])
+ )

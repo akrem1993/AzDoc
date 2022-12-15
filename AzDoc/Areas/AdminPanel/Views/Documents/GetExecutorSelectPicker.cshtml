@@ -1,0 +1,66 @@
+﻿@using Admin.Model.ViewModel
+
+<style>
+    .navbar-header{
+        display:none;
+    }
+</style>
+@if (@Model != null)
+{
+    <div class="row" id="divselectpicker">
+        <div class="col-sm-5">
+            <div class="form-group">
+                <br />
+                <select id="ExecName" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                    <option value="-1" selected="selected">Seçin</option>
+                    @foreach (ExecutorModel item in Model)
+                    {
+                        <option value="@item.WorkplaceId">@item.UserName</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-5" style="text-align:left;">
+            <div class="form-group">
+                <br />
+                <button type="button" class="mBtn mBtn-pr " id="btnSv">
+                    Təsdiqlə
+                </button>
+            </div>
+        </div>
+        <div class="col-sm-2" style="text-align:left;">
+            <div class="form-group">
+                <br />
+
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $('#btnSv').click(function () {
+           
+        $.ajax({
+          type: 'POST',
+         url: '@Url.Action("AddEditWorkplace", "Documents", new { area = "AdminPanel" })',
+                        dataType: 'json',
+             data: {
+                 doctype: $("#TypeNo").val(),
+                 docno: $("#txtDocNo").val(),
+                 execworkplaceid: $("#ExecName").val()
+            },
+                        beforeSend: function () {
+                            window.ShowLoading();
+                        },
+                        success: function () {
+                            alert("Əməliyyat uğurla başa çatdı.");
+
+                        },
+                        complete: function () {
+                            window.CloseLoading();
+                        }
+                    });
+
+        })
+</script>
+<script src="~/Scripts/widgets/jqxmin.min.js"></script>

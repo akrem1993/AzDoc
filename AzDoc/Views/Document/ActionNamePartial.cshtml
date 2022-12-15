@@ -1,0 +1,157 @@
+﻿@model BLL.Models.Document.ViewModel.ActionNameViewModel
+
+@if (Model.ActionNameModels.Any())
+{
+    <span style="display: none" class="d-none" id="spanToken">@Model.Token</span>
+    <span style="display: none" class="d-none" id="spanCurrentExecutorId">@Model.ExecutorId</span>
+    <style>
+        .popoverAction {
+            z-index:10000;
+        }
+    </style>
+    <div class="@Model.DocId" id="DocActionsPopover">
+
+        @foreach (var item in Model.ActionNameModels)
+        {
+            switch (item.Id)
+            {
+                case -1:
+                    {
+                        <div class="card">
+                            <div href="javascript:void(0)" id="@item.Id" class="btn-sm list-group-item-info">
+                                <i class="fas fa-info-circle"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+                case 1:
+                    {
+                        <div class="card">
+                            <div id="@item.Id" class="btn-sm list-group-item-action  popoverAction">
+                                <i class="fas fa-paper-plane"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+                case 2:
+                    {
+                        <div class="card">
+                            <div id="@item.Id" class="btn-sm list-group-item-action  popoverAction">
+                                <i class="fas fa-edit"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+                case 3:
+                    {
+                        <div class="card">
+                            <div id="@item.Id" class="btn-sm list-group-item-action  popoverAction">
+                                <i class="fas fa-check-double"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+
+                case 4:
+                    {
+                        <div class="card">
+                            <div id="@item.Id" class="btn-sm list-group-item-action popoverAction">
+                                <i class="fas fa-share-alt"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+
+                case 11://xidmeti mektubla cavabla
+                    {
+                        <div class="card">
+                            <div id="@item.Id" class="btn-sm list-group-item-action popoverAction">
+                                <i class="fas fa-poll-h"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+
+                case 12://elaqeli sened xidmedi mektub
+                    {
+                        <div class="card">
+                            <div id="@item.Id" class="btn-sm list-group-item-action popoverAction">
+                                <i class="fas fa-tasks"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+                case 13://xaric olan senedle cavabla
+                    {
+                        <div class="card">
+                            <div id="@item.Id" class="btn-sm list-group-item-action popoverAction">
+                                <i class="fas fa-envelope-open-text"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+                case 14://xaric olan elaqeli sened
+                    {
+                        <div class="card">
+                            <div id="@item.Id" class="btn-sm list-group-item-action popoverAction">
+                                <i class="fas fa-tasks"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+                case 18://icracini deyis
+                    {
+                        <div class="card">
+                            <div id="@item.Id" class="btn-sm list-group-item-action popoverAction">
+                                <i class="fas fa-user-cog"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+                case 19://icra muddetini deyis
+                    {
+                        <div class="card">
+                            <div id="@item.Id" class="btn-sm list-group-item-action popoverAction">
+                                <i class="fas fa-stopwatch"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+
+                case 8:
+                    {
+                        <div class="card">
+                            <div id="@item.Id" class="btn-sm list-group-item-action popoverAction">
+                                <i class="fas fa-code-branch"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+
+                default:
+                    {
+                        <div class="card">
+                            <div id="@item.Id" class="btn-sm list-group-item-action popoverAction">
+                                <i class="fas fa-info-circle"></i>
+                                @item.Name
+                            </div>
+                        </div>
+                    }
+                    break;
+            }
+
+        }
+    </div>
+}

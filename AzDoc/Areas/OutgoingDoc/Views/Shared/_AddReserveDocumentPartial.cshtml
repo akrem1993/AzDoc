@@ -1,0 +1,153 @@
+﻿
+@using Widgets
+@using AzDoc.Helpers
+
+@model DocumentViewModel
+@{
+    ViewBag.Title = "_AddReserveDocumentPartial";
+    RouteData routeData = ViewContext.RouteData;
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    int docType = SessionHelper.DocTypeId;
+    var _lang = routeValueDictionary["lang"] ?? "az";
+}
+
+
+<div class="mModal">
+    <div class="modal fade" id="reserveDoc" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document"  style="max-width: 50% !important">
+            <div class="modal-content" style="background: #ffffff">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Rezerv</span>
+                </div>
+                @using (Html.BeginForm("AddReserveDocument", "Document", FormMethod.Post, new { id = "AddReserveDocument" }))
+                {
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="font-weight-bold">Qeydiyyat tarixi <span style="color:red;font-weight:bold">*</span></label>
+                            @Html.TextBoxFor(model => model.DocumentModel.DocEnterDate, "{0:yyyy-MM-dd}", new
+                       {
+                           @type = "date",
+                           @class = "form-control",
+                           @data_live_search = "true",
+                           @id = "DocEnterDate",
+                           @data_required = "Qeydiyyat tarixini daxil edin"
+                       })
+                        </div>
+                        <div class="col-md-8">
+                            <label class="font-weight-bold">Imza edən şəxs <span style="color:red;font-weight:bold">*</span></label>
+                            @Html.DropDownListFor(model => model.SignatoryPerson.Id,
+                                new SelectList(Model.SignatoryPersons, "Id", "Name", Model.DocumentModel?.SignatoryPersonId), "Seç", new
+                                {
+                                    @id = "SignatoryPerson",
+                                    @class = "selectpicker",
+                                    @data_live_search = "true",
+                                    @data_width = "100%",
+                                    @data_required = "İmza edən şəxsi daxil edin"
+                                })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label class="font-weight-bold">Struktur bölmə</label>
+                            @Html.DropDownListFor(model => model.Department.Id,
+                           new SelectList(Model.Departments, "Id", "Name", Model.DocumentModel?.DepartmentId), "Seç", new
+                           {
+                               @id = "Deparmtment",
+                               @class = "selectpicker",
+                               @data_live_search = "true",
+                               @data_width = "100%",
+                               @data_required = "Bölməni daxil edin"
+                           })
+
+
+                        </div>
+
+                    </div>
+
+
+
+                </div>
+                    <div class="modal-footer justify-content-center">
+                        <div class="col-3">
+                            <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Ləğv et</button>
+
+                        </div>
+                        <div class="col-3">
+                            <button type="button" name="DirectionSave" onclick="saveChange(this)" class="mBtn mBtn-pr defaultBtn" style="width: 100%">Rezerve et</button>
+                        </div>
+
+
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#reserveDoc").modal();
+        $('.selectpicker').selectpicker('refresh');
+    });
+    function saveChange(e) {
+        //window.ShowLoading();
+
+        var formData = $('#AddReserveDocument').getFormData();
+        var date = $('#DocEnterDate').val();
+        var signer = $('#SignatoryPerson').val();
+        var dep = $('#Deparmtment').val();
+        console.log(formData);
+        if (date != '')
+            $("#DocEnterDate").css("border", "1px solid #ccc");
+        if (date == '')
+            $("#DocEnterDate").css("border", "red solid 1px");
+
+        if (signer != '')
+            $("#SignatoryPerson").css("border", "1px solid #ccc");
+        if (signer == '')
+            $("#SignatoryPerson").css("border", "red solid 1px");
+        if (dep != '')
+            $("#Deparmtment").css("border", "1px solid #ccc");
+        if (dep == '')
+            $("#Deparmtment").css("border", "red solid 1px");
+        if (formData != '' && date != '' && signer != '' && dep != '') {
+            $.ajax({
+            method: "POST",
+            data: { docType:  @docType, model: formData },
+            contenType: 'json',
+            dataType: 'html',
+                url: '@Url.Action("AddReserveDocument", "Document", new { area = "OutgoingDoc", lang =_lang})',
+            beforeSend: function () {
+                    window.ShowLoading();
+            },
+            success: function (response) {
+                $("#reserveDoc").modal('toggle');
+                setInterval(function () { window.location.reload(); }, 2000);
+                //if (response.result == 'true')
+                //    window.location = response.url;
+            },
+            complete: function ()
+            {
+                window.CloseLoading();
+            }
+        }).done(function ()
+             {
+            window.CloseLoading();
+            });
+
+        }
+
+
+
+
+    }
+
+</script>
+
+

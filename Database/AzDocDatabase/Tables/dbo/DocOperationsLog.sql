@@ -1,0 +1,15 @@
+CREATE TABLE [dbo].[DocOperationsLog](
+	[OperationId] int identity NOT NULL,
+	[DocId] int NULL,
+	[ExecutorId] int NULL,
+	[SenderWorkPlaceId] int NULL,
+	[ReceiverWorkPlaceId] int NULL,
+	[DocTypeId] int NULL,
+	[OperationTypeId] int NULL,
+	[DirectionTypeId] int NULL,
+	[OperationDate] [datetime] NULL,
+	[OperationStatus] int NULL,
+	[OperationStatusDate] [datetime] NULL,
+	[OperationNote] nvarchar(max) NULL,
+	[IsDeleted] bit NULL,
+	[OperationFileId] int NULL)

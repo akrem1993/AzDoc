@@ -1,0 +1,397 @@
+﻿@using Widgets
+@using AzDoc.Helpers
+@model BLL.Models.Direction.Direction.DirectionModel
+
+@{
+    int? directionid = SessionHelper.DirectionId;
+
+    var val = ViewBag.DirConfirm;
+    int workplaceId = SessionHelper.WorkPlaceId;
+    ViewBag.Title = "_DirectionEditPanel";
+    var gridSource = Html.MhmGrid("gridSource")
+    .Columns(cols =>
+    {
+
+        cols.Column(col => col.SetText("Adi").SetDataField("ExecutorFullName").SetHeaderAlign(TextAlign.Center).SetWidth(160).IsPinned().IsFilterable());
+        cols.Column(col => col.SetText("Vəzifəsi").SetDataField("DepartmentPositionName").SetHeaderAlign(TextAlign.Center).SetMinWidth(190)
+        .SetColumnType(ColumnType.ComboBox)
+        .IsFilterable(Filtertype.CheckedList, " [{value:-200, text:'Qrum üzrə'}, { value:-100, text:'Şöbə üzrə'}]", "PositionIndicator"));
+
+//.IsFilterable(Filtertype.List, filterItems: @"[{value:-200, text:'Qurum üzrə'}, { value:-100, text:'Şöbə üzrə'}]", widgetCreateFunct: "createfilterwidget"));
+cols.Column(col => col.SetText("").SetDataField("ExecutorWorkplaceId").SetHidden());
+        cols.Column(col => col.SetText("").SetDataField("PositionIndicator").SetHidden());
+
+    })
+    //.AllowSorting(true)
+    .AllowFiltering(true)
+    .AllowFilterRow(true)
+    .AllowColumnResizing(true)
+    .ColumnCustomizer(false)
+    .SetPageSize(30)
+    .SetHeight("100%")
+    .SetOnFilter("onFilter")
+    .SetRowSelectChanged("onRowSelected")
+    .SetSelectionMode();
+
+    var gridDestination = Html.MhmGrid("gridDestination")
+    .Columns(cols =>
+    {
+        cols.Column(col => col.SetText("").SetDataField("ExecutorId").SetHidden());
+        cols.Column(col => col.SetText("Adi").SetDataField("ExecutorFullName").SetHeaderAlign(TextAlign.Center).SetWidth(130).IsPinned().IsEditable(false));
+        cols.Column(col => col.SetDataField("ExecutorMain").SetHidden());
+        cols.Column(col => col.SetDataField("SendStatusId").SetHidden());
+        cols.Column(col => col.SetText("İcra növü").SetDataField("SendStatusName").SetHeaderAlign(TextAlign.Center).SetMinWidth(110).IsEditable(false));
+        cols.Column(col => col.SetText("Məzmun").SetDataField("ExecutorResolutionNote").SetColumnType(ColumnType.DropDownList)
+         .SetHeaderAlign(TextAlign.Center)
+         .SetWidth(120)
+         .IsEditable()
+         .SetColumnType(ColumnType.TextBox));
+        cols.Column(col => col.SetRenderer("<a class='textDecoration'><i class='fas fa-times' style='color:red!important;'></i></a>",
+
+     htmlAttributes: new { @class = "operation-button", fn_onclick = "removeExecutor" }).SetWidth(10).SetText("").SetHeaderRender("<a class='operation-button' style='z-index: 2;' onclick='removeAll()'><i class='fas fa-times' style='color:red!important;'></i></a>"));
+        cols.Column(col => col.SetText("").SetDataField("ExecutorWorkplaceId").SetHidden());
+
+    })
+    .SetEditable()
+    .SetPageSize(30)
+    .SetHeight("100%")
+    .SetEditable()
+    .SetRowSelectChanged("onRowSelectDestination")
+    .ColumnCustomizer(false)
+    .AllowFiltering(false)
+    .SetSelectionMode();
+}
+
+<link href="~/Content/direction/direction.css" rel="stylesheet" />
+<div class="mModal">
+    <div class="modal-backdrop" style="background-color:#0000003b;  z-index: 1066;">
+        <div class="modal fade show" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" style=" display: block;/*z-index: 1100;*/">
+            <div class="modal-dialog modal-dialog-centered" style="display:flex;justify-content:center;" role="document">
+                <div class="modal-content">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <button type="button" class="change-size">
+                        <i class="far fa-square"></i>
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <div class="modal-header"></div>
+                    <div class="modal-header2" style="cursor:all-scroll">
+                        <span>Dərkənar</span>
+                    </div>
+                    <div class="modal-body" id="mbody">
+
+                        @using (Html.BeginForm("DirectionSave", "Direction", new { t = Request["t"] }, FormMethod.Post, new { id = "directionForm" }))
+                        {
+                            <div class="form-group">
+                                <div class="alert  alert-dismissible" id="alertInfoDiv" style="display:none">
+                                    <table class="table table-bordered mTable">
+                                        <thead>
+                                            <tr>
+                                                <th scope="row">Sənədin nömrəsi</th>
+                                                @*<th scope="col">Sənədin növü</th>*@
+                                                <th scope="row">Hardan daxil olub</th>
+                                                <th scope="row">Sənədin qısa məzmunu</th>
+                                                <th scope="row">Nəzarət statusu</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            <tr>
+                                                <td id="docno"></td>
+                                                @*<td id="doctype"></td>*@
+                                                <td id="where"></td>
+                                                <td id="content"></td>
+                                                <td id="control" style="color: red;font-weight: 600;"></td>
+
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+
+
+                            </div>
+
+                            <input type="hidden" value="@Model.DirectionDocId" name="DirectionDocId" id="DirectionDocId" />
+                            <input type="hidden" value="@Model.DirectionId" name="DirectionId" id="DirectionId" />
+                            <input type="hidden" value="@Request["t"]" name="TabNumber" id="TabNumber" />
+                            <form class="form-inline">
+
+                                <div class="row align-items-end mb-2">
+
+                                    <div class="col-8 col-xl-5">
+                                        <div class="row">
+                                            <div class="col-2 d-flex align-items-end">
+                                                <button type="button" id="infoButtonDirection" class="circleBtn circleBtn-sm">
+                                                    <i class="fas fa-info"></i>
+                                                </button>
+                                            </div>
+                                            <div class="col-5">
+                                                <label for="insAuthor">Müəllif:</label>
+                                                @Html.DropDownList("DirectionWorkplaceId", Model.Authors, new { @class = "form-control lang selectpicker", @id = "DirectionWorkplaceId", @name = "DirectionWorkplaceId", @onchange = "CallChangefunc(this.value)" })
+
+                                            </div>
+                                            <div class="col-5">
+
+                                                @if (ViewBag.DocStatus == 1)
+                                                {
+                                                    <label class="font-weight-bold" for="DirectionDate">Tarixi:</label>
+                                                    @Html.TextBoxFor(model => model.DirectionDate, "{0:yyyy-MM-dd}", new
+                                                    {
+                                                        @type = "date",
+                                                        @class = "form-control",
+                                                   @readonly = "readonly",
+                                                        @id = "DirectionDate"@*@value = DateTime.Today.Date*@})}
+                                                else
+                                                {
+                                                    <label class="font-weight-bold" for="DirectionDate">Tarixi:</label>
+                                                    @Html.TextBoxFor(model => model.DirectionDate, "{0:yyyy-MM-dd}", new
+                                                    {
+                                                        @type = "date",
+                                                        @class = "form-control",
+                                                    @id = "DirectionDate"@*@value = DateTime.Today.Date*@})
+                                                }
+                                                @*<input type="text" class="form-control" id="insDate" name="insDate">*@
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4 col-xl-2">
+                                        <label class="font-weight-bold" for="DirectionPlanneddate">İcra müddəti:</label>
+                                        @if (ViewBag.DocStatus == 1)
+                                        {
+                                            @Html.TextBoxFor(model => model.DirectionPlanneddate, "{0:yyyy-MM-dd}", new { @type = "date", @readonly = "readonly", @class = "form-control", @id = "DirectionPlanneddate" })
+                                            /**/
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(model => model.DirectionPlanneddate, "{0:yyyy-MM-dd}", new { @type = "date", @class = "form-control", @id = "DirectionPlanneddate" })
+                                        }
+                                    </div>
+                                    <div class="col-xl-5">
+                                        <div class="row justify-content-between mt-3">
+                                            <div class="col-4">
+                                                <div class="checkboxInput">
+                                                    <input name="DirectionControlStatus" type="checkbox" id="ControlStatus" @(ViewBag.DocStatus == 1 ? "disabled" : "") @(ViewBag.ControlStatus == 3 || ViewBag.ControlStatus == 1 ? "checked" : "") />
+                                                    <span>Nəzarətlə</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-8 col-xl-8 text-right">
+                                                <div class="mBtnGroup">
+                                                    <button name="DirectionClose" onclick="sendBack(this)" type="button" value="Geriyə" class="mBtn mBtn-sec"><i class="fa fa-arrow-left"></i>&nbsp;Geriyə</button>
+                                                    <button name="DirectionSave" class="mBtn mBtn-pr" value="Save" type="button" onclick="forCheck(this)">
+                                                        <i class="far fa-save" style="font-size: 1.3em"></i>&nbsp;Yadda Saxla
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--/ Row-->
+
+                            </form>
+
+
+
+                            <div class="row gridContainer" style="min-height: 60vh">
+                                <div class="col-5 text-center">
+                                    @gridSource.GetHtml()
+                                </div>
+                                <div class="col-2 text-center pt-5">
+                                    <button id="forInfo" @((directionid != 0 && ViewBag.Visible == false) || !new [] { 1, 5, 15 }.Contains((int)ViewBag.DirConfirm) || ViewBag.ExStatus == 1 ? "disabled" : "") type="button" class="mBtn squareBtn" onclick="addExecutor(this)" data-value="1" data-sn="İcra üçün">
+                                        İcra
+                                    </button>
+                                    <button id="forExecute" type="button" @(ViewBag.DirConfirm == 3 || ViewBag.ExStatus == 1 ? "disabled" : "") class="mBtn squareBtn" onclick="addExecutor(this)" data-value="2" data-sn="Icra və Məlumat üçün">
+                                        Icra və Məlumat
+                                    </button>
+                                    <button id="forJoke" type="button" class="mBtn squareBtn" onclick="addExecutor(this)" data-value="3" data-sn="Məlumat üçün">
+                                        Məlumat
+                                    </button>
+                                    <button id="forDelete" type="button" class="mBtn squareBtn" onclick="addExecutor(this)" data-value="4" data-sn="Məlumat və nəzarət üçün">
+                                        Məlumat və nəzarət
+                                    </button>
+                                </div>
+                                <div class="col-5 text-center">
+                                    @gridDestination.GetHtml()
+                                </div>
+                            </div>
+
+
+
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    //$("#exampleModalCenter").draggable({
+
+    //    handle:".modal-header2"
+    //});
+
+    //$(".modal-content button.close").click(function () {
+    //    $("#exampleModalCenter").css("display", "none");
+    //    //$(".modal-backdrop").css("z-index", "1040");
+    //    $("#dynamiccontext").find(".modal-backdrop").remove();
+    //})
+
+    var fullSource = [];
+    var leftSource = [];
+    var rightSource = [];
+    var directioneditpanel = {
+        docReady: {
+            @*url:
+                '@Url.Action("LeftGrid", "Direction", routeValues: new { t = Request["t"], wid = 0, ExecutorGroupId = 1 ,egid=-1})',
+            url1: '@Url.Action("RightGrid", "Direction", routeValues: new { t = Request["t"], ExecutorGroupId = 1 })',*@
+            data: {  viewbag:@ViewBag.DirConfirm }
+        },
+        infoClick: {
+            url: '@Url.Action("InfoBlock", "Direction" )',
+            data: {DocId: @Model.DirectionDocId}
+        },
+        @*callChangefunc: {
+            val: @ViewBag.DirConfirm,
+            url: '@Url.Action("LeftGrid", "Direction", routeValues: new { t = Request["t"], ExecutorGroupId = 1 })&wid=',
+            data: {}
+        },*@
+        addExecutor:{
+            data: {
+                workplaceId:@workplaceId,
+            }
+        },
+        onRowSelectedProp: {
+            data: { directionid:@directionid, exstatus:@ViewBag.ExStatus, dirconfirm: @ViewBag.DirConfirm}
+        }
+    }
+    $(document).ready(function () {
+            //leftgridin birbasa dolmasinin qarsisini aliriq, ve helperden de action ve controller adini silirik,document readyde dolacaq bu setir vasitesi ile
+        loadData('@Url.Action("LeftGrid", "Direction", routeValues: new { t = Request["t"], wid = 0, ExecutorGroupId = 1 ,egid=-1})'
+               , '@Url.Action("RightGrid", "Direction", routeValues: new { t = Request["t"], ExecutorGroupId = 1 })');
+
+        var infoButtonDirection = document.getElementById("infoButtonDirection");
+        infoButtonDirection.onclick = function () {
+            if ($("#alertInfoDiv").css("display") == "none") {
+                $("#alertInfoDiv").slideDown('medium');
+            }
+            else {
+                $("#alertInfoDiv").slideUp();
+            }
+        };
+
+
+
+    });
+    function CallChangefunc(val) {
+         loadData('@Url.Action("LeftGrid", "Direction", routeValues: new { t = Request["t"], ExecutorGroupId = 1 })&wid=' + val, '');
+    }
+    function forCheck(e) {
+        var d = new Date();
+        var output = d.getFullYear() + '-' +
+            ((d.getMonth() + 1) < 10 ? '0' : '') + (d.getMonth() + 1) + '-' +
+            (d.getDate() < 10 ? '0' : '') + d.getDate();
+
+        var value = 0;
+        var destination = $('#gridDestination').DataList();
+        var date = $('#DirectionPlanneddate').val();
+        var index = destination.In({ SendStatusId: 1 }, 'SendStatusId');
+        var index2 = destination.In({ SendStatusId: 2 }, 'SendStatusId')
+        for (var i = 0; i < destination.length; i++) {
+            var item = destination[i]['SendStatusId'];
+            if (item == 1)
+                 value ++;
+
+        }
+        console.log(date, value,@workplaceId, output);
+        if ((index == -1 && index2 >=0) &&  @directionid == 0 && @Array.IndexOf(new [] { 1, 5, 0,  15 },ViewBag.DirConfirm)!= -1  && @ViewBag.ExStatus!=1)
+        {
+            toastr.info('Icra ucun yoxdur');
+            return;
+        }
+        if (index == -1 && index2 >= 0 &&  @directionid == 0 && (@workplaceId== 430 || @workplaceId == 24) && @ViewBag.DirConfirm!= 3 &&  @ViewBag.DirConfirm!= 2 &&  @ViewBag.DirConfirm!= 4)//ali mellime tesdig ucun gelende redakte eden zaman melumat ucun secilibse icraci secilmelidi
+        {
+            console.log('test gular');
+            toastr.info('Icra ucun yoxdur');
+            return;
+        }
+        if (value > 1)
+        {
+            toastr.info('Icra ucun yalnız bir şəxs seçilə bilər');
+            return;
+        }
+
+        window.ShowLoading();
+        var model = $('#directionForm').getFormData();
+        model.Executors = destination;
+
+        $.ajax({
+            method: "POST",
+            data: { direction: model },
+            contenType: 'json',
+            dataType: 'html',
+            url: '@Url.Action("DirectionSave", "Direction")',
+            success: function (response) {
+                $('#dynamiccontext').html(response);
+            },
+            complete: function() {
+                window.CloseLoading();
+            }
+        }).done(function () {
+            window.CloseLoading();
+        });
+    }
+
+    function sendBack(e)
+    {
+        $.ajax({
+            method: "POST",
+            data: { docId: @Model.DirectionDocId},
+            contenType: 'json',
+            dataType: 'html',
+            url: '@Url.Action("DirectionModal", "Direction",new { area="", t = Request["t"] })',
+            success: function (response) {
+                $('#dynamiccontext').html(response);
+
+            }
+            , error: function (response) {
+                console.log(response);
+            }
+        }).done(function () {
+            window.CloseLoading();
+        });
+    }
+
+    function onFilter(sender, filters, query) {
+        query.wid = $('#DirectionWorkplaceId').val();
+        //$('#gridSource').setRouteValue({ 'wid':  });
+        //$('#gridSource').bindgrid(1);
+
+        /*console.log(filters, query, ''.buildUrl(query));*/
+       // loadData('@Url.Action("LeftGrid", "Direction", routeValues: new { t = Request["t"] })'.buildUrl(query), '')
+       // return;
+        var filterIndex = filters.In({ datafield: 'DepartmentPositionName' },'datafield');
+        if (filterIndex >= 0) {
+            loadData('@Url.Action("LeftGrid", "Direction", routeValues: new { t = Request["t"], wid = 0})&egid=' + filters[filterIndex].from.id, '');
+        }
+        else
+            //loadData('@Url.Action("LeftGrid", "Direction", routeValues: new { t = Request["t"], wid = 0 })', '');
+        loadData('@Url.Action("LeftGrid", "Direction", routeValues: new { t = Request["t"] })'.buildUrl(query), '')
+
+    }
+
+    //function createfilterwidget(column, columnElement, widget) {
+    //    widget.jqxDropDownList({
+    //        displayMember: 'text', valueMember: 'value',
+    //        dropDownHeight: 500, dropDownWidth: '210px'
+    //    });
+    //}
+    gridDestination
+
+</script>
+<script src="~/Scripts/direction/direction.js"></script>

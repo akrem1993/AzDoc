@@ -1,0 +1,22 @@
+CREATE TABLE [dbo].[DOCS_FILEINFO](
+	[FileInfoId] int identity NOT NULL,
+	[FileInfoWorkplaceId] int NOT NULL,
+	[FileInfoParentId] int NULL,
+	[FileInfoVersion] [tinyint] NOT NULL CONSTRAINT [DF_DOCS_FILEINFO_FileInfoVersion]  DEFAULT 0,
+	[FileInfoType] varchar(100) NULL,
+	[FileInfoCapacity] [bigint] NULL,
+	[FileInfoExtention] varchar(5) NULL,
+	[FileInfoInsertdate] [datetime] NULL,
+	[FileInfoPath] nvarchar(200) NULL,
+	[FileInfoName] nvarchar(300) NULL,
+	[FileInfoGuId] nvarchar(60) NULL,
+	[FileInfoStatus] int NULL,
+	[FileInfoBinary] [binary](1) NULL,
+	[FileInfoContent] nvarchar(max) NULL,
+	[FileInfoAttachmentCount] int NULL,
+	[FileInfoCopiesCount] int NULL,
+	[FileInfoPageCount] int NULL,
+    CONSTRAINT [PK_DOCS_FILEINFO] PRIMARY KEY ([FileInfoId]),
+	CONSTRAINT [FK_DOCS_FILEINFO_DC_WORKPLACE] FOREIGN KEY([FileInfoWorkplaceId]) REFERENCES [dbo].[DC_WORKPLACE] ([WorkplaceId]),
+	CONSTRAINT [FK_DOCS_FILEINFO_DOCS_FILEINFO] FOREIGN KEY([FileInfoParentId]) REFERENCES [dbo].[DOCS_FILEINFO] ([FileInfoId])
+)

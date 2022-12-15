@@ -1,0 +1,242 @@
+﻿@using Model.Models.FeedBack
+@using Widgets
+@model FeedBackMain
+<style>
+    .feedbackBtn {
+        display: inline-block;
+        background: #516a72;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        line-height: 34px;
+    }
+    .feedbackBtn i {
+        font-size: 18px;
+        color: white;
+    }
+    .mModal .modal-content button.close {
+        position: absolute;
+        right: -20px;
+        top: -12px;
+        background: #4f6870;
+        opacity: 1;
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        border-radius: 100%;
+        color: white;
+        font-size: 22px;
+        font-weight: 100;
+        transition: all 0.1s;
+        padding: 0;
+        z-index: 1;
+    }
+    .mModal .modal-content button.close:focus {
+        outline: none;
+    }
+</style>
+@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+    var grid = Html.MhmGrid("gridFeedBack", "FeedBackData", "FeedBack")
+    .Columns(cols =>
+    {
+        cols.Column(c =>
+        {
+            c.Text = "ID";
+            c.SetDataField("RequestId", FieldType.Number);
+            c.Pinned = true;
+            c.MinWidth = 60;
+            c.MaxWidth = 80;
+            c.IsFilterable();
+            c.SetCellsAlign(TextAlign.Center);
+            c.SetHeaderAlign(TextAlign.Center);
+        });
+
+        cols.Column(c =>
+        {
+            c.Text = "Müraciət tarixi";
+            c.SetDataField("RequestDate", FieldType.Date, "d");
+            c.SetHeaderAlign(TextAlign.Center);
+            c.MinWidth = 50;
+            c.MaxWidth = 120;
+            c.IsFilterable(Filtertype.Date);
+        });
+        cols.Column(c =>
+        {
+            c.Text = "Əməkdaş və vəzifəsi";
+            c.SetDataField("Person");
+            c.IsFilterable();
+            c.SetHeaderAlign(TextAlign.Center);
+            c.MinWidth = 160;
+        });
+        cols.Column(c =>
+        {
+            c.Text = "Müraciət mətni";
+            c.SetDataField("RequestHeader");
+            c.IsFilterable();
+            c.SetHeaderAlign(TextAlign.Center);
+            c.MinWidth = 600;
+            c.MaxWidth = 600;
+        });
+        cols.Column(c =>
+        {
+            c.Text = "Müraciət növü";
+            c.SetDataField("RequestTypeName");
+            c.SetHeaderAlign(TextAlign.Center);
+            c.MaxWidth = 100;
+            c.IsFilterable(Filtertype.CheckedList);
+        });
+        cols.Column(c =>
+        {
+            c.Text = "Status";
+            c.SetDataField("RequestStatusName");
+            c.SetHeaderAlign(TextAlign.Center);
+            c.MinWidth = 70;
+            c.IsFilterable(Filtertype.CheckedList);
+        });
+        cols.Column(c =>
+        {
+            c.SetText("");
+            c.SetDataField("", FieldType.Number);
+            c.SetHeaderAlign(TextAlign.Center);
+            c.SetWidth(60);
+            c.SetRenderer("<a><i class='fas fa-eye'></i></a>", htmlAttributes: new { @class = "feedbackBtn", fn_onclick = "ShowMessages" });
+        });
+
+    })
+.SetRowDoubleClick("ShowMessages")
+.AllowCrud()
+.AllowSorting(true)
+.AllowTooltips(false)
+.AllowPaging(true)
+.AllowFiltering(true)
+.AllowFilterRow(true)
+.AllowColumnOrdering(true)
+.AllowColumnResizing(true)
+.SetPageSize(30)
+.SetHeight("100%")
+.SetWidth("100%");
+}
+
+<head>
+    <link href="~/Content/common/breadcrumbs.css" rel="stylesheet" />
+    <link async href="~/Content/feedback/LoadingButton.css" rel="stylesheet" />
+    <link async href="~/Content/feedback/FileUpload.css" rel="stylesheet" />
+</head>
+
+<script>
+    function ShowMessages(obj, boundData) {
+        $.ajax({
+            url: '@Url.Action("GetRequestMessages", "FeedBack")',
+            data: { requestId: boundData.RequestId },
+            type: "GET",
+            beforeSend: function () {
+                $(this).addClass('running');
+            },
+            success: function (result) {
+                $('#chatBody').html(result);
+                $("#chatModal").modal();
+            },
+            error: function (e) {
+                toastr.error(e.responseText);
+            },
+            complete: function () {
+                $(this).removeClass('running');
+            }
+        });
+    }
+
+    function NewRequestForm() {
+        $.ajax({
+            url: '@Url.Action("RequestFormPartial", "FeedBack")',
+            type: "GET",
+            beforeSend: function () {
+                $('#newRequest').addClass('running');
+            },
+            success: function (result) {
+                $('#requestBody').html(result);
+                $("#requestModal").modal();
+            },
+            error: function (e) {
+                toastr.error(e.responseText);
+            },
+            complete: function () {
+                $('#newRequest').removeClass('running');
+            }
+        });
+
+    }
+</script>
+<div class="row mb-4 mt-4">
+    @if (!Model.UserIsHelper)
+    {
+        <div class="newDocBtn ml-3">
+
+            <button id="newRequest" class="btn btn-info ld-ext-right mBtn mBtn-pr" onclick="NewRequestForm()">
+                Yeni müraciət
+                <div class="ld ld-ring ld-spin-fast" style="font-size: 1.5em"></div>
+            </button>
+
+        </div>
+    }
+    <div class="col-9">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="\">Ana səhifə</a></li>
+
+                <li class="breadcrumb-item active" aria-current="page">
+                    Müraciətlərin siyahısı
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+  
+</div>
+<div class="row" style="margin-bottom: 5px; height: 87vh">
+    <div class="col-12">
+        @grid.GetHtml()
+    </div>
+</div>
+
+<div class="mModal">
+<div class="modal fade" id="chatModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document" style="margin-right: 35%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                
+            </div>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                @*<i class="fa fa-window-close" aria-hidden="true"></i>*@
+                <span aria-hidden="true">×</span>
+            </button>
+            <div id="chatBody" class="modal-body"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+    <div class="mModal">
+        <div class="modal fade" id="requestModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document" style="margin-right: 35%;">
+
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                    </div>
+                    <button class="close" data-dismiss="modal" aria-label="Close">
+                        @*<i class="fa fa-window-close" aria-hidden="true"></i>*@
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <div id="requestBody" class="modal-body"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#requestModal").on("hidden.bs.modal", function () {
+            window.location = "/az/FeedBack/FeedbackRequest";
+        });
+    </script>

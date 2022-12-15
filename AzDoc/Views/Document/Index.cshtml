@@ -1,0 +1,490 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+    var docType = SessionHelper.DocTypeId;
+}
+
+@Html.AntiForgeryToken()
+@Html.Partial("~/Views/Document/PanelViewPartial.cshtml")
+
+<div>SALAM</div>
+
+<div class="col-md-12" id="DocGrid" style="padding-top: 10px; height: 86vh">
+    @Html.Action("GetGridView")
+</div>
+
+<div id="popover-content-ActionName"></div>
+
+
+<div class="mModal">
+    <div class="modal fade" id="doubleClickModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document" style="max-width: 75% !important">
+            <div class="modal-content" style="background: #ffffff">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>@ViewData["DocTypeName"]</span>
+                </div>
+                <div class="modal-header3">
+                    <div class="row no-gutters" style="border-bottom:1px solid #8080805e; margin: 0 1rem">
+                        <div class="col-6">
+                            <a href="#ElectronicDocument" class="individual active">
+                                @RLang.EDocumentsView
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#DocInfo" class="juridical">
+                                @RLang.RegistrationForm
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+
+                    <form class="indForm" id="ElectronicDocument"></form>
+
+                    <form class="jurForm d-none" id="DocInfo"></form>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" data-dismiss="modal">@RLang.Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("/Views/Modals/_SendDocumentModal.cshtml")
+@Html.Partial("/Views/Modals/_SendForInformationModal.cshtml")
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('#doubleClickModal').on('hidden.bs.modal', function (e) {
+                $('#ElectronicDocument').html('');
+                $('#DocInfo').html('');
+            });
+        });
+        
+
+        $(document).on("click", ".popoverAction", function () {
+                var actionId = this.id;
+                var requestToken = $("#spanToken").html();
+                var currentExecutorId = $("#spanCurrentExecutorId").html();
+                var elementDocId = $("#DocActionsPopover").attr('class');
+
+            if (elementDocId == null || elementDocId < 1) {
+                console.log('return');
+                return;
+            }
+            DocumentOperation(actionId, elementDocId, requestToken, currentExecutorId);
+            	$("[data-toggle='popover']").popover('hide');
+            });
+
+        function DocumentOperation(actionId, docId, requestToken, currentExecutorId) {
+            console.log('executorid:' + currentExecutorId);
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            if (actionId == 1) {
+                SendDocumnet();
+            }
+
+            if (actionId == 2) {
+                window.location = `/az/Document/EditDocument?token=${requestToken}`;
+            }
+
+            if (actionId == 3) {
+                $.ajax({
+                    url: `/az/Document/RecognizedDocument?token=${requestToken}`,
+                    type: "POST",
+                    data: { __RequestVerificationToken: token, executorId:currentExecutorId },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function() {
+                        var pageIndex = $('#gridDMS').CachedGrid().config.params.pageIndex;
+                        $('#gridDMS').bindgrid(pageIndex, undefined);
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+
+            if (actionId == 4) {
+                SendForInformaton(requestToken);
+            }
+
+            if (actionId == 8) {
+                $.ajax({
+                    url: '/az/Direction/DirectionModal',
+                    type: 'GET',
+                    dataType: 'html',
+                    data: { docId: docId, executorId: currentExecutorId },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function(response) {
+                        $('#dynamiccontext').html(response);
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+
+            if (actionId == 11) {
+                window.location = `/az/ServiceLetters/Document/AnswerByLetter?token=${requestToken}`;
+            }
+
+            if (actionId == 12) {
+                window.location = `/az/ServiceLetters/Document/RelateDocumentByServiceLetter?token=${
+                    requestToken}`;
+            }
+            if (actionId == 13) {
+                window.location = `/az/outgoing/Document/AnswerByOutgoingDoc/?token=${requestToken}`;
+            }
+
+            if (actionId == 14) {
+                window.location = `/az/outgoing/Document/RelatedDocByOutgoingDoc/?token=${requestToken}`;
+            }
+
+            if (actionId == 15) {
+                $.ajax({
+                    url: `/az/outgoing/Document/ActionOperation?token=${requestToken}`,
+                    type: "POST",
+                    data: { __RequestVerificationToken: token,actionId:15 },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function() {
+                        var pageIndex = $('#gridDMS').CachedGrid().config.params.pageIndex;
+                        $('#gridDMS').bindgrid(pageIndex, undefined);
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+
+            if (actionId == 16) {
+                $.ajax({
+                    url: `/az/outgoing/Document/ActionOperation?token=${requestToken}`,
+                    type: "POST",
+                    data: { __RequestVerificationToken: token, actionId: actionId },
+                    beforeSend: function () {
+                        window.ShowLoading();
+                    },
+                    success: function () {
+                        var pageIndex = $('#gridDMS').CachedGrid().config.params.pageIndex;
+                        $('#gridDMS').bindgrid(pageIndex, undefined);
+                    },
+                    complete: function () {
+                        window.CloseLoading();
+                    }
+                });
+            }
+
+            if (actionId == 18) {
+                $.ajax({
+                    url: '/az/Direction/ChangeMainExecutor',
+                    type: 'GET',
+                    dataType: 'html',
+                    data: { docId: docId },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function (response) {
+
+                        if (response.indexOf("ExecutingTimeLate") > -1) {
+                             return toastr.warning("Sənədin icra müddəti gecikib");
+                        }
+                         else if (response.indexOf("executor") > -1) {
+                             var obj = JSON.parse(response);
+                            Swal.fire({
+                                title: "Bu sənəd hal-hazırda " + obj['executor'] + "-da icraatdadır. Bu səbəbdən həmin icraçı geri qaytarmadan sizin, icraçını dəyişmək əməliyatını yerinə yetirməyiniz mümkün deyil.",
+                                type: 'warning'
+
+                            });
+                        } else  { $('#dynamiccontext').html(response); }
+
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+            if (actionId == 19) {
+                $.ajax({
+                    url: '/az/Direction/ChangeExecutionDate',
+                    type: 'GET',
+                    dataType: 'html',
+                    data: { docId: docId },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function(response) {
+                        $('#dynamiccontext').html(response);
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+            if (actionId == 21) {
+                $.ajax({
+                    url: '/az/BlankNumber/BlankModal',
+                    type: 'GET',
+                    dataType: 'html',
+                    data: { docId: docId },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function(response) {
+                        $('#dynamiccontext').html(response);
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+            if (actionId == 22) {
+                $.ajax({
+                    url: '/az/outgoing/Document/DocNote',
+                    type: 'GET',
+                    dataType: 'html',
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function(response) {
+                        $('#dynamiccontext').html(response);
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+            if (actionId == 23) {
+                $.ajax({
+                    url: `/az/ReserveDocs/Document/SetReserveNumber?token=${requestToken}`,
+                    type: 'GET',
+                    dataType: 'html',
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function (response) {
+                        if (response == "false")
+                        {
+                            return toastr.warning("Bu sənədə rezerve nömrə artıq verilib");
+                        }
+                        $('#dynamiccontext').html(response);
+                    },
+
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+        }
+
+        function GetPopoverActions(item, boundData) {
+            $("[data-toggle='popover']").popover('hide');
+            $.ajax({
+                type: 'GET',
+                url: '/az/Document/GetDocumentActions',
+                dataType: 'html',
+                data: { docId: boundData.DocId,executorId: boundData.ExecutorId, menuTypeId: 0 },
+                success: function (data) {
+                    $(item).popover({
+                        content: data,
+                        html:true,
+                        trigger: "manual"
+                    });
+
+                    $(item).popover('show');
+                }
+            });
+        }
+
+        function GetPopoverActionsTask(item, boundData) {
+            console.log(boundData);
+            $.ajax({
+                type: 'GET',
+                url: '/az/InsDoc/Document/GetDocumentActions',
+                dataType: 'html',
+                data: { docId: boundData.TaskDocId, menuTypeId: 0 },
+                success: function(data) {
+                    $(item).popover({
+                        html: true,
+                        content: data,
+                        container: "body",
+                        trigger: "focus"
+                    });
+
+                    $(item).popover('show');
+                }
+            });
+        }
+
+        function DocView(item, boundData) {
+            $.ajax({
+                type: 'GET',
+                url: '/az/Document/DocInfo',
+                dataType: 'json',
+                data: { docId: boundData.DocId },
+                success: function(result) {
+                    if (result != '') {
+                        window.open('/az/Document/GetDocView?token=' + result, '_blank');
+                    }
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+        }
+
+        function DocViewTask(item, boundData) {
+            window.open('/az/Document/GetDocView?docId=' + boundData.TaskDocId, '_blank');
+        }
+
+        function onFilter(sender, args, query) {
+            var ajaxOption = {
+                url: '@Url.Action("Document", "Document", routeValues: new {docType = SessionHelper.DocTypeId})'
+                    .buildUrl(query),
+                type: 'POST',
+                success: function(response) {
+                    console.log("onFilter", response);
+                    $('#gridDMS')
+                        .UpdateGrid({
+                            items: response.Items,
+                            totalCount: response.TotalCount
+                        }); //gridin yeni source ile bind edirik
+                },
+                error: function(response) {
+                }
+            };
+            console.log(ajaxOption);
+            $.ajax(ajaxOption);
+        }
+
+        function rowExpand(e) {
+            if (e.rowData.DocDoctypeId != 3) {
+                $('#' + e.parentGridId).jqxGrid('hiderowdetails', e.rowIndex);
+                return;
+            }
+            var detail = $('#' + e.detailGridId).CachedGrid();
+            if (detail !== undefined) {
+                var ajaxOption = {
+                    url: '@Url.Action("GetTask", "Document")?docId=' +
+                        e.rowData.DocId +
+                        '&docType=' +
+                        e.rowData.DocDoctypeId,
+                    type: 'POST',
+                    success: function(response) {
+
+                        $('#' + e.detailGridId).UpdateGrid({
+                            items: response.Items,
+                            totalCount: 0
+                        });
+
+                    },
+                    error: function(response) {
+                    }
+                };
+                $.ajax(ajaxOption);
+            }
+        }
+
+        function GridRowDoubleClick(event, rowdata) {
+            console.log(event, rowdata);
+            $("#globalDocId").val(rowdata.DocId);
+            window.ShowLoading();
+            $.ajax({
+                type: 'GET',
+                url: '/az/Document/ElectronicDocument',
+                dataType: 'html',
+                data: { docId: rowdata.DocId, executorId: rowdata.ExecutorId },
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                success: function(response) {
+
+                    $('#ElectronicDocument').html(response);
+                    readAs(rowdata.DocId);
+                    $("#doubleClickModal").modal();
+
+                    $.ajax({
+                        type: 'GET',
+                        url: '/az/Document/DocInfo',
+                        dataType: 'json',
+                        data: { docId: rowdata.DocId },
+                        success: function(result) {
+                            if (result != '') {
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '/az/Document/GetDocView'.buildUrl({ token: result }),
+                                    dataType: 'html',
+                                    success: function(response) {
+                                        window.CloseLoading();
+                                        $('#DocInfo').html(response);
+                                    }
+                                });
+                            }
+                        },
+                        complete: function() {
+                            window.CloseLoading();
+                        }
+                    });
+
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+        }
+
+
+        $(function() {
+
+            var $contextMenu = $("#contextMenu");
+
+            $("body").on("contextmenu",
+                "#DocGrid",
+                function(e) {
+                    $contextMenu.css({
+                        display: "block",
+                        left: e.pageX,
+                        top: e.pageY
+                    });
+                    return false;
+                });
+
+            $('html').click(function() {
+                $contextMenu.hide();
+            });
+
+        });
+
+        $("#Period").change(function() {
+            var periodId = $(this).val();
+
+            console.log(periodId);
+            var ajaxOption = {
+                url:
+                    '@Url.Action("Document", "Document", routeValues: new {docType = SessionHelper.DocTypeId})&periodId=' +
+                        periodId,
+                type: 'POST',
+                success: function(response) {
+                    $('#gridDMS')
+                        .UpdateGrid({
+                            items: response.Items,
+                            totalCount: response.TotalCount
+                        }); //gridin yeni source ile bind edirik
+                },
+                error: function(response) {
+                }
+            };
+            $.ajax(ajaxOption);
+        });
+    </script>
+}

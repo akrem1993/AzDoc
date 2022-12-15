@@ -1,0 +1,6 @@
+CREATE TABLE [dbo].[DC_EDUCATIONLEVEL](
+	[LevelId] int identity NOT NULL,
+	[LevelName] nvarchar(100) NULL,
+	[LevelStatus] bit NOT NULL CONSTRAINT [DF__DC_EDUCAT__Level__627A95E8]  DEFAULT 1,
+    CONSTRAINT [PK_DC_EDUCATIONLEVEL] PRIMARY KEY ([LevelId])
+ )

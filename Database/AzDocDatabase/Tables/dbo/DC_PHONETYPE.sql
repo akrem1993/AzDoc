@@ -1,0 +1,6 @@
+CREATE TABLE [dbo].[DC_PHONETYPE](
+	[TypeId] int identity NOT NULL,
+	[TypeName] nvarchar(100) NULL,
+	[TypeStatus] bit NOT NULL CONSTRAINT [DF__DC_PHONET__TypeS__68336F3E]  DEFAULT 1,
+	CONSTRAINT [PK_DC_PHONETYPE] PRIMARY KEY ([TypeId])
+ )

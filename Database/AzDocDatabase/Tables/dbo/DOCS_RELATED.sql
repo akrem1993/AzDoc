@@ -1,0 +1,10 @@
+CREATE TABLE [dbo].[DOCS_RELATED](
+	[RelatedId] int identity NOT NULL,
+	[RelatedDocId] int NOT NULL,
+	[RelatedDocumentId] int NOT NULL,
+	[RelatedTypeId] int NULL,
+    CONSTRAINT [PK_DOCS_RELATED] PRIMARY KEY ([RelatedId]),
+    CONSTRAINT [FK_DOCS_RELATED_DOCS] FOREIGN KEY([RelatedDocId]) REFERENCES [dbo].[DOCS] ([DocId]),
+	CONSTRAINT [FK_DOCS_RELATED_DOCS_RELATEDTYPE1] FOREIGN KEY([RelatedTypeId]) REFERENCES [dbo].[DOCS_RELATEDTYPE] ([RelatedTypeId]),
+	CONSTRAINT [FK_DOCS_RELATED_DOCS1] FOREIGN KEY([RelatedDocumentId]) REFERENCES [dbo].[DOCS] ([DocId])
+)

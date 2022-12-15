@@ -1,0 +1,222 @@
+﻿@using AzDoc.Helpers
+@using Widgets
+
+@{
+    Layout = null;
+
+    var grid = Html.MhmGrid("gridEditDocument", routeValues: new { area = "AdminPanel" })
+        .Columns(cols =>
+        {
+
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetDataField("Id", FieldType.Number);
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth("30px");
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='fa fa-refresh' aria-hidden='true'></i></a>",
+                    htmlAttributes: new
+                    {
+                        @class = "operation-button",
+                        fn_onclick = "EditDocumentOpen",
+                        @title = "Sənədin redaktəyə açılması/bağlanması"
+                    });
+            });
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetDataField("DocId2", FieldType.Number);
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='fa fa-trash btn'></i></a>", htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    fn_onclick = "CloseReadStatus",
+                    title = "Sənədin oxunmamışlardan silinməsi"
+                });
+            });
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetDataField("DocId1", FieldType.Number);
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='fas fa-eye'></i></a>", htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    fn_onclick = "DocView",
+                    title = "Qeydiyyat nəzarət vərəqəsi"
+                });
+            });
+
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetDataField("", FieldType.Number);
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='fa fa-share'></i></a>", htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    fn_onclick = "RedirectionViza",
+                    title = "Sənədin şəxsə yönləndirilməsi"
+                });
+            });
+
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetDataField("VizaPass", FieldType.Number);
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='fas fa-angle-double-right'></i></a>", htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    fn_onclick = "PassVizaFromPerson",
+                    title = "Sənədi şəxsdə vizadan ötürmə"
+                });
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetDataField("EditDoc", FieldType.Number);
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='far fa-edit'></i></a>", htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    fn_onclick = "EditDoc",
+                    title = "Mövcud sənədin redaktə olunması"
+                });
+            });
+
+            cols.Column(c =>
+            {
+                c.SetDataField("DocId");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Qeydiyyat nömrəsi</b>");
+                c.SetDataField("DocEnterNo");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable();
+                c.SetMaxWidth(200);
+            });
+            cols.Column(c =>
+            {
+                c.SetText("<b>Layihə nömrəsi</b>");
+                c.SetDataField("DocDocNo");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable();
+                c.SetMaxWidth(200);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Əməliyyat növü</b>");
+                c.SetDataField("SendType");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable();
+                c.SetWidth(150);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>İcraçılar</b>");
+                c.SetDataField("ExecutorFullName");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable();
+                c.SetWidth(250);
+            });
+
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Status</b>");
+                c.SetDataField("DocStatusName");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable();
+                c.SetWidth(150);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Redaktəsi</b>");
+                c.SetDataField("DocEditStatus");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable();
+                c.SetWidth(100);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Oxunmamış</b>");
+                c.SetDataField("ReadStatus");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable();
+                c.SetWidth(100);
+            });
+            cols.Column(c =>
+            {
+                c.SetText("ExecutorId");
+                c.SetDataField("ExecutorId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetMaxWidth(200);
+                c.IsFilterable();
+                c.SetHidden();
+            });
+            cols.Column(c =>
+            {
+                c.SetText("WorkplaceId");
+                c.SetDataField("WorkplaceId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetMaxWidth(200);
+                c.IsFilterable();
+                c.SetHidden();
+            });
+
+
+        })
+
+.AllowSorting(true)
+.AllowTooltips(false)
+.AllowPaging(false)
+.AllowFiltering(false)
+.AllowFilterRow(false)
+.AllowColumnOrdering(false)
+.AllowColumnResizing(false)
+.ColumnCustomizer(false)
+.SetPageSize(35)
+.SetWidth("1334px")
+.SetHeight("500px");
+
+
+
+}
+
+@grid.GetHtml()
+
+

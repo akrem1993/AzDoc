@@ -1,0 +1,157 @@
+﻿@using BLL.Models.Document
+@using InsDoc.Model.EntityModel
+@model  InsDoc.Model.ViewModel.DocumentViewModel
+
+@{
+    var showTask = Model.DocumentModel.CurrentRedirectPersons?.Count() > 0 ? "block" : "none";
+
+    var persons = Model.RedirectPersons;
+}
+<style>
+    .borderDiv {
+        border: 1px solid darkgrey;
+        border-radius: 10px;
+    }
+</style>
+
+<div class="input-group borderDiv">
+    <div class="col-8">
+        <label class="font-weight-bold">
+            Kimə ünvanlanıb
+        </label>
+        @Html.DropDownListFor(model => model.WhomAddress.Id,
+            new SelectList(persons, "Id", "Name"), new
+            {
+                @class = "selectpicker",
+                @id = "dropdownRedirectPersons",
+                @data_live_search = "true",
+                @data_width = "100%",
+                multiple = "multiple",
+                @data_actions_box = "true",
+            })
+    </div>
+
+    <div class="col-2">
+        <label class="font-weight-bold">
+            İcra qaydası
+        </label>
+        <input type="text" class="form-control " id="ExecutionStatus" readonly value="Məlumat üçün" />
+    </div>
+
+    <div class="col-1" style="padding-top:10px">
+        <br />
+        <button type="button" class="btn btn-light btn-sm" id="addWhomAddress" title="Əlavə et" onclick='AddRedirectPerson(this)'>
+            Əlavə et
+            <i class="fas fa-plus-circle" style="color: green; font-size: 1.3em"></i>
+        </button>
+    </div>
+
+    <div id="divTablePersons" style="display:@showTask">
+        <br />
+        <table class="table table-bordered table-sm table-hover" id="tableRedirectPersons" style="margin-left:10px">
+            <thead>
+                <tr>
+                    <th>Kimə ünvanlanıb</th>
+                    <th style="border-right: 0 !important;">İcra qaydası</th>
+                    <th style="border-right: 0 !important; width: 20px">Sil</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.DocumentModel.CurrentRedirectPersons ?? Enumerable.Empty<RedirectPersonsView>())
+                {
+                    <tr id="tr" class="data-row" data-PersonWorkPlace='@item.PersonWorkPlace' data-SendStatusId='@item.ExecutionType'>
+                        <td scope="col">
+                            @item.PersonName
+                        </td>
+                        <td scope="col">
+                            @item.ExecutionTypeName
+                        </td>
+                        <td style="width: 100px">
+                            <a href='javascript:void(0);' onclick='DeleteWhomAddressed(@item.RedirectId, this)' id='deleteRowDataTable' class='remove'>
+                                <span class='fas fa-trash-alt btn btn-light' style='color: red'></span>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+
+<script>
+    var redirectPersons = [];
+
+    $(document).ready(function () {
+        $('.bs-select-all').text('Hamisi').addClass('btn-info');
+        $('.bs-deselect-all').text('Sil').addClass('btn-danger');
+
+    });
+
+    $('#dropdownRedirectPersons').on("change",
+        function () {
+            redirectPersons = $(this).val();
+        });
+
+    function DeleteWhomAddressed(redirectId, element) {
+        Swal.fire({
+            title: 'Bu sətir cədvəldən silinəcək',
+            type: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'Ləğv et',
+            confirmButtonText: 'Təsdiqlə'
+        }).then((result) => {
+            if (result.value) {
+                if (redirectId === -1) {
+                    $(element).closest('tr').remove();
+
+                    SAlert.deleteSuccess();
+                } else {
+                    $.post("/az/InsDoc/Operation/DeleteRedirectedPerson",
+                        {
+                            redirectId: redirectId,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        function (data) {
+                            if (data) {
+                                $(element).closest("tr").remove();
+
+                                SAlert.deleteSuccess();
+                            } else
+                                SAlert.failed();
+                        });
+                }
+            }
+        });
+    }
+
+    function AddRedirectPerson(element) {
+        if (redirectPersons.length == 0) return;
+
+        var executionStatusValue = $("#ExecutionStatus").val();
+        $.each(redirectPersons, function (index, value) {
+            var markup = "<tr class='data-row rowSelector'" +
+                "data-PersonWorkPlace='" +
+                value +
+                "'" +
+                "data-SendStatusId='3'>" +
+                '<td scope="col" style="text-align: left;">' +
+                $(`#dropdownRedirectPersons option[value="${value}"]`).text() +
+                '</td>' +
+                '<td scope="col" style="text-align: left;">' +
+                executionStatusValue +
+                '</td>' +
+                '<td style="width:20px">' +
+                "<a href='javascript:void(0);' onclick='DeleteWhomAddressed(-1,this)' id='deleteRowDataTable' class='remove'><span class='fas fa-trash-alt btn btn-light' style='color:red'></span></a>" +
+                '</td>' +
+                '</tr>';
+            $("#tableRedirectPersons").append(markup);
+
+            $("#dropdownRedirectPersons").selectpicker('deselectAll');
+        });
+        $("#divTablePersons").show();
+        toastr.success('Məlumat əlavə olundu');
+
+    }
+</script>

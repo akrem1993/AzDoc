@@ -1,0 +1,472 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@using RelatedDocModel = OrgRequests.Model.EntityModel.RelatedDocModel
+@using BLL.Models.Document.EntityModel
+@model OrgRequests.Model.ViewModel.DocumentViewModel
+@{
+    var countAuthor = 1;
+    //var countRelDoc = 1;
+}
+
+<style>
+    .isChecked {
+        background: #ddd;
+    }
+
+    .check {
+        pointer-events: none;
+    }
+
+    .tr-header > th, #tr > td {
+        border: #ccc solid 1px;
+        text-align: center !important;
+        vertical-align: middle;
+    }
+
+    #ShortContent {
+        height: 100px !important;
+    }
+
+    .btn-light {
+        color: #212529;
+        background-color: #f8f9fa;
+        border-color: #cccccc !important;
+    }
+
+    .tableRelated {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+        text-align: left !important;
+        height: 200px;
+        display: block;
+        overflow: scroll
+    }
+
+    .tr-header-related > th, #tr > td {
+        border: #ccc solid 1px;
+        text-align: left !important;
+        vertical-align: middle;
+    }
+
+    /*.form-control, .btn {
+        font-size: 0.8rem !important;
+    }*/
+
+    .card-body {
+        padding: 0.5rem !important;
+    }
+
+
+
+    .inputSelector {
+    }
+
+    .custom {
+    }
+
+    .required {
+    }
+
+    .remove {
+    }
+
+    .rowSelector {
+    }
+</style>
+
+<link href="~/Content/jquery-editable-select/jquery-editable-select.min.css" rel="stylesheet" />
+<div class="editGroup">
+    <h4>@RLang.BasicInfo</h4>
+
+    <div class="input-group input-group-sm">
+        <div class="col-sm-4" style="padding-left: 0;">
+            <label>
+                Qeydiyyat tarixi <span style=" color: red;font-weight: bold">*</span>
+            </label>
+            @Html.TextBoxFor(model => model.DocumentModel.DocEnterDate, "{0:yyyy-MM-dd}", new
+            {
+                @type = "date",
+                @class = "form-control",
+                @id = "DocEnterDate",
+                @data_required = "Qeydiyyat tarixini daxil edin"
+            })
+        </div>
+        <div class="col-sm-4">
+            <label>
+                Mövzu <span style="color: red;font-weight: bold">*</span>
+            </label>
+            @Html.DropDownListFor(model => model.TopicTypeName.Id,
+                new SelectList(Model.TopicTypeNames, "Id", "Name", Model.DocumentModel.TopicTypeId), "Seç", new
+                {
+                    @id = "TopicTypeName",
+                    @class = "selectpicker",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+                    @data_required = "Mövzunu daxil edin"
+                })
+        </div>
+        <div class="col-sm-4" style="padding-right: 0;">
+            <label>
+                Sənədin nömrəsi
+            </label>
+            @Html.TextBoxFor(model => model.DocumentModel.DocNo, new
+            {
+                @type = "text",
+                @class = "form-control",
+                @id = "DocNo"
+            })
+        </div>
+
+    </div>
+
+    <div class="input-group">
+        <div class="col-sm-4" style="padding-left: 0;">
+            <label>Kimə ünvanlanıb</label>
+            @Html.DropDownListFor(model => model.WhomAddress.Id,
+                new SelectList(Model.WhomAddresses, "Id", "Name", Model.DocumentModel.WhomAddressId), "Seç", new
+                {
+                    @class = "selectpicker",
+                    @id = "WhomAddress",
+                    @data_live_search = "true",
+                    @data_width = "100%"
+                })
+        </div>
+        <div class="col-sm-4">
+            <label>
+                Daxil olma yolları <span style="color: red;font-weight: bold">*</span>
+            </label>
+            @Html.DropDownListFor(model => model.ReceivedForm.Id,
+                new SelectList(Model.ReceivedForms, "Id", "Name", Model.DocumentModel.ReceivedFormId), "Seç", new
+                {
+                    @class = "selectpicker",
+                    @id = "ReceivedForm",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+                    @data_required = "Daxil olma yollarını daxil edin"
+                })
+        </div>
+
+        <div class="col-sm-4" style="padding-right: 0;">
+            <label>
+                Sənədin tarxi <span style="color: red;font-weight: bold">*</span>
+            </label>
+            @Html.TextBoxFor(model => model.DocumentModel.DocDate, "{0:yyyy-MM-dd}", new
+            {
+                @type = "date",
+                @class = "form-control",
+                @id = "DocDate",
+                @data_required = "Sənədin tarixini daxil edin"
+            })
+        </div>
+    </div>
+
+    <div class="input-group">
+
+        <div class="col-sm-4" style="padding-left: 0;">
+            <label>
+                Sənədin növü <span style="        color: red;
+                                                                                                                                                                                                                                                                                                                                         font-weight: bold">*</span>
+            </label>
+            @Html.DropDownListFor(model => model.TypeOfDocument.Id,
+                new SelectList(Model.TypeOfDocuments, "Id", "Name", Model.DocumentModel.TypeOfDocumentId), "Seç", new
+                {
+                    @class = "selectpicker",
+                    @id = "TypeOfDocument",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+                    @data_required = "Sənədin növünü daxil edin"
+                })
+        </div>
+        <div class="col-sm-4">
+            <label>İcra qaydası</label>
+            @Html.DropDownListFor(model => model.ExecutionStatus.Id,
+                new SelectList(Model.ExecutionStatuses, "Id", "Name", Model.DocumentModel.ExecutionStatusId), "Seç", new
+                {
+                    @class = "selectpicker",
+                    @id = "ExecutionStatus",
+                    @data_live_search = "true",
+                    @data_width = "100%"
+                })
+        </div>
+
+        <div class="col-sm-4" id="hidden_PlannedDate" style="padding-right: 0;">
+            <label class="font-weight-bold">İcra müddəti</label>
+            @Html.TextBoxFor(model => model.DocumentModel.PlannedDate, "{0:yyyy-MM-dd}", new
+            {
+                @type = "date",
+                @class = "form-control",
+                @id = "PlannedDate",
+                @disabled="disabled"
+            })
+        </div>
+        @if (@Model.DocumentModel.DocIsAppealBoard)
+        {
+            <div class="col-sm-2">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <br />
+                    <input name="DocumentModel.DocIsAppealBoard" type="checkbox" class="custom-control-input" id="DocIsAppealBoard" value="true" checked="checked" />
+
+                    <label class="custom-control-label" for="DocIsAppealBoard">Apelyasiya şurası</label>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-sm-2" id="hidden_DocIsAppealBoard" style="display: block">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <br />
+                    <input name="DocumentModel.DocIsAppealBoard" type="checkbox" class="custom-control-input" id="DocIsAppealBoard" />
+
+                    <label class="custom-control-label" for="DocIsAppealBoard">Apelyasiya şurası</label>
+                </div>
+            </div>
+        }
+
+        @if (Model.DocumentModel.DocDuplicateId)
+        {
+            <div class="col-sm-2">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <br />
+                    <input name="DocumentModel.DocDuplicateId" type="checkbox" class="custom-control-input" id="DocDuplicateId" value="true" checked="checked" />
+
+                    <label class="custom-control-label" for="DocDuplicateId">Təkrar müraciət</label>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="col-sm-2">
+                <div class="custom-control custom-checkbox mr-sm-2">
+                    <br />
+                    <input name="DocumentModel.DocDuplicateId" type="checkbox" class="custom-control-input" id="DocDuplicateId" />
+
+                    <label class="custom-control-label" for="DocDuplicateId">Təkrar müraciət</label>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<div class="editGroup">
+    <h4>Hardan/Kimdən daxil olub  <span style="color: red;font-weight: bold">*</span></h4>
+
+    <div class="input-group input-group-sm">
+        <input type="text" id="searchAuthor" class="form-control custom" placeholder="Müəllifi axtar..." title="Kimdən daxil olub">
+        <input type="hidden" name="next4" value="4" />
+        <div class="input-group-append">
+            <a href="#addNewAuthorModal" id="labelForAddNewAuthorModal" class="btn btn-info" data-toggle="modal" style="display: none;float: right">Yeni müəllif əlavə et</a>
+        </div>
+    </div>
+
+    <table id="dataTableOrgAuthor" style="margin-top: 10px; width: auto" class="table table-hover mTable" aria-readonly="true">
+        <thead>
+            <tr>
+                <td scope="col" class="thead">№</td>
+                <td scope="col" class="thead">Təşkilat</td>
+                <td scope="col" class="thead">Müəllif</td>
+                <td scope="col" class="thead">Şöbə</td>
+                <td scope="col" class="thead">Vəzifə</td>
+                <td scope="col" class="thead">Sil</td>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model.DocumentModel.AuthorModels ?? Enumerable.Empty<AuthorModel>())
+            {
+                <input type="hidden" id="hiddenOrganizationId" value="@item.AuthorOrganizationId" />
+                if (Model.DocumentModel.Supervision)
+                {
+                    <tr id="tr" class="data-row" style="color: red;font-weight: bold">
+                        <td style="text-align: center!important"><span id="countNo">@(countAuthor++)</span></td>
+                        <td>@(item.OrganizationName ?? "---")</td>
+                        <td>@(item.FullName ?? "---")</td>
+                        <td style="text-align: center!important">@(item.AuthorDepartmentName ?? "---")</td>
+                        <td>@(item.PositionName ?? "---")</td>
+                        <td hidden><input type="text" class="form-control" disabled="disabled" value="@item.PrevOrganization" /></td>
+                        <td>
+                            <i class='fas fa-trash-alt icon-size' onclick="deleteRowAuthor(@item.AuthorId, this)" style='color: red'></i>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr id="tr" class="data-row">
+                        <td style="text-align: center !important;font-weight: bold"><span id="countNo">@(countAuthor++)</span></td>
+                        <td>@(item.OrganizationName ?? "---")</td>
+                        <td>@(item.FullName ?? "---")</td>
+                        <td style="text-align: center!important">@(item.AuthorDepartmentName ?? "---")</td>
+                        <td>@(item.PositionName ?? "---")</td>
+                        <td hidden>@item.PrevOrganization</td>
+                        <td>
+                            <a href="javascript:void(0);" onclick="deleteRowAuthor(@item.AuthorId, this)" id="deleteRowDataTable" class="remove">
+                                <span class='fas fa-trash-alt icon-size' style='color: red'></span>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+
+    </table>
+
+    @if (Model.DocumentModel.Supervision)
+    {
+        <div class="custom-control custom-checkbox my-1 mr-sm-2" id="hiddenSupervisionCheckbox">
+            <input name="DocumentModel.Supervision" type="checkbox" id="supervision" class="custom-control-input" checked="checked">
+            <label class="custom-control-label" for="supervision">Nəzarətlə daxil olub</label>
+        </div>
+    }
+    else
+    {
+        <div class="custom-control custom-checkbox my-1 mr-sm-2" id="hiddenSupervisionCheckbox" style="display: none">
+            <input name="DocumentModel.Supervision" type="checkbox" id="supervision" class="custom-control-input" value="@Model.DocumentModel.Supervision">
+            <label class="custom-control-label" for="supervision">Nəzarətlə daxil olub</label>
+        </div>
+    }
+</div>
+
+<div class="editGroup">
+    <h4>Əlaqəli sənəd</h4>
+    <div class="input-group input-group-sm">
+        <input type="text" id="searchRelatedDoc" class="form-control custom" placeholder="Sənədi axtar..." title="Əlaqəli sənəd">
+        <input type="hidden" name="next5" value="5" />
+    </div>
+
+    <table id="relatedDocTable" class="table table-hover mTable" style="display:block;margin-top: 10px;" aria-readonly="true">
+        <thead>
+            <tr class="tr-header">
+                @*<td scope="col" class="thead">№</td>*@
+                <td scope="col" class="thead">Daxil olma nömrəsi</td>
+                <td scope="col" class="thead">Hardan daxil olub</td>
+                <td scope="col" class="thead">Sil</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.DocumentModel.RelatedDocModels ?? Enumerable.Empty<RelatedDocModel>())
+            {
+                <tr id="tr" class="data-row">
+                    @*<td style='text-align: center !important;font-weight: bold'><span id="countNo">@(countRelDoc++)</span></td>*@
+                    <td style='text-align:center!important'><a href="/az/Document/GetDocView?token=@(CustomHelpers.CustomHelper.Encrypt($"{SessionHelper.WorkPlaceId}-{DateTime.Now:dd.MM.yyyyHH:mm:ss}-{item.DocId}"))" target="_blank">@item.DocEnterno</a></td>
+                    <td style='text-align:center!important'>@(item.DocumentInfo ?? "---")</td>
+                    <td style='text-align: center !important'>
+                        @if (item.DocId != SessionHelper.CurrentDocId)
+                        {
+                            <a href="javascript:void(0);" onclick="deleteRowRelated(@item.RelatedId, this)" id="deleteRowDataTable" class="remove">
+                                <span class='fas fa-trash-alt icon-size' style='color: red'></span>
+                            </a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="editGroup">
+    <h4>Qısa məzmun <span style="color: red;font-weight: bold">*</span></h4>
+
+    @Html.TextAreaFor(model => model.DocumentModel.ShortContent, new
+    {
+        @placeholder = "",
+        @type = "text",
+        @class = "form-control",
+        @id = "ShortContent",
+        @data_required = "Qıza məzmunu daxil edin"
+    })
+</div>
+
+<div class="row mb-5 pb-5 mt-4">
+    <div class="col-12 text-center">
+        <button type="button" class="mBtn mBtn-sec mr-2" onclick="window.history.go(-1); return false;">
+            @RLang.PrevStep
+        </button>
+        <button id="next-step-2" type="button" class="mBtn mBtn-pr next-step">
+            @RLang.NextStep
+        </button>
+
+    </div>
+</div>
+
+<div class="mModal">
+    <div class="modal fade" id="addNewAuthorModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Müəllifi əlavə etmə paneli</span>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <input type="text" name="surname" class="form-control inputSelector" placeholder="Soyadı">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <input type="text" name="firstName" class="form-control inputSelector" placeholder="@RLang.Name">
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <input type="text" name="fatherName" class="form-control inputSelector" placeholder="Atasının adı">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <select name="organizationName" class="form-control custom inputSelector required" placeholder="@RLang.OrganizationNameEnter"></select>
+                                <input type="hidden" name="next1" value="1" />
+                                <input type="hidden" class="inputSelector" name="organizationId" value="" />
+                            </div>
+
+                            <div class="form-group">
+                                <select name="departmentName" class="form-control custom inputSelector" placeholder="Şöbəsi"></select>
+                                <input type="hidden" name="next2" value="2" />
+                                <input type="hidden" class="inputSelector" name="departmentId" value="" />
+                            </div>
+
+                            <div class="form-group">
+                                <select name="positionName" class="form-control custom inputSelector" placeholder="Vəzifəsini daxil edin"></select>
+                                <input type="hidden" name="next3" value="3" />
+                                <input type="hidden" class="inputSelector" name="positionId" value="" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Ləğv et</button>
+
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="addNewAuthorButton" class="mBtn mBtn-pr defaultBtn" style="width: 100%">@RLang.Save</button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+    $("#dataTableOrgAuthor").find(".data-row").length === 0
+        ? $("#dataTableOrgAuthor").hide()
+        : $("#dataTableOrgAuthor").show();
+
+    $("#relatedDocTable").find(".data-row").length === 0
+        ? $("#relatedDocTable").hide()
+        : $("#relatedDocTable").show();
+
+    var orgId = $("#hiddenOrganizationId").val();
+
+    if ($.inArray(orgId, controlOrg) !== -1) {
+        $("#hiddenSupervisionCheckbox").show();
+    }
+</script>
+
+<script src="~/Scripts/jquery-editable-select/jquery-editable-select.min.js?v=@AppVersion.Version"></script>

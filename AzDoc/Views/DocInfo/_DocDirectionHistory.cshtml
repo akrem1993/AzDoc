@@ -1,0 +1,55 @@
+﻿@using BLL.Models.DocInfo
+@model IEnumerable<DocHistory>
+
+<div class="col-12">
+    <h4 class="text-center">Əməliyyat tarixçəsi</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col" class="thead">Kimdən</th>
+                <th scope="col" class="thead">Kimə</th>
+                <th scope="col" class="thead">Əməliyyatın növü</th>
+                <th scope="col" class="thead">Dərkənarın mətni</th>
+                <th scope="col" class="thead">Qeyd</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+
+                if (item.SendStatusId != 1)
+                {
+                    <tr>
+                        <td>@item.PersonFrom</td>
+                        <td>@item.PersonTo</td>
+                        <td>
+                            @item.OperationTypeName <br />
+                            <font size="2">@item.OperationDate</font>
+                        </td>
+                        <td>
+                            @item.DirectionChangeStatus
+                        </td>
+                        <td>@item.OperationNote</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr style="font-weight: bold">
+                        <td>@item.PersonFrom</td>
+                        <td>@item.PersonTo</td>
+                        <td>
+                            @item.OperationTypeName <br />
+                            <font size="2">@item.OperationDate</font>
+                        </td>
+                        <td>
+                            @item.DirectionChangeStatus
+                        </td>
+                        <td>@item.OperationNote</td>
+
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+

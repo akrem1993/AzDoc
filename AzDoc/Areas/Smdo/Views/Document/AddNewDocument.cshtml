@@ -1,0 +1,198 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@{
+    ViewBag.Title = "AddNewDocument";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+}
+
+<link href="~/Content/common/md-form-design.css" rel="stylesheet" />
+<style>
+    .display-none {
+        display: none;
+    }
+
+    .display-block {
+        display: block;
+    }
+
+    .card-header-custom {
+        background-color: #5c91af !important;
+        padding: 0.4em 1.25rem !important;
+    }
+
+    .icon-size {
+        font-size: 1.2em;
+    }
+</style>
+
+<div class="col-12">
+    <div class="row breadCrumbRow mt-5">
+        <div class="col-6 text-center" id="basicInformation">
+            <a href="#step1" class="brActive" data-brcrumb="1">
+                @RLang.BasicInfo
+            </a>
+        </div>
+
+        <div class="col-6 text-center" id="attachmentDocuments">
+            <a href="#step2" data-brcrumb="2">@RLang.EDocuments</a>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("CreateDocument", "Operation", FormMethod.Post, new { id = "AddNewDocument" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            @Html.Partial("BasicInformationPartial")
+        </div>
+    </div>
+
+}
+<script src="~/Scripts/e-sign/eimzaLib.js"></script>
+<div class="mModal">
+    <div class="modal fade modalBtn" id="signatureDialogModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>İmzalama paneli</span>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group" style="text-align: left!important">
+                                <label for="ctlCertificates">Pin kod daxil edin:</label>
+                                <input type="password" maxlength="8" class="form-control" name="" id="ctlCertificates" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="progressBarContainer" class="container">
+                                <p id="progressStatus"></p>
+                                <div class="progress">
+                                    <div id="progressBar"
+                                         class="progress-bar progress-bar-striped active"
+                                         role="progressbar"
+                                         aria-valuenow="0"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100"
+                                         style="width:0%">
+                                        0
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" id="signFile" class="mBtn mBtn-pr defaultBtn" style="width: 100%">Təsdiq</button>
+                        <button type="button" class="btn btn-secondary" id="getCerts" hidden></button>
+                        <input type="file" class="custom-file-input" id="files" multiple hidden>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" style="width: 100%">İmtina</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts{
+
+    <script src="~/Areas/Smdo/Scripts/EsignSmdo.js"></script>
+
+
+    <script>
+        $("#sendButton").click(function () {
+            $.ajax({
+                type: 'POST',
+                url: '/az/Smdo/Mail/SendDocumentToSmdo',
+                beforeSend: function () {
+                    window.ShowLoading();
+                },
+                success: function (res) {
+                    if (res) {
+                        addSendedRow();
+                        $("#sendButton").hide();
+                    }
+                    //setTimeout(function () {
+                    //    $("#sendButton").hide();
+                    //    addSendedRow();
+                    //    window.CloseLoading();
+                    //}, 2000);
+                },
+                complete: function () {
+                    window.CloseLoading();
+                }
+            });
+        });
+
+        function saveDocument(e) {
+            var formData = $('#AddNewDocument').getFormData();
+
+            var files = e.target.files;
+            var data = new FormData();
+            data.append('fileBase', files[0]);
+
+            $.ajax({
+                type: 'POST',
+                url: '/az/Smdo/Operation/CreateDocument',
+                data: data,
+                cache: false,
+                processData: false,
+                contentType: false,
+                beforeSend: function () {
+                    window.ShowLoading();
+                },
+                success: function (response) {
+                    $.ajax({
+                        url: '/az/Smdo/Document/GetDocView',
+                        beforeSend: function () {
+                            window.ShowLoading();
+                        },
+                        success: function (res) {
+                            if (res) {
+                                $('#DocView').html(res);
+                            }
+                        },
+                        complete: function () {
+                            window.CloseLoading();
+                        }
+                    });
+                },
+                complete: function () {
+                    window.CloseLoading();
+                }
+            });
+        }
+
+
+        $('#fileBrowse').change(function (e) {
+            saveDocument(e);
+        });
+
+        //saveDocument();
+
+        $(document).ready(function () {
+
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('DocEnterDate').value = today;
+            document.getElementsByName("DocumentModel.DocEnterDate")[0].setAttribute('min', today);
+            document.getElementsByName("DocumentModel.PlannedDate")[0].setAttribute('min', today);
+        });
+
+    </script>
+
+    <script src="~/Scripts/serviceletters/form-wizard.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/serviceletters/serviceletters.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/AttachmentFile.js?v=@AppVersion.Version"></script>
+}

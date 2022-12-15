@@ -1,0 +1,343 @@
+﻿@using AzDoc.Helpers
+@model BLL.Models.Document.ViewModel.DocCountViewModel
+@{
+    /**/
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<div class="row no-gutters">
+    <div class="col-10">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="\">Ana səhifə</a></li>
+                @if (ViewData["DocTypeGroupName"] != null)
+                {
+                    <li class="breadcrumb-item"><a href="#">@ViewData["DocTypeGroupName"]</a></li>
+                }
+
+                <li class="breadcrumb-item active" aria-current="page">
+                    @ViewData["DocTypeName"]
+                </li>
+            </ol>
+        </nav>
+    </div>
+</div>
+@if (Model.DocCountModels.Any())
+{
+    <style>
+        .breadAction {
+        }
+    </style>
+
+    <div class="row breadcrumbRow" id="DocBreads">
+        <div class="col-10">
+            <div class="docStatus">
+                <ul class="breadcrumb2">
+                    @foreach (var item in Model.DocCountModels)
+                    {
+                        switch (item.SendStatusId)
+                        {
+                            case -1: //Butun sənədlər
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-envelope"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 1: //İcra üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-file"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 2: //İcra və Məlumat üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-info-circle"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 3: //Məlumat üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-info"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 4: //Məlumat və nəzarət üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-envelope"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 5: //Dərkənar layihəsinin təsdiqi üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-envelope"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 6: //İcra müddətinin uzadıılması üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-calendar-alt"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 7: //Vizanın təsdiqi üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-handshake"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 8: //İmza üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-file-signature"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 9: //Poçt etmək üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-envelope"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 10: //İcraçınınn dəyişdirilməsi üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-envelope"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 11: //Çap etmək üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-envelope"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 12: //Təsdiq üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-check"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 13: //Aidiyyəti üzrə
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-envelope"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 14: //Qəbul üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-envelope"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+
+                            case 15: //Təsdiq üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-edit"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                            case 16: //Təsdiq üçün
+                                {
+                                    <li>
+                                        <a href="#" id="@item.SendStatusId" class="breadAction">
+                                            <div class="item">
+                                                <i class="fas fa-pencil-alt"></i>
+                                                <span class="count">@item.DocNo</span>
+                                            </div>
+                                            <span class="text">@item.SendStatusName</span>
+                                        </a>
+                                    </li>
+                                }
+                                break;
+                        }
+                    }
+
+                    <!-- <li>
+                        <a href="#" class=".circleBtn">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                    </li> -->
+                </ul>
+            </div>
+        </div>
+
+        @*<div class="col-2 text-right">
+                <select id="Period" class="selectpicker" data-width="100%">
+                    @foreach (var item in SessionHelper.Period)
+                    {
+                        <option value="@item.PeriodId">@item.PeriodDescription</option>
+                    }
+                </select>
+            </div>*@
+    </div>
+}
+
+<script>
+    $(document).on("click", ".breadAction", function () {
+        var sendStatusId = this.id;
+        var elementDocId = $("#DocBreads").attr('class');
+
+        if (elementDocId == null || elementDocId < 1)
+            return;
+        BreadOperation(sendStatusId);
+    });
+
+    function BreadOperation(sendStatusId) {
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        $('#gridDMS').setRouteValue({ sendStatusId: sendStatusId });
+
+        //var pageSize = $('div[author="kamran"] button.btn-secondary.dropdown-toggle').html();
+
+        $('#gridDMS').bindgrid();
+
+        @*var ajaxOption = {
+            url: `@Url.Action("Document", "Document", routeValues: new { docType = SessionHelper.DocTypeId })&sendStatusId=${sendStatusId}&pageSize=${pageSize}`,
+            type: 'POST',
+            beforeSend: function() {
+                window.ShowLoading();
+            },
+            success: function (response) {
+                $('#gridDMS').UpdateGrid({ items: response.Items, totalCount: response.TotalCount });//gridin yeni source ile bind edirik
+            },
+            complete: function () {
+                window.CloseLoading();
+            }
+        };
+        $.ajax(ajaxOption);*@
+
+    }
+
+    $(document).ready(function () {
+
+        $('[data-toggle="popover"]').popover();
+
+        //    $(".breadcrumbRow .breadcrumb2 a").tooltip();
+        //    $('[data-toggle="popover"]').popover({
+        //        html: true,
+        //        content: function () {
+        //            return $('#popover-content').html();
+        //        }
+
+        //});
+
+        //    $('.popover-dismiss').popover({
+        //        trigger: 'focus'
+        //    });
+        //});
+    });
+</script>

@@ -1,0 +1,167 @@
+﻿@using Widgets
+
+@{
+    Layout = null;
+
+    string action = ViewBag.Sended ? "GetSendedDocs" : "GetReceivedDocs";
+
+    <style>
+        button,
+        [type="button"],
+        [type="reset"],
+        [type="submit"] {
+            -webkit-appearance: none !important;
+        }
+    </style>
+
+    if (!ViewBag.Sended)
+    {
+        <button type="button" id="hello" class="btn btn-sm"  onclick="createReceivedDoc();"></button>
+    }
+
+    var grid = Html.MhmGrid("gridSmdo", action, "Document", routeValues: new { area = "Smdo", docType = 25 })
+        .Columns(cols =>
+        {
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetDataField("DocId", FieldType.Number);
+                c.SetHeaderAlign(TextAlign.Center).IsFilterable();
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='line'></i><i class='line'></i><i class='line'></i></a>",
+                htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    data_toggle = "popover",
+                    data_container = "body",
+                    data_trigger = "focus",
+                    data_placement = "right",
+                    type = "button",
+                    data_html = "true",
+                    href = "#",
+                    id = "ActionName",
+                    //fn_onclick = "GetPopoverActions"
+                });
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetDataField("", FieldType.Number);
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='fas fa-eye'></i></a>", htmlAttributes: new { @class = "operation-button", fn_onclick = "GridRowDoubleClick" });
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Qeydiyyat nömrəsi");
+                c.SetDataField("DocEnterNo");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(50);
+                c.SetMaxWidth(130);
+                c.IsPinned();
+                c.IsFilterable();
+            });
+
+
+            cols.Column(c =>
+            {
+                c.SetText("Qeydiyyat tarixi");
+                c.SetDataField("DocEnterDate", FieldType.Date,"dd.MM.yyyy HH:mm");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(50);
+                c.IsPinned();
+                c.IsFilterable(Filtertype.Date);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Yaradan");
+                c.SetDataField("Creator");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(300);
+                c.SetMaxWidth(400);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("İmzalayan şəxs");
+                c.SetDataField("Signer");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(300);
+                c.SetMaxWidth(400);
+                c.IsFilterable();
+            });
+
+
+
+            cols.Column(c =>
+            {
+                c.SetText("Qısa məzmun");
+                c.SetDataField("Note");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(300);
+                c.SetMaxWidth(400);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Sənədin növü");
+                c.SetDataField("Kind");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetMaxWidth(200);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Sənədin statusu");
+                c.SetDataField("StatusName");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetMaxWidth(200);
+            });
+
+        })
+        .AllowCrud()
+        .SetRowDoubleClick("GridRowDoubleClick")
+        .AllowSorting(false)
+        .AllowTooltips(false)
+        .AllowPaging(true)
+        .AllowFiltering(true)
+        .AllowFilterRow(true)
+        .AllowColumnOrdering(true)
+        .AllowColumnResizing(true)
+        .SetOnFilter("onFilter")
+        .SetUnRead("checkUnread")
+        .SetPageSize(50)
+        .SetWidth("100%")
+        .SetHeight("100%");
+}
+   
+
+@grid.GetHtml() 
+
+<script>
+    function createReceivedDoc() {
+        $.ajax({
+            type:'POST',
+            url: "/az/Smdo/Operation/CreateReceivedDoc",
+            success: function () {
+                location.reload();
+            }
+        });
+    }
+</script>

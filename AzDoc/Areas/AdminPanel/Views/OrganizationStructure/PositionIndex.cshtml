@@ -1,0 +1,118 @@
+﻿@{
+    ViewBag.Title = "DepartmentIndex";
+}
+
+@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@using DMSModel
+@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+}
+
+
+<div class="row no-gutters mt-4">
+    <div class="">
+        <div class="newDocBtn">
+            <button id="newPosition" class="mBtn mBtn-pr" style="width: 100%"> <i class="fas fa-plus">Yeni vəzifə yarat</i></button>
+        </div>
+    </div>
+    <div class="col-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="\">Ana səhifə</a></li>
+                <li class="breadcrumb-item"><a href="#">Admin</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Vəzifələr</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+
+
+
+@Html.AntiForgeryToken()
+
+<div class="col-md-12" id="DocGrid" style="padding-top: 10px; height: 86vh">
+    @Html.Partial("PosGridViewPartial")
+</div>
+
+<script>
+
+    function onFilter(sender, args, query) {
+        $('#gridPositionStructure').bindgrid(1);
+    }
+
+    function PositionEdit(item, boundData) {
+        window.location = '/az/AdminPanel/OrganizationStructure/GetEditPosition?posId=' + boundData.DepartmentPositionId;
+    }
+
+    $(document).on("click", "#newPosition", function () {
+        window.location = '/az/AdminPanel/OrganizationStructure/GetCreatePosition';
+    });
+
+    function PositionRemove(item, boundData) {
+
+
+
+            Swal.fire({
+                title: 'Vəzifə silinsinmi?',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Ləğv et',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+
+                    var values = { posId: boundData.DepartmentPositionId };
+             $.ajax({
+                 url: '/@_lang/AdminPanel/OrganizationStructure/RemovePositionById',
+                 type: 'POST',
+                 data: JSON.stringify(values),
+                 contentType: 'application/json; charset=utf-8',
+                 success: function (response) {
+
+                     if (response) {
+
+
+                         Swal.fire({
+                             type: 'success',
+                             title: 'Vəzifə silindi',
+                             showConfirmButton: false,
+                             timer: 1000
+                         });
+                         window.location.reload();
+
+                     }
+                     else
+                     {
+                         Swal.fire({
+                             type: 'error',
+                             title: 'Xəta baş verdi',
+                             showConfirmButton: false,
+                             timer: 1000
+                         });
+                     }
+                 },
+                 beforeSend: function () {
+                     window.ShowLoading();
+                 },
+                 complete: function () {
+                     window.CloseLoading();
+                 }
+             });
+
+                }
+            });
+
+        }
+
+
+</script>
+
+<script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>

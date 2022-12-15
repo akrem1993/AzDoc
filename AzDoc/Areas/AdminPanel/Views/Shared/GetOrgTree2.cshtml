@@ -1,0 +1,29 @@
+﻿@model StructTree
+@using Admin.Model.EntityModel
+@foreach (var structure in Model.Structures.Where(a => a.ParentID == Model.ParentId))
+{
+    if (Model.Structures.Any(a => a.ParentID == structure.Id))
+    {
+        <li class="drop active open">
+            <i class="fas fa-angle-right"  struct-id="@structure.StructId" has-opened="False"></i>
+            <a href="#" class="editStructure"  struct-type="@structure.StructType" struct-id="@structure.StructId"  onclick="GetUser(this)">
+                <span class="test" struct-type="@structure.StructType" struct-id="@structure.StructId" org-id="@structure.OrgId">@structure.Name</span>
+            </a>
+            <div class="down">
+                <ul>
+                    @Html.Partial("GetOrgTree2", new StructTree { Structures = Model.Structures, ParentId = structure.Id })
+                </ul>
+            </div>
+        </li>
+    }
+    else
+    {
+        <li class="" id="@structure.Id">
+            <a href="#" class="editStructure" struct-type="@structure.StructType" struct-id="@structure.StructId" onclick="GetUser(this)">
+                <span class="test" struct-type="@structure.StructType" struct-id="@structure.StructId" org-id="@structure.OrgId">@structure.Name</span>
+            </a>
+        </li>
+     }
+}
+
+

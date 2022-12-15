@@ -1,0 +1,20 @@
+﻿@using BLL.Models.Document
+@model BaseElectronDoc
+
+@Html.Partial("~/Views/ESign/SignaturePanel.cshtml")
+@Html.Partial("~/Views/ESign/ConfirmationPanel.cshtml")
+
+@*@Html.Partial("~/Views/ESign/SignaturePanel-V2.cshtml", Model)
+@Html.Partial("~/Views/ESign/ConfirmationPanel-V2.cshtml", Model)*@
+
+@Html.Partial("/Views/Modals/_DisposeDocumentModal.cshtml", Model)
+
+@Html.Partial("/Views/Modals/_ReturnDocumentModal.cshtml")
+@Html.Partial("/Views/Modals/_VizaAcceptModal.cshtml")
+@Html.Partial("/Views/Modals/_CancelDocumentModal.cshtml")
+@Html.Partial("/Views/Modals/_SendDocumentModal.cshtml")
+@Html.Partial("/Views/Modals/_RecognizeDocumentModal.cshtml", Model)
+@Html.Partial("/Views/Modals/_ResolutionModal.cshtml")
+@Html.Partial("/Views/Modals/_EditDocumentModal.cshtml")
+@Html.Partial("/Views/Modals/_ApproveDocumentModal.cshtml")
+@*@Html.Partial("/Views/Modals/_SendForInformationModal.cshtml")*@

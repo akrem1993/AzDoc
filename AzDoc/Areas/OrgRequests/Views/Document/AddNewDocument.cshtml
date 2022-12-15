@@ -1,0 +1,204 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@{
+    ViewBag.Title = "AddNewDocument";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<link href="~/Content/common/style.css" rel="stylesheet" />
+<style>
+    .display-none {
+        display: none;
+    }
+
+    .display-block {
+        display: block;
+    }
+
+    .card-header-custom {
+        background-color: #5c91af !important;
+        padding: 0.4em 1.25rem !important;
+    }
+
+    .icon-size {
+        font-size: 1.2em;
+    }
+</style>
+
+<div class="col-12">
+    <div class="row breadCrumbRow mt-5">
+        <div class="col-4 text-center" id="basicInformation">
+            <a href="#step1" class="brActive" data-brcrumb="1">
+                @RLang.BasicInfo
+            </a>
+        </div>
+        <div class="col-4 text-center " id="tasks">
+            <a href="#step2" data-brcrumb="2">Tapşırıqlar</a>
+        </div>
+        <div class="col-4 text-center" id="attachmentDocuments">
+            <a href="#step3" data-brcrumb="3">@RLang.EDocuments</a>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("CreateDocument", "Operation", FormMethod.Post, new { id = "AddNewDocument" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            @Html.Partial("BasicInformationPartial")
+        </div>
+        <div class="mainEdit contentItem d-none" id="step2" style="padding-top:1px" data-brnum="2">
+            @Html.Partial("DocumentInformationPartial")
+        </div>
+        <div class="connectDoc contentItem d-none" id="step3" style="padding-top:1px" data-brnum="3">
+            @Html.Partial("~/Views/Document/AttachmentDocumentsPartial.cshtml")
+        </div>
+    </div>
+
+}
+
+@section scripts{
+    <script>
+
+        $("#ParentButton").click(function() {
+
+            if ($(".table-custom").find("tr.rowSelector").length === 0) {
+                return toastr.warning(" Qoşma sənədi daxil edin.");
+            }
+
+            var isMainCount = 0;
+            var pageCopyCount = 0;
+
+            $.each($("input[name='isMain']"),
+                function() {
+                    if ($(this).attr('checked') === 'checked') {
+                        ++isMainCount;
+                    }
+                });
+
+            $.each($("i[name='icon']"),
+                function() {
+                    if ($.trim($(this).text()) === "") {
+                        $(this).closest("span").css('border', '1px solid red');
+                        ++pageCopyCount;
+                    }
+                });
+
+            if (isMainCount === 0) {
+                $.each($("input[name='isMain']"),
+                    function() {
+                        $(this.parentElement).css('border', 'solid red 1px');
+                    });
+                toastr.warning("Bütün məcburi xanaların doldurulduğuna əmin olun.");
+            }
+
+            if (isMainCount !== 0 && pageCopyCount === 0) {
+                var fileInfoId = $('#fileInfoId').val();
+                var formData = $('#AddNewDocument').getFormData();
+                formData.RelatedDocModels = $('#relatedDocTable').tableToJsonList();
+                formData.AuthorModels = $('#dataTableOrgAuthor').tableToJsonList();
+                var typeOfDocument = $('#TypeOfDocument').val();
+                if (typeOfDocument==12) {
+                    formData.TaskFormModels = $('#taskTable').tableToJsonList();
+                }
+
+                var token = $('input[name="__RequestVerificationToken"]').val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/@_lang/OrgRequests/Operation/CreateDocument',
+                    dataType: 'json',
+                    data: { __RequestVerificationToken: token, model: formData,fileInfoId:fileInfoId },
+                    beforeSend: function () {
+                        window.ShowLoading();
+                    },
+                    success: function(response) {
+                        if (response) {
+                            window.location = '/@_lang/OrgRequests';
+                        }
+                    },
+                    complete: function () {
+                        window.CloseLoading();
+                    }
+                });
+            }
+        });
+
+    
+    $(document).ready(function () {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('DocEnterDate').value = today;
+        document.getElementsByName("DocumentModel.DocEnterDate")[0].setAttribute('min', today);
+        document.getElementsByName("DocumentModel.PlannedDate")[0].setAttribute('min', today);
+
+        document.getElementsByName("DocumentModel.DocDate")[0].setAttribute('max', today);
+        document.getElementsByName("DocumentModel.DocDate")[0].setAttribute('max', today);
+       
+
+        @*var select = $("#tbRelatedDoc");
+            var data = '<thead><tr>';
+            data+='<th style="width: 25 % " class="thead">Sənədin nömrəsi</th>';
+
+            data+='<th style="width: 75%" class="thead">Sənədin məlumatı</th>';
+            data+='</tr></thead>';
+            $.ajax({
+                type: "GET",
+                url: "/@_lang/OrgRequests/Document/GetRelatedDocument",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    data+='<tbody>';
+                    $.each(response,
+                        function () {
+                            data+='<tr class="tr-header-related" onclick="fnSaveRelatedDocument(this)">';
+                            data+='<td style="display: none">'+this.DocId +'</td>';
+                            data+='<td >' + this.DocEnterno+'</td>';
+                            data+='<td >' + this.DocumentInfo + '</td>';
+                            data+='</tr>';
+                        });
+                    data+='</tbody>';
+
+                    select.html(data);
+                }
+            });*@
+        });
+
+        $('#TopicTypeName').on('change', function () {
+            var selectedTopicType = $("#TopicTypeName option:selected").text();
+
+            Swal.fire({
+                title: 'Qısa məzmuna əlavə edilməsi',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Ləğv et',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+
+                    console.log(selectedTopicType);
+                    $('#ShortContent').val(selectedTopicType);
+
+                    Swal.fire({
+                        type: 'success',
+                        title: 'Məlumat əlavə olundu',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                }
+            });
+          
+        });
+    </script>
+
+    <script src="~/Scripts/orgrequests/form-wizard.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/orgrequests/orgrequests.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/AttachmentFile.js?v=@AppVersion.Version"></script>
+}

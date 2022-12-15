@@ -1,0 +1,79 @@
+﻿<div class="row">
+    <div class="col-6 text-center">
+        <label class="d-block">İlk səhifə</label>
+        
+        <select id="DefaultPages" class="form-control selectpicker" data-live-search="true" data-width="80%" tabindex="-98" ></select>
+    </div>
+    <div class="col-6 text-center">
+        <label class="d-block">Dil</label>
+        
+        <select id="DefaultPagesLanguages" class="form-control selectpicker" data-width="80%" tabindex="-98"></select>
+    </div>
+    <div class="col-12 mt-4 text-center">
+        <button class="mBtn mBtn-pr" id="btnChangeDefaultPage">
+            <i class="fas fa-save"></i>
+            Yadda saxla
+        </button>
+    </div>
+</div>
+
+
+<script>
+    $.ajax({
+        type: "GET",
+        url: "/az/Settings/ChangeDefaultPage",
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: function (response) {
+            $("#DefaultPages").append($("<option value='-1'>Oxunmamış sənədlər</option>"));
+            $.each(response, function () {
+                $("#DefaultPages").append($("<option></option>").val(this.TreeDocTypeId).html(this.TreeTreeName));
+            });
+
+            $('.selectpicker').selectpicker('refresh');
+        }
+    });
+
+    $.ajax({
+        type: "GET",
+        url: "/az/Settings/ChangeDefaultLanguage",
+        success: function (model) {
+            console.log(model);
+            $.each(model, function () {
+                $("#DefaultPagesLanguages").append($("<option></option>").val(this.Id).html(this.Name));
+            });
+
+            $('.selectpicker').selectpicker('refresh');
+        }
+    });
+
+    $("#btnChangeDefaultPage").click(function () {
+
+        $.ajax({
+            type: 'POST',
+            url: '/az/Settings/ChangeDefaultPage',
+            dataType: 'json',
+            data: { treeId: $("#DefaultPages").val() },
+            success: function (response) {
+                if (response.result == true)
+                    console.log($("#DefaultPages option:selected").val());
+                toastr.success("Əməliyyat uğurlu oldu");
+            }
+        });
+
+        //$.ajax({
+        //    type: "POST",
+        //    url: "/az/Settings/ChangeDefaultLanguage",
+        //    dataType: "json",
+        //    data: { langId: $("#DefaultPagesLanguages").val() },
+        //    success: function (response) {
+        //        if (response.result == true)
+        //            toastr.success("Əməliyyat uğurlu oldu");
+        //    }
+        //});
+        
+    });
+
+   
+</script>
+

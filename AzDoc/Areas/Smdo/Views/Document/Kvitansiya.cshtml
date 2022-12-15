@@ -1,0 +1,151 @@
+﻿@model  Smdo.AzDoc.Models.GridViewDoc
+
+@{
+
+    string GetD(DateTime? time)
+    {
+        if (time.HasValue)
+        {
+            return time.Value.ToShortDateString();
+        }
+        return "dd.mm.yyyy";
+    }
+}
+
+<div class="mModal">
+    <div class="modal fade modalBtn" id="DvcsKvitansiyaModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group" style="text-align: left!important">
+                                <label for="ctlCertificates">Imzalar</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <table class="table table-hover table-sm mTable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Ölkə</th>
+                                        <th scope="col">Imza</th>
+                                        <th scope="col">İmza edən şəxs</th>
+                                        <th scope="col">Vəzifə</th>
+                                    </tr>
+                                </thead>
+                                <tr>
+                                    <td style="text-align:center"><img src="~/Areas/Smdo/Scripts/azerbaijan.svg" height="35" width="35" /></td>
+                                    <td style="text-align:center"><img src="~/Areas/Smdo/Scripts/certificateAz.svg" height="35" width="35" /></td>
+                                    <td>Ramin Quluzadə</td>
+                                    <td>Azərbaycan Respublikasının Nəqliyyat və Rabitə naziri</td>
+                                </tr>
+                                @if (Model.IsReceived)
+                                {
+                                    <tr>
+                                        <td style="text-align:center"><img src="~/Areas/Smdo/Scripts/belarus.svg" height="35" width="35" /></td>
+                                        <td style="text-align:center"><img src="~/Areas/Smdo/Scripts/certificateBel.svg" height="35" width="35" /></td>
+                                        <td>Шульган Константин Константинович</td>
+                                        <td>Министр связи и информатизации Республики Беларусь</td>
+                                    </tr>
+                                }
+
+                            </table>
+                        </div>
+
+                        @if (Model.Checks.Any(x => !string.IsNullOrEmpty(x.indicator)))
+                        {
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group" style="text-align:center !important">
+                                        <label>&nbsp; Kvitansiyalar</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="col-12">
+                                <table class="table table-hover table-sm mTable">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Nəticə</th>
+                                            <th scope="col">Ad</th>
+                                            <th scope="col">Kvitansiyanın təsviri</th>
+                                        </tr>
+                                    </thead>
+                                    @foreach (var kvit in Model.Checks)
+                                    {
+                                        <tr>
+                                            @if (kvit.indicator == "+")
+                                            {
+                                                <td style="text-align: center"><img src="~/Areas/Smdo/Scripts/checked.svg" height="30" width="30" /></td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align: center"><img src="~/Areas/Smdo/Scripts/error.svg" height="30" width="30" /></td>
+                                            }
+                                            <td>@kvit.name</td>
+                                            <td>@kvit.description</td>
+                                        </tr>
+                                    }
+
+
+                                </table>
+                            </div>
+
+                            <div class="col-10">
+                                @if (Model.Checks.Select(x => x.indicator == "+").Count() == 3)
+                                {
+                                    <table class="table table-hover table-sm mTable">
+                                        <thead>
+                                            <tr>
+                                                @*<th scope="col"></th>
+                                                    <th scope="col"></th>*@
+                                            </tr>
+                                        </thead>
+                                        <tr>
+                                            @*<td style="text-align: center"><img src="~/Areas/Smdo/Scripts/checked.svg" height="30" width="30" /></td>*@
+                                            <td style="text-align: center"><i class="fas fa-calendar-check" style="color: #4e9a46;font-size:2.7em"></i></td>
+                                            <td>DTS sənədi uğurla təstiq edib</td>
+                                        </tr>
+                                    </table>
+                                }
+                            </div>
+                        }
+                        @if (Model.SignerSubjects.Any(x => !string.IsNullOrEmpty(x.subject)))
+                        {
+                            <div class="col-12">
+                                <textarea readonly class="col-12" style="height: 250px">
+@($"DTS'in təsviri: {Model.SignerSubjects.First().subject}{Environment.NewLine}" +
+$"DTS'in seriya nomresi : {Model.SignerSubjects.First().serialNumber}{Environment.NewLine}" +
+$"DTS'in etibarliq tarixi : {GetD(Model.SignerSubjects.First().validFrom)} - {GetD(Model.SignerSubjects.First().validTo)}{Environment.NewLine}")   
+@(!string.IsNullOrEmpty( Model.subject) ? $"Imza edən şəxs: {Model.subject.Replace("\\","")}{Environment.NewLine}" : "" )
+@(!string.IsNullOrEmpty( Model.issuer) ? $"Imzanın təsviri: {Model.issuer.Replace("\\","")}{Environment.NewLine}" : "" )
+@(Model.validFrom.HasValue && Model.validTo.HasValue ? $" Imzanın etibarlıq tarixi: {GetD(Model.validFrom)} - {GetD(Model.validTo)}" : "" )                            
+</textarea>
+                            </div>
+                        }
+
+
+
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <div class="col-3">
+                            <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" style="width: 100%">Bağla</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(".closeBtn").click(function () {
+            $(".modalBtn").modal("hide");
+
+        });
+    </script>

@@ -1,0 +1,208 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@using ServiceLetters.Common.Enums
+@model ServiceLetters.Model.ViewModel.ElectronicDocumentViewModel
+@{
+    Layout = null;
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<style>
+    .col-md-1 {
+        flex: 0 0 4.333333% !important;
+        width: 3.5% !important;
+    }
+
+    .accept-modal-dialog {
+        width: 30%;
+        /* margin: 48px auto; */
+        margin: 15% auto;
+    }
+
+    .signature-modal-dialog {
+        width: 20%;
+        /* margin: 48px auto; */
+        margin: 20% auto;
+    }
+
+    .operation-history-modal-dialog {
+        width: 50%;
+        /* margin: 48px auto; */
+        margin: 10% auto;
+    }
+
+    .operationIcons {
+        font-size: 1.7em;
+    }
+</style>
+
+<div style="height: 100%">
+    <div class="col-12">
+        <div class="form-group">
+            <div class="input-group input-group-sm">
+                <span class="d-none" id="spanToken">@Model.Token</span>
+                <div class="col-md-1">
+                    <button type="button" id="DocInfoButton" class="btn btn-default btn-sm">
+                        <i class="fas fa-chevron-circle-down operationIcons" style="color: #005487"></i>
+                    </button>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" id="operationHistoryButton" class="btn btn-default btn-sm" title="Əməliyyat tarixçəsi">
+                        <i class="fas fa-history operationIcons" style="color: #005487"></i>
+                    </button>
+                </div>
+
+                <div class="col-md-5">
+                    @Html.DropDownListFor(model => Model.FileInfoId,
+                        new SelectList(Model.DocFiles, "FileInfoId", "FileName"), new
+                        {
+                            @class = "form-control",
+                            id = "JsonFile"
+                        })
+                </div>
+
+                @Html.Partial("~/Views/Document/ElectronicDocumentActions.cshtml", Model.DocActions)
+
+                @if (Model.FileSignatureStatus == 2)
+                {
+                    <div class="col-md-1">
+                        <img src="~/Areas/Smdo/Scripts/certificateAz.svg" height="35" width="35" title="Sənəd imzalanıb" />
+                    </div>
+                }
+            </div>
+
+            <div class="col-12">
+                <div class="form-group">
+                    <div class="alert alert-light alert-dismissible" id="alertInfo">
+                        <table class="table table-hover table-sm mTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Sənədin nömrəsi</th>
+                                    <th scope="col">Sənədin Tarixi</th>
+                                    <td scope="col">Əməliyyatın növü</td>
+                                    <td scope="col">Əməliyyatı aparan</td>
+                                    <th scope="col">Sənədin qısa məzmunu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@Model.DocEnterNo</td>
+                                    <td>@Model.DocEnterDate.Value.ToString("d")</td>
+                                    <td>@Model.ExecuteRule</td>
+                                    <td>@Model.CreaterPersonnelName</td>
+                                    <td>@Model.Description</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @Html.Partial("~/Views/DocInfo/_DocPlan.cshtml", Model.DocPlan)
+
+                    @Html.Partial("~/Views/Document/DocumentQrCode.cshtml", Model)
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12" id="DocViewer">
+        <div class="form-group">
+            @Html.Partial("~/Areas/ServiceLetters/Views/Document/DocumentDisplay.cshtml")
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="signStatus" data-IsDocConfirm="@(Model.DocDocumentStatusId == (int)DocumentStatus.WaitForAccept ? "true" : "false")" />
+<input type="hidden" id="fileSignStatus" data-signStatus="@Model.FileSignatureStatus" />
+
+@Html.Partial("/Views/Modals/_CommonModal.cshtml", Model)
+
+<script>
+    $('#fakeButton').click();
+
+    $("#sendForInformationButton").click(function () {
+        var token = $("#spanToken").html();
+        SendForInformaton(token);
+    });
+
+    function RefreshGrid() {
+        var nameOfObject = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
+
+        if (nameOfObject == 'UnreadDocuments') {
+            var pageIndex = $('#gridDMS').CachedGrid().config.params.pageIndex;
+            $('#gridDMS').bindgrid(pageIndex, undefined);
+            $('.modal').modal('hide');
+        }
+        else {
+            var pageIndex = $('#gridServiceLetters').CachedGrid().config.params.pageIndex;
+            $('#gridServiceLetters').bindgrid(pageIndex, undefined);
+            $('.modal').modal('hide');
+        }
+    }
+
+    $(".closeBtn").click(function () {
+        $(".modalBtn").modal("hide");
+    });
+
+    $("#signatureCloseButton").click(function () {
+        $("#signatureDialogModal").modal("hide");
+    });
+
+    $("#acceptCloseButton").click(function () {
+        $("#acceptModal").modal("hide");
+    });
+
+    $("#HistoryCloseButton").click(function () {
+        $("#operationHistoryDialogModal").modal("hide");
+    });
+
+    $(document).ready(function () {
+        $(".alert").hide();
+
+        $('#DocInfoButton').on("click",function() {
+            $("#alertOperationHistory").hide();
+            $("#alertTask").hide();
+            if ($("#alertInfo").css("display") == "none")
+            {
+                $("#alertInfo").show('medium');
+            }
+            else
+            {
+                $("#alertInfo").hide();
+            }
+        });
+
+        $('#operationHistoryButton').on("click",function() {
+            $("#alertInfo").hide();
+            $("#alertTask").hide();
+            if ($("#alertOperationHistory").css("display") == "none")
+            {
+                $("#alertOperationHistory").show('medium');
+            }
+            else {
+                $("#alertOperationHistory").hide();
+            }
+        });
+
+        $(".close").click(function () {
+            $(".alert").hide();
+        });
+
+        $("#JsonFile").change(function () {
+            var id = $(this).val();
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/ServiceLetters/Document/DocumentDisplay',
+                dataType: 'html',
+                data: { docInfoId: id},
+                success: function (response) {
+                    $("#DocViewer").html(response);
+                }
+            });
+        });
+    });
+</script>

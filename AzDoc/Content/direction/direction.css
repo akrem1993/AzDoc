@@ -1,0 +1,230 @@
+﻿body {
+}
+
+.btn-container {
+    width: 100%;
+    display: block;
+    position: absolute;
+    text-align: center;
+    top: -35%;
+}
+
+.btnDecoration {
+    /*padding: 12px;*/
+    color: #1c5e84;
+    position: relative;
+    display: inline-block;
+    width: 32px;
+    margin-right: 12px;
+    left: unset;
+    transform: translateX(-50%);
+}
+
+    .btnDecoration > i {
+        position: absolute;
+        left: unset;
+        transform: unset;
+    }
+
+
+
+.btn-block:hover {
+    color: #fff !important;
+    background-color: #143a63;
+    border-color: #142c46;
+}
+
+.btn-block {
+    color: #035688;
+    border-color: #035688;
+    width: 156px;
+    font-size: 13px !important;
+}
+
+.jqx-grid-cell-filter {
+    font-weight: normal !important;
+}
+
+#exampleModalCenter {
+    font-size: 14px;
+}
+
+    #exampleModalCenter .bootstrap-select .dropdown-toggle {
+        height: 100%;
+    }
+
+    #exampleModalCenter .checkboxInput {
+        display: flex;
+        align-items: center;
+        height: 100%;
+    }
+
+        #exampleModalCenter .checkboxInput input {
+            min-width: 20px;
+            min-height: 20px;
+            margin-right: 10px;
+        }
+
+        #exampleModalCenter .checkboxInput span {
+            font-size: 15px;
+        }
+
+    #exampleModalCenter .squareBtn {
+        margin-bottom: 10px;
+    }
+
+    #exampleModalCenter .mBtnGroup button {
+        border-radius: 100px;
+        font-size: 12px;
+        padding: 5px 0px;
+        /*width: 49%;*/
+    }
+
+        #exampleModalCenter .mBtnGroup button.mBtn-sec {
+            margin-bottom: 10px;
+        }
+
+
+.squareBtn {
+    background: #7ca4b1;
+    width: 100%;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px 15px;
+    font-size: 13px;
+    box-shadow: 2px 2px 4px 0px #64646478;
+}
+
+.mBtnGroup .mBtn-pr {
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    /*width: 160px;*/
+    padding: 5px 15px;
+    font-size: 14px;
+}
+
+.mBtnGroup .mBtn-sec {
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    /*width: 100px;*/
+    padding: 5px 15px;
+    font-size: 14px;
+    box-shadow: -4px 3px 4px 0px #64646478;
+}
+
+
+@media (max-width: 1370px) {
+    #exampleModalCenter .mBtnGroup {
+        /*text-align: center;*/
+    }
+
+        #exampleModalCenter .mBtnGroup button {
+            border-radius: 100px;
+            font-size: 12px;
+            padding: 5px 0px;
+            /*width: initial;*/
+        }
+    /*#exampleModalCenter .mBtnGroup button.mBtn-sec {
+                    margin-bottom: 10px;
+                }*/
+}
+
+.mModal .modal-content {
+    background: #f0f2fa;
+}
+
+#infoButtonDirection {
+    border: none;
+}
+
+    #infoButtonDirection:focus {
+        outline: none;
+    }
+
+.mModal .modal-content button.close {
+    position: absolute;
+    right: -20px;
+    top: -12px;
+    background: #4f6870;
+    opacity: 1;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    color: white;
+    font-size: 22px;
+    font-weight: 100;
+    transition: all 0.1s;
+}
+
+    .mModal .modal-content button.close:hover {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    .mModal .modal-content button.close:focus {
+        outline: none;
+        opacity: 1;
+    }
+
+.disabled {
+    font-size: 14px;
+    background: #cccccc;
+    box-shadow: none;
+    color: gray;
+    pointer-events: none;
+}
+
+.mBtn[disabled] {
+    font-size: 14px;
+    background: #cccccc;
+    box-shadow: none;
+    color: gray;
+    pointer-events: none;
+}
+
+
+#exampleModalCenter .modal-dialog {
+    max-width: 66%;
+}
+
+#exampleModalCenter .change-size {
+    position: absolute;
+    right: 18px;
+    top: -12px;
+    background: #4f6870;
+    opacity: 1;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    color: white;
+    font-size: 14px;
+    font-weight: 100;
+    transition: all 0.1s;
+    border: 0;
+    outline: none;
+}
+
+    #exampleModalCenter .change-size i:last-of-type {
+        display: none
+    }
+
+.full-size .modal-dialog {
+    max-width: initial !important;
+    width: calc(100% - 50px);
+    height: 100%;
+    margin: 0 auto;
+}
+
+    .full-size .modal-dialog .modal-content {
+        height: calc(100vh - 50px);
+    }
+
+.full-size .change-size i:last-of-type {
+    display: block !important;
+}
+
+.full-size .change-size i:first-of-type {
+    display: none;
+}

@@ -1,0 +1,787 @@
+﻿@model Admin.Model.ViewModel.UserInfoWithOtherData
+@using AzDoc.Helpers
+@using Admin.Model.ViewModel
+@using AzDoc.App_LocalResources
+
+@{
+    /**/
+
+    ViewBag.Title = "EditUser";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+    var lang = routeValueDictionary["lang"] ?? "az";
+    var itemCount = 0;
+
+}
+
+<link href="~/Content/adminPanel/bootstrap-datepicker3.css" rel="stylesheet" />
+<link href="~/Content/adminPanel/adminTreeStyle.css" rel="stylesheet" />
+
+<div class="row">
+    <div class="col-12">
+        <div class="headingRow">
+            <h3>@(ViewBag.IsEdit ? "İstifadəçinin redaktəsi" : "Yeni istifadəçinin yaradılması ")</h3>
+        </div>
+    </div>
+</div>
+
+
+<link href="~/Content/jquery-editable-select/jquery-editable-select.min.css" rel="stylesheet" />
+
+<form id="userForm" name="userForm">
+
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            <div class="editGroup">
+
+                <h4>Şəxsi məlumatlar</h4>
+
+                <div class="row">
+
+                    <input type="hidden" name="UserId" value="@Model.UserDetailsWithWorkplaces.UserId" />
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="PersonnelName">Adı</label>
+                            <input data-required="Adı daxil edin" type="text" name="PersonnelName" class="form-control" id="PersonnelName" value="@Model.UserDetailsWithWorkplaces.PersonnelName" />
+                            @*@Html.TextBoxFor(m => m.UserDetailsWithWorkplaces.PersonnelName, new { @class = "form-control", @data_required = "Adı daxil edin" })*@
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="PersonnelSurname">Soyadı</label>
+                            <input data-required="Soyadı daxil edin" type="text" name="PersonnelSurname" class="form-control" id="PersonnelSurname" value="@Model.UserDetailsWithWorkplaces.PersonnelSurname" />
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            @*<label for="PersonnelLastname">Ata adı</label>
+                                @*<input type="text" name="PersonnelLastname" class="form-control" id="PersonnelLastname" value="@Model.UserDetailsWithWorkplaces.PersonnelLastname" />*@
+                            @*@Html.TextBoxFor(m => m.UserDetailsWithWorkplaces.PersonnelLastname, new { @class = "form-control", @data_required = "Ata adını daxil edin" })*@
+                            <label for="PersonnelLastname">Ata adı</label>
+                            <input data-required="Ata adını daxil edin" type="text" name="PersonnelLastname" class="form-control" id="PersonnelLastname" value="@Model.UserDetailsWithWorkplaces.PersonnelLastname" />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="UserDetailsWithWorkplaces.PersonnelBirthdate">Doğum tarixi</label>
+                            <input type="date" name="PersonnelBirthdate" class="form-control"  id="PersonnelBirthdate" value="@(Model.UserDetailsWithWorkplaces.PersonnelBirthdate?.ToString("yyyy-MM-dd"))"  />
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label name="SexName" for="SexName">Cinsi</label>
+                            <select class="form-control" name="PersonnelSexId" id="SexId">
+                                <option value="1" @(Model.UserDetailsWithWorkplaces.PersonnelSexId == 1 ? "selected" : "")>Kişi</option>
+                                <option value="2" @(Model.UserDetailsWithWorkplaces.PersonnelSexId == 2 ? "selected" : "")>Qadın</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="WorkId">İş nömrəsi</label>
+                            <input type="text" name="PersonnelPhone" class="form-control" value="@Model.UserDetailsWithWorkplaces.PersonnelPhone" />
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="PersonnelEmail">E-poçt</label>
+                            <input type="text" name="PersonnelEmail" class="form-control custom sum sum-out ng-dirty ng-valid ng-valid-sl-number" id="PersonnelEmail" value="@Model.UserDetailsWithWorkplaces.PersonnelEmail" />
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="PersonnelMobile">Mobil nömrəsi</label>
+                            <input type="text" name="PersonnelMobile" class="form-control" id="PersonnelMobile" value="@Model.UserDetailsWithWorkplaces.PersonnelMobile" />
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="PersonnelMobile">Fin</label>
+                            <input type="text" name="UserFin" class="form-control" id="UserFin"  value="@Model.UserDetailsWithWorkplaces.UserFin"/>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+                <br />
+            </div>
+
+            <div class="editGroup">
+                <h4>Giriş məlumatları</h4>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            @*<label>İstifadəçi adı</label>*@
+                            @*<input type="text" name="UserName" class="form-control" value="@(Model.UserDetailsWithWorkplaces?.UserName)" style="margin-top:16px;" />*@
+                            @*@Html.TextBoxFor(m => m.UserDetailsWithWorkplaces.UserName, new { @class = "form-control", @data_required = "İstifadəçi adını daxil edin", @style = "margin-top:10x;" })*@
+                            <input data-required="İstifadəçi adını daxil edin" type="text" name="UserName" class="form-control" value="@(Model.UserDetailsWithWorkplaces?.UserName)" style="margin-top:16px;" />
+                        </div>
+                    </div>
+
+                    @if (ViewBag.IsEdit)
+                    {
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label>Parolu sıfırla</label> <br />
+                                <button id="passwordResetButton" type="button" class="btn btn-secondary" style="margin-top:16px;border-radius: 22px;">Parolu sıfırla</button>
+                            </div>
+                        </div>
+                    }
+
+                    @if (ViewBag.IsEdit)
+                    {
+
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label style="margin:0;">Status</label> <br />
+                                <label class="mSwitch">
+                                    <input id="userStatusBtn" type="checkbox" name="UserStatus" @(Model.UserDetailsWithWorkplaces.UserStatus ? "checked" : "")>
+                                    <span class="switch-left"><i class="fas fa-lock-open"></i></span>
+                                    <span class="switch-right"><i class="fas fa-lock"></i></span>
+                                </label>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+
+
+            </div>
+
+
+            <div class="workplaceContainer">
+
+                @foreach (var item in Model.UserDetailsWithWorkplaces.JsonWorkPlace)
+                {
+                    itemCount++;
+                    @Html.Partial("PositionViewPartial", new EditPositionPartialViewModel
+               {
+                   DeptPositionViewModels = item.DepartmentPositions,
+                   DeptViewModels = item.Departments,
+                   SectosViewModels = item.Sectors,
+                   OrgViewModels = item.Organisations,
+                   PositionIndex = itemCount,
+                   Roles = item.AllRoles,
+                   UserWorkPlace = item,
+                   IsInitial = ViewBag.IsEdit,
+                   Structures = Model.Structures
+               })
+                }
+
+
+            </div>
+
+
+
+
+        </div>
+        <br />
+    </div>
+
+    <div class="row mb-5 pb-5 mt-4">
+        <div class="col-12 text-center">
+            <button type="button" class="mBtn mBtn-sec mr-2" onclick="window.history.go(-1); return false;">
+                @RLang.PrevStep
+            </button>
+            <button id="submitForm" type="button" class="mBtn mBtn-pr next-step">
+                @RLang.Save
+            </button>
+        </div>
+    </div>
+</form>
+
+
+
+
+<script src="~/Scripts/jquery-editable-select/jquery-editable-select.min.js?v=@AppVersion.Version"></script>
+<script src="~/Scripts/adminPanel/bootstrap-datepicker.min.js"></script>
+<script src="~/Scripts/adminPanel/bootstrap-datepicker.az.min.js"></script>
+
+<script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+
+<script>
+
+
+
+
+
+    $(document).on("click", ".searchSelectTree .form-control",function () {
+        var currentClciked = $(this);
+        $(this).next().slideToggle('fast');
+        $(document).click(function (e) {
+            if (!$(e.target).closest(currentClciked).length && !$(e.target).closest($(currentClciked).next()).length) {
+                $(currentClciked).next().slideUp('fast');
+            }
+        })
+    })
+    $(".searchSelectTree .downContent a").click(function(e) {
+        e.preventDefault();
+    });
+
+
+
+
+
+
+    $(document).on("click", ".treeListContent .drop>i.fas", function ()
+        {
+            var angle = $(this);
+             if ($(this).hasClass("fa-angle-right")) {
+                $(this).removeClass("fa-angle-right");
+                $(this).addClass("fa-angle-down");
+            }
+            else {
+                $(this).addClass("fa-angle-right");
+                $(this).removeClass("fa-angle-down");
+            }
+            if ($(this).attr("has-department") == 'True' && $(this).attr("has-opened") == 'False')
+            {
+             angle.attr("has-opened", "True");
+             var org_id = $(this).attr("struct-id");
+             var values = { orgId: org_id};
+             $.ajax({
+                 url: '/@lang/AdminPanel/OrganizationStructure/GetDepartmentTreeByOrgId',
+                 type: 'POST',
+                 data: JSON.stringify(values),
+                 contentType: 'application/json; charset=utf-8',
+                 success: function (response) {
+                     angle.siblings(".down").children(":first").prepend(response.Data);
+                 },
+                 beforeSend: function () {
+                 },
+                 complete: function () {
+                     //angle.next().next().slideToggle('fast');
+                 }
+             });
+            }
+            $(this).next().next().slideToggle('fast');
+        });
+    //$(".searchSelectTree li a").click(function () {
+    //    var inputTxt = $(this).text();
+    //    $(".searchSelectTree .form-control .span").text(inputTxt);
+    //    $(this).parents(".searchSelectTree").find(".downContent").slideUp();
+    //});
+    $(document).on("click", ".searchSelectTree li a", function (e) {
+        e.preventDefault();
+        var inputTxt = $(this).text();
+        var structId = $(this).attr("struct-id");
+        var structType = $(this).attr("struct-type");
+        if (structType !== '0') {
+            getDepatmentPositionsByDeprtmentId(structId,$(this));
+            $(this).parents(".searchSelectTree").find(".span").text(inputTxt);
+            $(this).parents(".searchSelectTree").prev().val(structId);
+            $(this).parents(".searchSelectTree").find(".downContent").slideUp();
+
+            $("#selectedTreeView").text('');
+
+            var selectedTreeViewContent = [];
+            var labelText = '';
+            selectedTreeViewContent = $(this).parents(".down");
+            for (let i = selectedTreeViewContent.length - 1; i >= 0; i--) {
+                if ($(selectedTreeViewContent[i]).prev('a').length) {
+                    labelText += $(selectedTreeViewContent[i]).prev().text() + "<i class='fas fa-angle-double-right mr-2 ml-2'></i>";
+
+                }
+            }
+            labelText += $(this).text();
+            $("#selectedTreeView").append(labelText);
+        //   $("#selectedTreeView").text('')
+
+        //var selectedTreeViewContent = [];
+        //var labelText = ''
+        //selectedTreeViewContent = $(this).parents(".down")
+        //for (let i = selectedTreeViewContent.length - 1; i >= 0; i--) {
+        //    if ($(selectedTreeViewContent[i]).prev('a').length) {
+        //        labelText += $(selectedTreeViewContent[i]).prev().text() + "<i class='fas fa-arrow-right mr-2 ml-2'></i>";
+        //    }
+        //}
+        //labelText += $(this).text();
+        //$("#selectedTreeView").append(labelText)
+        }
+        else
+        {
+            toastr.info("Yalnız sektor, şöbə və ya departament seçmək olar");
+        }
+    });
+
+    
+
+    $(document).ready(function () {
+        var count = 0;
+
+
+        //user validations
+        //$('#submitForm').on('click',
+        //    function (e) {
+        //        var required = $("[data-required]");
+
+        //        $.each(required,
+        //            function () {
+        //                if (!$(this).val()) {
+        //                    $(this).css("border", "1px solid red").css("border-radius", ".25rem");
+        //                    count++;
+        //                } else {
+        //                    $(this).css("border", "1px solid transparent").css("border-radius", ".25rem");
+        //                }
+        //            });
+        //        if (count > 0) {
+        //            toastr.warning("Bütün məcburi xanaların doldurulduğuna əmin olun.");
+        //            return;
+        //        }
+        //    });
+
+        //_____________________________________________//
+        //_____________________________________________//
+
+        $(".workplaceStatus").click(function ()
+        {
+            var element = $(this);
+
+            var workplace_id = $(this).attr("workplace-id");
+            var workplaceStatus = $(this).attr("status");
+            var workplaceName = $(this).attr("workplace-name");
+
+            var isTruestatus = (workplaceStatus === 'True');
+
+            var message = `${workplaceName} vəzifəsinin statusu uğurla ${isTruestatus ? 'deaktiv edildi' : 'aktiv edildi'}`;
+
+            var values = { workplaceId: workplace_id };
+            $.ajax({
+                url: '/@lang/AdminPanel/OrganizationStructure/UpdateWorkplaceStatus',
+                type: 'POST',
+                data: JSON.stringify(values),
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    if (response) {
+                        element.attr("status", isTruestatus ? "False":"True");
+
+                        toastr.success(message);
+                    }
+                    else {
+                        toastr.error("Xəta baş verdi");
+                    }
+                },
+                beforeSend: function () {
+                    window.ShowLoading();
+                },
+                complete: function () {
+                    window.CloseLoading();
+                }
+            });
+        });
+
+
+
+
+        $("#passwordResetButton").click(function () {
+            var user_id = parseInt('@Model.UserDetailsWithWorkplaces.UserId');
+
+
+            var values = { userId: user_id };
+            $.ajax({
+                url: '/@lang/AdminPanel/OrganizationStructure/ResetUserPassword',
+                type: 'POST',
+                data: JSON.stringify(values),
+                contentType: 'application/json; charset=utf-8',
+                success: function (response) {
+                    if (response) {
+                        toastr.success("İstifadəçi parolu uğurla yeniləndi");
+                    }
+                    else {
+                        toastr.error("Xəta baş verdi");
+                    }
+                },
+                beforeSend: function () {
+                    window.ShowLoading();
+                },
+                complete: function () {
+                    window.CloseLoading();
+                }
+            });
+        });
+
+    });
+
+
+     $("#submitForm").click(function () {
+         var count = 0;
+         var required = $("[data-required]");
+
+                $.each(required,
+                    function () {
+                        if (!$(this).val()) {
+                            $(this).css("border", "1px solid red").css("border-radius", ".25rem");
+                            count++;
+                        } else {
+                            $(this).css("border", "1px solid transparent").css("border-radius", ".25rem");
+                        }
+                    });
+                if (count > 0) {
+                    toastr.warning("Bütün məcburi xanaların doldurulduğuna əmin olun.");
+                    return;
+                }
+
+         $('input:disabled, select:disabled').each(function () {
+             $(this).removeAttr('disabled');
+         });
+
+
+         var form = document.forms.namedItem("userForm");
+         var oData = new FormData(form);
+
+         //if (count === 0) {
+
+
+             $.ajax({
+                 url: "/@lang/AdminPanel/OrganizationStructure/@(ViewBag.IsEdit ? "PostEditUser" : "PostCreateUser")",
+                 type: 'POST',
+                 data: oData,
+                 dataType: 'Json',
+                 contentType: false,
+                 processData: false,
+                 success: function (result) {
+                     if (result.result) {
+                         window.location.reload();
+                     }
+
+
+                 },
+                 error: function (response) {
+                 },
+                 beforeSend: function () {
+
+                     window.ShowLoading();
+                 },
+                 complete: function () {
+                     window.CloseLoading();
+                 }
+             });
+         //}
+
+    });
+
+
+
+
+
+
+    $(document).on('changed.bs.select', 'Select.organizationSelect', function () {
+
+
+       var updatedSelect = $(this).parents(".orgGroup").next().find("select.DepartmentMainId");
+       var deptPositions =  updatedSelect.parents(".deptGroup").next().find("select.DepartmentPositionId");
+
+
+
+        var org_id = $(this[this.selectedIndex]).val();
+
+        var values = {orgId: org_id};
+             $.ajax({
+                 url: '/@lang/AdminPanel/OrganizationStructure/GetDepatmentsByOrganisationId',
+                 type: 'POST',
+                 data: JSON.stringify(values),
+                 contentType: 'application/json; charset=utf-8',
+                 success: function (response) {
+
+                     updatedSelect.empty();
+                     deptPositions.empty();
+                     updatedSelect.append($('<option>', {
+                         value: '',
+                         text: 'Seçin'
+                     }));
+                     $.each(response, function (i, item) {
+
+                         updatedSelect.append($('<option>', {
+                             value: item.Id,
+                             text: item.Name
+                         }));
+                     });
+                     $('.selectpicker').selectpicker('refresh');
+                 },
+                 beforeSend: function () {
+                     window.ShowLoading();
+                 },
+                 complete: function () {
+                     window.CloseLoading();
+                 }
+             });
+
+    });
+
+
+    $(document).on('changed.bs.select', 'Select.DepartmentMainId', function () {
+
+
+        var updatedSelectDept = $(this).parents(".deptGroup").next().find("select.SectorMainId");
+        var updatedSelectPosition = updatedSelectDept.parents(".sectorGroup").next().find("select.DepartmentPositionId");
+
+        var dept_id = $(this[this.selectedIndex]).val();
+
+        var values = { deptId: dept_id};
+             $.ajax({
+                 url: '/@lang/AdminPanel/OrganizationStructure/GetSectorsByDeptId',
+                 type: 'POST',
+                 data: JSON.stringify(values),
+                 contentType: 'application/json; charset=utf-8',
+                 success: function (response) {
+
+                     updatedSelectDept.empty();
+                     updatedSelectPosition.empty();
+
+                     updatedSelectDept.append($('<option>', {
+                         value: '',
+                         text: 'Seçin'
+                     }));
+
+                     $.each(response.departments, function (i, item) {
+
+                         updatedSelectDept.append($('<option>', {
+                             value: item.Id,
+                             text: item.Name
+                         }));
+                     });
+
+                     $.each(response.positions, function (i, item) {
+
+                         updatedSelectPosition.append($('<option>', {
+                             value: item.Id,
+                             text: item.Name
+                         }));
+                     });
+
+                     $('.selectpicker').selectpicker('refresh');
+                 },
+                 beforeSend: function () {
+                     window.ShowLoading();
+                 },
+                 complete: function () {
+                     window.CloseLoading();
+                 }
+             });
+
+    });
+
+
+
+
+    /////////////////
+
+
+
+
+    $(document).on('click', '#userStatusBtn', function () {
+
+
+        Swal.fire({
+            title: '@(Model.UserDetailsWithWorkplaces.PersonnelName) adlı istifadəçinin status dəyişdirilsinmi?',
+            type: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'Ləğv et',
+            confirmButtonText: 'Təsdiqlə'
+        }).then((result) => {
+            if (result.value) {
+
+                var user_id = parseInt('@Model.UserDetailsWithWorkplaces.UserId');
+
+
+                var values = { userId: user_id };
+                $.ajax({
+                    url: '/@lang/AdminPanel/OrganizationStructure/ChangeUserStatus',
+                    type: 'POST',
+                    data: JSON.stringify(values),
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (response) {
+                        if (response) {
+                            Swal.fire({
+                                type: 'success',
+                                title: '@(Model.UserDetailsWithWorkplaces.PersonnelName) adlı istifadəçinin status uğurla dəyişdirildi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        }
+                        else {
+                            toastr.error("Xəta baş verdi");
+                        }
+                    },
+                    beforeSend: function () {
+                        window.ShowLoading();
+                    },
+                    complete: function () {
+                        window.CloseLoading();
+                    }
+                });
+            }
+        });
+    });
+
+
+
+
+
+
+
+    ////////////////////////
+
+
+
+
+
+    @*$(document).on('changed.bs.select', 'Select.SectorMainId', function () {
+
+
+        var updatedSelect = $(this).parents(".sectorGroup").next().find("select.DepartmentPositionId");
+
+        var dept_id = $(this[this.selectedIndex]).val();
+
+        var values = { deptId: dept_id};
+             $.ajax({
+                 url: '/@lang/AdminPanel/OrganizationStructure/GetDepatmentPositionsByDeprtmentId',
+                 type: 'POST',
+                 data: JSON.stringify(values),
+                 contentType: 'application/json; charset=utf-8',
+                 success: function (response) {
+
+                     updatedSelect.empty();
+                     updatedSelect.append($('<option>', {
+                         value: '',
+                         text: 'Seçin'
+                     }));
+                     $.each(response, function (i, item) {
+
+                         updatedSelect.append($('<option>', {
+                             value: item.Id,
+                             text: item.Name
+                         }));
+                     });
+                     $('.selectpicker').selectpicker('refresh');
+                 },
+                 beforeSend: function () {
+                     window.ShowLoading();
+                 },
+                 complete: function () {
+                     window.CloseLoading();
+                 }
+             });
+
+    });*@
+
+
+
+    function getDepatmentPositionsByDeprtmentId(dept_id,element)
+    {
+        var updatedSelect = element.parents(".col-sm-12").next().find("select.DepartmentPositionId");
+             var values = { deptId: dept_id};
+             $.ajax({
+                 url: '/@lang/AdminPanel/OrganizationStructure/GetDepatmentPositionsByDeprtmentId',
+                 type: 'POST',
+                 data: JSON.stringify(values),
+                 contentType: 'application/json; charset=utf-8',
+                 success: function (response) {
+
+                     updatedSelect.empty();
+                     updatedSelect.append($('<option>', {
+                         value: '',
+                         text: 'Seçin'
+                     }));
+                     $.each(response, function (i, item) {
+
+                         updatedSelect.append($('<option>', {
+                             value: item.Id,
+                             text: item.Name
+                         }));
+                     });
+                     $('.selectpicker').selectpicker('refresh');
+                 },
+                 beforeSend: function () {
+                     window.ShowLoading();
+                 },
+                 complete: function () {
+                     window.CloseLoading();
+                 }
+             });
+    }
+
+    var rowIndex = parseInt("@Model.UserDetailsWithWorkplaces.JsonWorkPlace.Count()");
+
+    $(document).on("click", ".removeWorkplaceBtn", function ()
+    {
+        $(this).parent().parent().remove();
+        rowIndex--;
+    });
+
+    $(document).ready(function () {
+
+        $(".addWorkplaceBtn").click(function () {
+
+            rowIndex++;
+
+            var values = { positionIndex: rowIndex, userId:'@Model.UserDetailsWithWorkplaces.UserId'};
+             $.ajax({
+                 url: '/@lang/AdminPanel/OrganizationStructure/GetPositionPartial',
+                 type: 'POST',
+                 data: JSON.stringify(values),
+                 contentType: 'application/json; charset=utf-8',
+                 success: function (response) {
+                     $(".workplaceContainer").append(response);
+
+                     $('select').selectpicker();
+                 },
+                 beforeSend: function () {
+                     window.ShowLoading();
+                 },
+                 complete: function () {
+                     window.CloseLoading();
+                 }
+
+             });
+
+        });
+
+
+            //$(".dateTime").datepicker({
+            //    format: "DD.MM.YYYY",
+            //    //language: "az",
+            //    autoclose: true,
+            //    todayHighlight: true,
+            //    toggleActive: true,
+            //    //endDate: new Date(),
+            //    orientation: "auto"
+            //});
+
+        var date = new Date();
+        var maxYear = date.getFullYear() - 18;
+        var minYear = date.getFullYear() - 89;
+
+
+        //$('input[name="PersonnelBirthdate1"]').daterangepicker({
+        //    singleDatePicker: true,
+        //    showDropdowns: true,
+        //    "minYear": minYear,
+        //    "maxYear": maxYear,
+        //    "showWeekNumbers": true,
+        //    "autoApply": true,
+        //    locale: {
+        //        firstDay: 1,
+        //        format: 'DD.MM.YYYY'
+        //    }
+        //}, function(start, end, label) {
+        //});
+
+
+
+
+
+    });
+
+
+
+
+
+
+</script>

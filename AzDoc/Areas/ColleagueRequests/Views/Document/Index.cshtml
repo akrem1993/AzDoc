@@ -1,0 +1,314 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@using InsDoc.Model.EntityModel
+@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+    var docType = SessionHelper.DocTypeId;
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+
+}
+
+@{
+    Html.RenderPartial("PanelViewPartial");
+}
+@Html.AntiForgeryToken()
+<div class="col-md-12" id="DocGrid" style="padding-top: 10px; height: 86vh">
+    @Html.Action("GetGridView")
+</div>
+
+<link href="~/Content/fontawesome/css/all.min.css" rel="stylesheet" />
+<link href="~/Content/fontawesome/css/v4-shims.min.css" rel="stylesheet" />
+
+<div id="popover-content-ActionName">
+</div>
+
+
+
+
+
+<div class="mModal">
+    <div class="modal fade" id="doubleClickModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document" style="max-width: 75% !important">
+
+            <div class="modal-content" style="background: #ffffff">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>@ViewData["DocTypeName"]</span>
+                </div>
+                <div class="modal-header3">
+                    <div class="row no-gutters" style="border-bottom:1px solid #8080805e; margin: 0 1rem">
+                        <div class="col-6">
+                            <a href="#ElectronicDocument" class="individual active" id="docElectronic">
+                                @RLang.EDocumentsView
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#DocInfo" class="juridical" id="docDocInfo">
+                                @RLang.RegistrationForm
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+
+                    <form class="indForm" id="ElectronicDocument"></form>
+
+                    <form class="jurForm d-none" id="DocInfo"></form>
+
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" data-dismiss="modal">@RLang.Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("/Views/Modals/_SendDocumentModal.cshtml")
+@Html.Partial("/Views/Modals/_SendForInformationModal.cshtml")
+
+@section scripts{
+    <script>
+        $(document).on("click",
+            ".popoverAction",
+            function() {
+                var actionId = this.id;
+                var requestToken =  $("#spanToken").html();
+                var elementDocId = $("#DocActionsPopover").attr('class');
+
+                if (elementDocId == null || elementDocId < 1)
+                    return;
+                console.log('go to operation');
+                DocumentOperation(actionId, elementDocId, requestToken);
+            });
+
+        function DocumentOperation(actionId, docId, requestToken) {
+
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            if (actionId == 1) {
+                SendDocumnet();
+            }
+
+            if (actionId == 2) {
+                window.location = `/@_lang/ColleagueRequests/Document/EditDocument?token=${requestToken}`;
+            }
+
+            if (actionId == 3) {
+                $.ajax({
+                    type: 'POST',
+                    url: `/@_lang/ColleagueRequests/Operation/RecognizedDocument?token=${requestToken}`,
+                    dataType: 'json',
+                    data: { __RequestVerificationToken: token, description: null },
+                    success: function() {
+                        var pageIndex = $('#gridColleagueRequests').CachedGrid().config.params.pageIndex;
+                        $('#gridColleagueRequests').bindgrid(pageIndex, undefined);
+                    }
+                });
+            }
+
+            if (actionId == 4) {
+                SendForInformaton(requestToken);
+            }
+
+            if (actionId == 8) {
+                $.ajax({
+                    url: '/@_lang/Direction/DirectionModal',
+                    type: 'GET',
+                    dataType: 'html',
+                    data: { docId: docId },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function(response) {
+                        $('#dynamiccontext').html(response);
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+
+            if (actionId == 11) {
+                            window.location = `/@_lang/ServiceLetters/Document/AnswerByLetter?token=${requestToken}`;
+            }
+
+
+            if (actionId == 12) {
+                 window.location = `/@_lang/ServiceLetters/Document/RelateDocumentByServiceLetter?token=${requestToken}`;
+            }
+
+
+            if (actionId == 13) {
+                 window.location = `/@_lang/outgoing/Document/AnswerByOutgoingDoc?token=${requestToken}`;
+            }
+            if (actionId == 14) {
+                window.location = `/@_lang/outgoing/Document/RelatedDocByOutgoingDoc?token=${requestToken}`;
+            }
+
+
+            if (actionId == 18) {
+                $.ajax({
+                    url: '/@_lang/Direction/ChangeMainExecutor',
+                    type: 'GET',
+                    dataType: 'html',
+                    data: { docId: docId },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function (response) {
+                            if (response == "false")
+                        {
+                            return toastr.warning("Sənədin icra müddəti gecikib");
+                        }
+                        $('#dynamiccontext').html(response);
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+            if (actionId == 19) {
+                $.ajax({
+                    url: '/@_lang/Direction/ChangeExecutionDate',
+                    type: 'GET',
+                    dataType: 'html',
+                    data: { docId: docId },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function(response) {
+                        $('#dynamiccontext').html(response);
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+        }
+
+        function GetPopoverActions(item, boundData) {
+            $.ajax({
+                type: 'GET',
+                url: '/@_lang/ColleagueRequests/Document/GetDocumentActions',
+                dataType: 'html',
+                data: { docId: boundData.DocId, menuTypeId: 0, executorId: boundData.ExecutorId },
+                success: function(data) {
+                    $(item).popover({
+                        html: true,
+                        content: data,
+                        container: "html",
+                        trigger: "focus"
+                    });
+
+                    $(item).popover('show');
+                }
+            });
+        }
+
+
+        function DocView(item, boundData) {
+            $.ajax({
+                type: 'GET',
+                url: '/@_lang/Document/DocInfo',
+                dataType: 'json',
+                data: { docId: boundData.DocId },
+                success: function(result) {
+                    if (result != '') {
+                        window.open('/@_lang/Document/GetDocView?token=' + result, '_blank');
+                    }
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+        }
+
+        function onFilter(sender, args, query) {
+            $('#gridColleagueRequests').bindgrid(1);
+
+        }
+
+        function checkUnread(boundData) {
+            return boundData.ExecutorControlStatus === false;
+        }
+
+        function GridRowDoubleClick(event, rowdata) {
+            $.ajax({
+                type: 'GET',
+                url: '/@_lang/ColleagueRequests/Document/ElectronicDocument',
+                dataType: 'html',
+                data: { docId: rowdata.DocId, executorId: rowdata.ExecutorId },
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                success: function(response) {
+                    $('#ElectronicDocument').html(response);
+                    $(`[title='${rowdata.DocId}']`).closest('[role="row"]').removeClass('unread');
+                    $("#doubleClickModal").modal();
+
+
+                    $.ajax({
+                        type: 'GET',
+                        url: '/@_lang/Document/DocInfo',
+                        dataType: 'json',
+                        data: { docId: rowdata.DocId },
+                        success: function(result) {
+                            if (result != '') {
+                                $.ajax({
+                                    type: 'GET',
+                                    url: '/@_lang/Document/GetDocView'.buildUrl({ token: result }),
+                                    dataType: 'html',
+                                    success: function(docInfoView) {
+                                        window.CloseLoading();
+                                        $('#DocInfo').html(docInfoView);
+                                    }
+                                });
+                            }
+                        },
+                        complete: function() {
+                            window.CloseLoading();
+                        }
+                    });
+
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+        }
+
+        $(function() {
+
+            var $contextMenu = $("#contextMenu");
+
+            $("body").on("contextmenu",
+                "#DocGrid",
+                function(e) {
+                    $contextMenu.css({
+                        display: "block",
+                        left: e.pageX,
+                        top: e.pageY
+                    });
+                    return false;
+                });
+
+            $('html').click(function() {
+                $contextMenu.hide();
+            });
+
+        });
+
+        $("#Period").change(function() {
+            $('#gridColleagueRequests').setRouteValue({ 'periodId': $(this).val() });
+            $('#gridColleagueRequests').bindgrid(1);
+        });
+    </script>
+
+}

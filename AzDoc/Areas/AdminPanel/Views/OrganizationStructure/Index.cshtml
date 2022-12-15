@@ -1,0 +1,89 @@
+﻿@using Admin.Model.EntityModel;
+@using Widgets
+@model List<Structure>
+@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+    RouteData routeData = ViewContext.RouteData;
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+    var _lang = routeValueDictionary["lang"] ?? "az";
+}
+@{
+    Html.RenderPartial("PanelViewPartial");
+}
+@Html.AntiForgeryToken()
+<link href="~/Content/adminPanel/adminTreeStyle.css" rel="stylesheet" />
+<div class="row" style="margin-top:20px;">
+    <div class="col-md-3" id="DocTree" style="height: 86vh">
+
+        <div class="downContent treeListContent" style="max-height:750px; margin-top:13px;">
+            <div class="drop">
+                <div class="down">
+
+                    <ul>
+                        @Html.Partial("GetOrgTree2", new StructTree { Structures = Model, ParentId = Model.FirstOrDefault()?.ParentID })
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8" id="DocGrid" style="padding-top: 10px; height: 86vh">
+        
+        @Html.Action("GetUserStatistics", "OrganizationStructure")
+        
+        @Html.Partial("GridViewPartial")
+    </div>
+</div>
+
+
+@section scripts
+{
+    <script>
+        $(document).on("click",
+            ".treeListContent .drop>i.fas",
+            function() {
+                var angle = $(this);
+                if ($(this).hasClass("fa-angle-right")) {
+                    $(this).removeClass("fa-angle-right");
+                    $(this).addClass("fa-angle-down");
+                } else {
+                    $(this).addClass("fa-angle-right");
+                    $(this).removeClass("fa-angle-down");
+                }
+                $(this).next().next().slideToggle('fast');
+            });
+
+        function UserEdit(item, boundData) {
+            window.location = '/az/AdminPanel/OrganizationStructure/GetEditUser?userId=' + boundData.UserId;
+        }
+
+        function UserView(item, boundData) {
+            window.open('/az/AdminPanel/OrganizationStructure/GetUserView?userId=' + boundData.UserId, '_blank');
+        }
+
+        function onFilter(sender, args, query) {
+            $('#gridOrganizationStructure').bindgrid(1);
+
+        }
+
+        function GetUser(element) {
+            var structType = $(element).attr("struct-type");
+            var structId = $(element).attr("struct-id");
+
+            $.ajax({
+                url: "/@_lang/AdminPanel/OrganizationStructure/GetUserStatistics",
+                type: 'GET',
+                data: { orgId: structId },
+                contentType: 'html',
+                success: function (response) {
+                    
+                    $('#userStatisticsTable').html(response);
+                }
+                
+            });
+            $('#gridOrganizationStructure').setRouteValue({ structType: structType, structId: structId });
+            $('#gridOrganizationStructure').bindgrid(1);
+
+
+        }
+    </script>
+}

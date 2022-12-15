@@ -1,0 +1,114 @@
+﻿@{
+    //ViewBag.Title = "View";
+    //Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>GetMailView</title>
+    <link href="~/Content/bootstrap/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-md-6">
+                    <form method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label>Attachments</label>
+                            <input class="form-control" type="file" name="filesForSend" id="filesForSend" multiple />
+                        </div>
+                        <div class="form-group">
+                            <label>Mail Adress</label>
+                            <input type="text" class="form-control" name="mailAdress" id="mailAdress" />
+                        </div>
+                        <div class="form-group">
+                            <button type="button" class="btn btn-info" id="btnSubmit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <button id="sendAck" class="form-control">Send kvitansiya</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="messageBox" class="form-control">
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="~/Scripts/jquery/jquery-3.3.1.min.js"></script>
+    <script async src="~/Scripts/toastr/toastr.min.js"></script>
+    <script>
+        $(document).ajaxError(function (e, xhr, settings, exception) {
+            if (xhr != null) {
+                console.log('Status:' + xhr.status + ',Message:' + xhr.responseText);
+                toastr.error(xhr.responseText);
+            }
+        });
+
+        $(document).ready(function () {
+
+
+            $('#btnSubmit').click(function () {
+
+                var data = new FormData();
+
+                var filesLength = $('#filesForSend').get(0).files.length;
+
+                for (var x = 0; x < filesLength; x++) {
+                    data.append("filesForSend", $('#filesForSend').get(0).files[x]);
+                }
+
+                data.append("mailAddress", $('#mailAdress').val());
+
+                $.ajax({
+                    type: "POST",
+                    url: 'Smdo/mail/SendDocument',
+                    data: data,
+                    //dataType: dataType,
+                    contentType: false,
+                    processData: false,
+                    success: function (respData) {
+                        if (respData) {
+                            toastr.success(respData.message);
+                        }
+                    }
+                });
+            });
+
+            $('#sendAck').click(function () {
+
+                $.ajax({
+                    type: "GET",
+                    url: 'smdo/mail/SendAcknowledgment',
+                    dataType: "json",
+                    success: function (respData) {
+                        if (respData) {
+                            toastr.success(respData.message);
+                        }
+                    }
+                });
+
+            });
+
+
+
+        });
+
+
+    </script>
+</body>
+</html>

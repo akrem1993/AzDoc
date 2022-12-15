@@ -1,0 +1,216 @@
+﻿@{
+    ViewBag.Title = "AddNewDocument";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+}
+
+
+<link href="~/Content/common/style.css" rel="stylesheet" />
+
+<style>
+    .isChecked {
+        background: #ddd;
+    }
+
+    .check {
+        pointer-events: none;
+    }
+
+    .tr-header > th, #tr > td {
+        border: #ccc solid 1px;
+        text-align: center !important;
+        vertical-align: middle;
+    }
+
+    #ShortContent {
+        height: 100px !important;
+    }
+
+    .btn-light {
+        color: #212529;
+        background-color: #f8f9fa;
+        border-color: #cccccc !important;
+    }
+
+    .tableRelated {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+        text-align: left !important;
+        height: 200px;
+        display: block;
+        overflow: scroll
+    }
+
+    .tr-header-related > th, #tr > td {
+        border: #ccc solid 1px;
+        text-align: left !important;
+        vertical-align: middle;
+    }
+
+    /*.form-control, .btn{
+        font-size: 0.8rem !important;
+    }*/
+    /*.card-body {
+        padding: 0.5rem !important;
+    }*/
+
+    .card-header-custom {
+        background-color: #5c91af !important;
+        padding: 0.4em 1.25rem !important;
+    }
+
+    .icon-size {
+        font-size: 1.2em;
+    }
+</style>
+
+
+<div class="col-12">
+    <div class="row breadCrumbRow mt-5">
+        <div class="col-4 text-center" id="basicInformation">
+            <a href="#step1" class="brActive" data-brcrumb="1">
+                @RLang.BasicInfo
+            </a>
+        </div>
+        <div class="col-4 text-center " id="tasks">
+            <a href="#step2" data-brcrumb="2">Tapşırıqlar</a>
+        </div>
+        <div class="col-4 text-center" id="attachmentDocuments">
+            <a href="#step3" data-brcrumb="3">@RLang.EDocuments</a>
+        </div>
+    </div>
+</div>
+@using(Html.BeginForm("CreateDocument", "Operation", FormMethod.Post, new { id = "AddNewDocument" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            @Html.Partial("BasicInformationPartial")
+        </div>
+        <div class="mainEdit contentItem d-none" id="step2" style="padding-top:1px" data-brnum="2">
+            @Html.Partial("DocumentInformationPartial")
+        </div>
+        <div class="connectDoc contentItem d-none" id="step3" style="padding-top:1px" data-brnum="3">
+            @Html.Partial("~/Views/Document/AttachmentDocumentsPartial.cshtml")
+        </div>
+    </div>
+
+}
+
+@section scripts{
+    <script>
+
+        $("#ParentButton").click(function() {
+
+            if ($(".table-custom").find("tr.rowSelector").length === 0) {
+                return toastr.warning(" Qoşma sənədi daxil edin.");
+            }
+
+            var isMainCount = 0;
+            var pageCopyCount = 0;
+
+            $.each($("input[name='isMain']"),
+                function() {
+                    if ($(this).attr('checked') === 'checked') {
+                        ++isMainCount;
+                    }
+                });
+
+            $.each($("i[name='icon']"),
+                function() {
+                    if ($.trim($(this).text()) === "") {
+                        $(this).closest("span").css('border', '1px solid red');
+                        ++pageCopyCount;
+                    }
+                });
+
+            if (isMainCount === 0) {
+                $.each($("input[name='isMain']"),
+                    function() {
+                        $(this.parentElement).css('border', 'solid red 1px');
+                    });
+                toastr.warning("Bütün məcburi xanaların doldurulduğuna əmin olun.");
+            }
+
+            if (isMainCount !== 0 && pageCopyCount === 0) {
+                var token = $('input[name="__RequestVerificationToken"]').val();
+                var fileInfoId = $('#fileInfoId').val();
+                var formData = $('#AddNewDocument').getFormData();
+                formData.RelatedDocModels = $('#relatedDocTable').tableToJsonList();
+                formData.TaskFormModels = $('#taskTable').tableToJsonList();
+                formData.RedirectPersonInput = $('#tableRedirectPersons').tableToJsonList();
+                formData.VizaDataJson = JSON.stringify(vizaPersonList);
+
+                console.log(formData);
+                $.ajax({
+                    type: 'POST',
+                    url: '/@_lang/InsDoc/Operation/CreateDocument',
+                    dataType: 'json',
+                    data: { __RequestVerificationToken: token, model: formData, fileInfoId: fileInfoId },
+                    beforeSend: function () {
+                        window.ShowLoading();
+                    },
+                    success: function(response) {
+                        if (response === 1)
+                            window.location = '/@_lang/InsDoc';
+                        else if (response === -1)
+                            toastr.warning("Qurum rəhbərini vizaya əlavə edin.");
+                    },
+                    complete: function () {
+                        window.CloseLoading();
+                    }
+                });
+            }
+        });
+
+
+        function deleteRowRelated(relatedId, element) {
+            Swal.fire({
+                title: 'Bu sətir cədvəldən silinəcək',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Ləğv et',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+                    if (!DeleteAnswerDoc(element)) {
+                        $(element).closest("tr").remove();
+                        $("#relatedDocTable").find("tr.rowSelector").length == 0
+                            ? $("#relatedDocTable").hide()
+                            : "";
+                        $("#answerDocTable").find("tr.rowSelector").length == 0
+                            ? $("#answerDocTable").hide()
+                            : "";
+
+                        Swal.fire({
+                            type: 'success',
+                            title: 'Məlumat silindi',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                    } else {
+                        Swal.fire({
+                            type: 'error',
+                            title: 'Xəta baş verdi.',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                    }
+                }
+            });
+        }
+
+    </script>
+
+    <script src="~/Scripts/insdoc/form-wizard.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/insdoc/insdoc.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/AttachmentFile.js?v=@AppVersion.Version"></script>
+}

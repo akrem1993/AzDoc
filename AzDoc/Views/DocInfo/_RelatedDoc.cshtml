@@ -1,0 +1,33 @@
+﻿@using BLL.Models.DocInfo
+@using AzDoc.Helpers
+@model IEnumerable<RelatedDoc>
+
+@if (Model?.Count() > 0)
+{
+    <div class="col-md-12">
+        <h4 class="text-center">Əlaqəli sənəd</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col" class="thead">Qeydiyyat nömrəsi</th>
+                    <th scope="col" class="thead">Qeydiyyat tarixi	</th>
+                    <th scope="col" class="thead">Haradan daxil olub</th>
+                    <th scope="col" class="thead">Sənədin məzmunu</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model ?? Enumerable.Empty<RelatedDoc>())
+                {
+                    <tr>
+                        <td>
+                            <a href="/az/Document/GetDocView?token=@TokenHelper.CreateToken(item.DocId)" target="_blank">@item.DocNo </a>
+                        </td>
+                        <td align='center'>@item.Docdate.Value.ToString("d")</td>
+                        <td align='center'>@item.DocAddress</td>
+                        <td align='center'>@item.DocDescription</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

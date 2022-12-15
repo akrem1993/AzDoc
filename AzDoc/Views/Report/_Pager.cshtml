@@ -1,0 +1,96 @@
+﻿
+@using BLL.Models.Report.Paging
+@model PagerPartialModel
+
+
+<style>
+    .pagination button.active {
+        background-color: #4CAF50;
+        color: white;
+        border-radius: 10px;
+    }
+
+    .pagination button:hover:not(.active) {
+        background-color: #ddd;
+    }
+
+    .pagination button {
+        border-radius: 10px;
+    }
+
+    .activePage {
+        background-color: #67c2e2;
+        border-radius: 10px;
+    }
+</style>
+
+@if (Model.Pager.EndPage > 1)
+{
+    <div class="row" style="margin-top:20px;">
+        <div class="col-md-12" style="text-align:center;">
+            @{
+                QueryStringHelper qs = new QueryStringHelper(Request.QueryString);
+                List<string>
+                    tempQuery = qs.QueryStringCollection.AllKeys.ToList();
+
+                if (tempQuery.Contains("page"))
+                {
+                    tempQuery.Remove("page");
+                }
+                foreach (var item in tempQuery)
+                {
+                    if (Request.QueryString[item] != null)
+                    {
+                        //qs.RemoveByName(Request.QueryString[item]);
+                        //qs.AddOrReplace(item, Request.QueryString[item]);
+                    }
+                }
+
+                <ul class="pagination">
+                    @if (Model.Pager.CurrentPage > 1)
+                    {
+                        qs.AddOrReplace("page", Model.Pager.CurrentPage - 1);
+
+
+                        <li>
+                            <button class="btnPaging btn" data-page="1" type="button">&laquo;</button>
+                        </li>
+
+                        <li>
+                            <button class="btnPaging btn" data-page="@qs.GetValueByName("page").ToString()" type="button">&lsaquo;@*&laquo;*@</button>
+                            @*<a href="@Model.URL?@qs.ToString()">&laquo;</a>*@
+                        </li>
+                    }
+
+                    @for (var page = Model.Pager.StartPage; page <= Model.Pager.EndPage; page++)
+                    {
+                        qs.AddOrReplace("page", page);
+
+                        <li class="@(page == Model.Pager.CurrentPage ? "activePage" : "")">
+                            <button class="btnPaging btn" data-page="@if (page != Model.Pager.CurrentPage) {@qs.GetValueByName("page").ToString();}" type="button">@page</button>
+                            @*<a @if (page != Model.Pager.CurrentPage) { <text> href="@Model.URL?@qs.ToString()" </text> ; }>@page</a>*@
+                        </li>
+                    }
+
+                    @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+                    {
+                        qs.AddOrReplace("page", Model.Pager.CurrentPage + 1);
+
+                        <li>
+                            <button class="btnPaging btn" data-page="@qs.GetValueByName("page").ToString()" type="button">&rsaquo;</button>
+                            @*<a href="@Model.URL?@qs.ToString()">&raquo;</a>*@
+                        </li>
+
+                        <li>
+                            <button class="btnPaging btn" data-page="@Model.Pager.TotalPages @*@qs.GetValueByName("page").ToString()*@" type="button">&raquo;</button>
+                        </li>
+
+                    }
+                        
+                </ul>
+            }
+        </div>
+    </div>
+
+
+}

@@ -1,0 +1,164 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@using DMSModel
+@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+    RouteData routeData = ViewContext.RouteData;
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+
+
+<div class="row no-gutters mt-4">
+    <div class="">
+        <div class="newAuthorityBtn">
+            <button id="newAuthorityTransfer" class="mBtn mBtn-pr" style="width: 100%"> <i class="fas fa-plus">Yeni səlahiyyət ötürmə</i></button>
+        </div>
+    </div>
+    <div class="col-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="\">Ana səhifə</a></li>
+                <li class="breadcrumb-item"><a href="#">Admin</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Səlahiyyətlər</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="col-md-12" id="DocGrid" style="padding-top: 10px; height: 86vh">
+    @Html.Partial("AuthorityTransferGridViewPartial")
+</div>
+@section scripts
+{
+    
+
+    <script>
+
+        
+        $(document).ready(function ()
+        {
+            $("#newAuthorityTransfer").click(function () {
+                window.location.href = '/@lang/AdminPanel/OrganizationStructure/GetCreateAuthorityTransfer';
+            });
+        });
+
+
+
+        function EditAuthorityTransfer(item, boundData)
+        {
+            window.location = '/az/AdminPanel/OrganizationStructure/GetEditAuthorityById?transferAuthorityId=' + boundData.AuthorityId;
+        }
+
+
+
+        function AuthorityTransferDisable(item, boundData) {
+            Swal.fire({
+                title: 'Səlahiyyət ötürülməsi deaktiv edilsinmi?',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Ləğv et',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+                    var values = { transferAuthorityId: boundData.AuthorityId };
+                    $.ajax({
+                        url: '/@lang/AdminPanel/OrganizationStructure/DisableAuthorityTransferById',
+                        type: 'POST',
+                        data: JSON.stringify(values),
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (response) {
+                            if (response) {
+                                Swal.fire({
+                                    type: 'success',
+                                    title: 'Uğurlu əməliyyat',
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                                $('#gridAuthorityTransfer').setRouteValue();
+                                $('#gridAuthorityTransfer').bindgrid(1);
+                            }
+                            else
+                            {
+                                Swal.fire({
+                                    type: 'error',
+                                    title: 'Xəta baş verdi',
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                            }
+                        },
+                        beforeSend: function () {
+                            window.ShowLoading();
+                        },
+                        complete: function () {
+                            window.CloseLoading();
+                        }
+                    });
+
+                }
+            });
+        }
+
+
+
+        
+        function AuthorityTransferRemove(item, boundData) {
+            Swal.fire({
+                title: 'Səlahiyyət ötürülməsi silinsinmi?',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Ləğv et',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+                    var values = { transferAuthorityId: boundData.AuthorityId };
+                    $.ajax({
+                        url: '/@lang/AdminPanel/OrganizationStructure/RemoveAuthorityTransferById',
+                        type: 'POST',
+                        data: JSON.stringify(values),
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (response) {
+                            if (response) {
+                                Swal.fire({
+                                    type: 'success',
+                                    title: 'Uğurlu əməliyyat',
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                                $('#gridAuthorityTransfer').setRouteValue();
+                                $('#gridAuthorityTransfer').bindgrid(1);
+
+                            }
+                            else
+                            {
+                                Swal.fire({
+                                    type: 'error',
+                                    title: 'Xəta baş verdi',
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                            }
+                        },
+                        beforeSend: function () {
+                            window.ShowLoading();
+                        },
+                        complete: function () {
+                            window.CloseLoading();
+                        }
+                    });
+
+                }
+            });
+        }
+
+
+
+        function onFilter(sender, args, query) {
+            $('#gridAuthorityTransfer').bindgrid(1);
+        }
+
+    </script>
+    <script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+
+}

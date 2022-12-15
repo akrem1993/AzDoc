@@ -1,0 +1,85 @@
+﻿
+@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@{
+
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+
+}
+
+<div class="mModal" style="z-index:1900">
+    <div class="modal fade" id="docNoteModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true" data-keyboard="false" data-backdrop="static" style="z-index:1900">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="background: #ffffff">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Məlumat üçün göndərmək</span>
+                    <span id="sendToken"></span>
+                </div>
+
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <div class="col-12">
+                                    <textarea class="form-control" id="notsentNote"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Ləğv et</button>
+
+                    </div>
+                    <div class="col-3">
+                        <button type="button" id="saveNote" class="mBtn mBtn-pr defaultBtn" style="width: 100%">@RLang.Save</button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#docNoteModal").modal();  
+
+    });
+    $("#saveNote").click(function () {
+        var note = $("#notsentNote").val();
+        var requestToken = $("#spanToken").html();
+        $.ajax({
+            type: 'POST',        
+            url: '@Url.Action("DocNote","Document", new {area="OutgoingDoc" })',
+                dataType: 'json',
+            data: { note: note},
+                beforeSend: function () {
+                    window.ShowLoading();
+                },
+            success: function (response) {
+             
+                toastr.success("Qeyd əlavə edildi");
+                $("#docNoteModal").css("display", "none");
+                $(".modal-backdrop").remove();
+
+          
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+            });
+
+    });
+</script>
+<script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+<script src="~/Scripts/common/SendForInformation.js?v=@AppVersion.Version"></script>

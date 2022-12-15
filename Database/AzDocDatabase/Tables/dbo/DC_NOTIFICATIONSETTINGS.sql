@@ -1,0 +1,9 @@
+CREATE TABLE [dbo].[DC_NOTIFICATIONSETTINGS](
+	[NotificationSettingsId] int identity NOT NULL CONSTRAINT [PK_DC_NOTIFICATIONSETTINGS] PRIMARY KEY ([NotificationSettingsId]),
+	[NotificationTypeId] int NOT NULL,
+	[DocTypeId] int NULL,
+	[WorkplaceId] int NOT NULL,
+	[NotificationSettingsValue] bit NULL,
+    CONSTRAINT [FK_DC_NOTIFICATIONSETTINGS_DC_NOTIFICATIONTYPE] FOREIGN KEY([NotificationTypeId]) REFERENCES [dbo].[DC_NOTIFICATIONTYPE] ([NotificationTypeId]),
+    CONSTRAINT [FK_DC_NOTIFICATIONSETTINGS_DC_WORKPLACE] FOREIGN KEY([WorkplaceId]) REFERENCES [dbo].[DC_WORKPLACE] ([WorkplaceId])
+)

@@ -1,0 +1,56 @@
+﻿ .backColor {
+     background-color: #005487;
+     padding-top: 0px !important;
+     padding-bottom: 0px !important;
+ }
+
+ .nav-item > a {
+     color: white !important;
+     font-size: 1.15em;
+ }
+
+ .nav-item > a:hover {
+     color: rgb(175, 25, 25);
+ }
+
+ #navbarSupportedContent > ul > li:hover {
+     background-color: rgba(66, 183, 230, 0.527);
+ }
+
+ .nav-item > .dropdown-menu > a:hover {
+     background-color: rgba(92, 154, 212, 0.562);
+ }
+
+ .aColor {
+     color: white;
+ }
+
+ .imageOptions {
+     background-color: white;
+     width: 230px;
+     height: 55px;
+ }
+
+ .borderRad {
+     border-radius: 10px;
+ }
+
+ #settingsIco {
+     color: dodgerblue;
+ }
+
+ #offIco {
+     color: red;
+ }
+
+ #settings:hover {
+     color: dodgerblue;
+ }
+
+ #off:hover {
+     color: dodgerblue;
+ }
+
+ .notifyCount {
+     color: rgb(130, 211, 110);
+ }

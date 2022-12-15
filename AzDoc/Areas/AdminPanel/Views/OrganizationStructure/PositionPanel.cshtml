@@ -1,0 +1,164 @@
+﻿@model Admin.Model.EntityModel.PositionInfo
+@using AzDoc.Helpers
+@using Admin.Model.ViewModel.PositionRelatedModels
+@using AzDoc.App_LocalResources
+
+@{
+    ViewBag.Title = "EditUser";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+    var lang = routeValueDictionary["lang"] ?? "az";
+
+}
+
+<link href="~/Content/adminPanel/bootstrap-datepicker3.css" rel="stylesheet" />
+
+
+<link href="~/Content/jquery-editable-select/jquery-editable-select.min.css" rel="stylesheet" />
+
+<form id="positionForm" name="postionForm">
+
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            <div class="editGroup">
+
+                <h4>@(Model.IsEdit ? "Vəzifənin redaktəsi" : "Yeni vəzifənin yaradılması")</h4>
+
+                <div class="row">
+
+                    <input type="hidden" name="DepartmentPositionId" value="@Model.DepartmentPositionId" />
+
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="PersonnelName">Vəzifə Adı</label>
+                            <input type="text" name="DepartmentPositionName" class="form-control" id="DepartmentPositionName" value="@Model.DepartmentPositionName" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="PersonnelSurname">İndeksi</label>
+                            <input type="text" name="DepartmentPositionIndex" class="form-control" id="DepartmentPositionIndex" value="@Model.DepartmentPositionIndex" />
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label>Departament adı</label>
+                            <select name="DepartmentId" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                                <option>Seçin</option>
+                                @foreach (DepartmentCustomModel department in Model.Departments)
+                                {
+                                    <option value="@department.DepartmentId" @(Model.DepartmentId == department.DepartmentId ? "selected" : "")>@department.DepartmentName</option>
+                                }
+                            </select>
+
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label>Vəzifə qrupu</label>
+                            <select name="PositionGroupId" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                                <option>Seçin</option>
+                                @foreach (PosGroupCustomModel posGroup in Model.PositionGroups)
+                                {
+                                    <option value="@posGroup.PositionGroupId" @(Model.PositionGroupId == posGroup.PositionGroupId ? "selected" : "")>@posGroup.PositionGroupName</option>
+                                }
+                            </select>
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+                <br />
+            </div>
+
+
+        </div>
+        <br />
+    </div>
+
+    <div class="row mb-5 pb-5 mt-4">
+        <div class="col-12 text-center">
+            <button type="button" class="mBtn mBtn-sec mr-2" onclick="window.history.go(-1); return false;">
+                @RLang.PrevStep
+            </button>
+            <button id="submitForm" type="button" class="mBtn mBtn-pr next-step">
+                @RLang.Save
+            </button>
+        </div>
+    </div>
+</form>
+
+
+
+<script src="~/Scripts/jquery-editable-select/jquery-editable-select.min.js?v=@AppVersion.Version"></script>
+
+<script>
+
+
+
+
+
+     $(document).on("click", "#submitForm", function ()
+     {
+
+         var form = document.forms.namedItem("positionForm");
+               var oData = new FormData(form);
+         var isEdit = '@Model.IsEdit' === 'True';
+         var message = isEdit ? 'Vəzifə redaktə edildi' : 'Yeni vəzifə yaradıldı';
+
+                $.ajax({
+                    url: "/@lang/AdminPanel/OrganizationStructure/@(Model.IsEdit ? "EditPosition":"CreatePosition")",
+                    type: 'POST',
+                    data: oData,
+                    dataType: 'Json',
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response) {
+
+                            toastr.success(message);
+
+                            if (isEdit) {
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+                            }
+
+
+                        }
+                        else {
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Xəta baş verdi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        }
+
+
+                    },
+                    error: function (response) {
+                        title: 'Xəta baş verdi!'
+                    },
+                    beforeSend: function () {
+                        window.ShowLoading();
+                    },
+                    complete: function () {
+                        window.CloseLoading();
+                    }
+                });
+
+
+
+        });
+
+
+</script>
+

@@ -1,0 +1,142 @@
+@using BLL.Models.Report
+@using AzDoc.Helpers
+
+@model ReportAllDocsBodyViewModel
+
+
+
+@if (Model?.AllDocs != null && Model.Pager.TotalItems > 0)
+{
+    int count = (Model.Pager.CurrentPage - 1) * Model.Pager.PageSize;
+
+    <div class="row">
+
+        <div class="col-12 mt-3" style="max-height: 60vh; overflow-y: auto">
+            <table class=" tableFixHead table table-striped table-sm mTable mTable2" id="tableReportExecution">
+                <thead>
+                <tr>
+                    <th>Sıra sayı №</th>
+                    <th>Qeydiyyat nömrəsi</th>
+                    <th>Qeydiyyat tarixi</th>
+                    <th>Göndərilən təşkilat</th>
+                    <th>Göndərilən şəxs</th>
+                    <th>Sənədin növü</th>
+                    <th>Sənədin qısa məzmunu</th>
+                    <th>Kimə ünvanlanıb</th>
+                    <th>İmzalayan şəxs</th>
+                    <th>Sənədin statusu</th>
+                    <th>İcraçı struktur bölmə</th>
+                    <th>Sənədin icraçısı</th>
+                    <th>Daxil olan sənədin nömrəsi</th>
+                    <th>Daxil olan sənədin tarixi</th>
+                    <th>Əlaqəli sənədlər</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                @foreach (var doc in Model.AllDocs)
+                {
+                    count++;
+                    <tr>
+                        <td>@count</td>
+                        <td>
+                            <a href="/az/Document/GetDocView?token=@doc.TokenForDocId" target="_blank">@doc.DocEnterno</a>
+                        </td> @*//senedin qeydiyyat nomresi*@
+                        <td>@doc.DocEnterDate.ToString("dd.MM.yyyy")</td> @*//senedin daxil olma tarixi*@
+                        <td>@doc.WhomAdressedCompany</td>
+                        <td>@doc.WhomAdressedPerson</td>
+                        @* senedin novu *@
+                        <td>@doc.FormName</td>
+
+                        @*//senedin qisa mezmunu*@
+                        <td title="@doc.DocDescription">
+                            @if (doc.DocDescription?.Length >= 30)
+                            {
+                                @($"{doc.DocDescription.Substring(0, 30)} ...")
+                            }
+                            else
+                            {
+                                @doc.DocDescription
+                                ;
+                            }
+                        </td>
+                        <td>@doc.WhomAdress</td>
+                        <td>@doc.Signer</td>
+                        <td>@doc.DocumentStatusName</td> @*//senedin statusu*@
+
+                        <td>@doc.ExecutorsDepartments</td> @*/icraci struktur bolme*@
+
+                        @*//senedin icracisi*@
+                        <td title="@doc.ExecutorsName">
+
+                            @if (!string.IsNullOrWhiteSpace(doc.ExecutorsName) ? doc.ExecutorsName.Length >= 30 : false)
+                            {
+                                @($"{doc.ExecutorsName.Substring(0, 30)} ...")
+                            }
+                            else
+                            {
+                                @doc.ExecutorsName
+                            }
+                        </td>
+
+                        @*//daxil olan senedin nomresi*@
+                        @if (doc.IncomingDocNumbersForView.Count > 0)
+                        {
+                            <td>
+                                @foreach (var item in doc.IncomingDocNumbersForView)
+                                {
+                                    <a style="margin-right:10px;" href="/az/Document/GetDocView?token=@item.Key" target="_blank">@item.Value;</a>
+                                }
+                            </td>
+                            <td>
+                                @foreach (var item in doc.IncomingDocDatesForView)
+                                {
+                                <a>@item.Value;</a> 
+                                }
+                            </td>
+                        }
+                        else
+                        {
+                            <td></td>
+                            <td></td>
+                            @*/daxil olan sənədin tarixi*@
+                        }
+
+                        @if (doc.RelationDocNumbersForView.Count > 0)
+                        {
+                            <td>
+                                @foreach (var item in doc.RelationDocNumbersForView)
+                                {
+                                    <a style="margin-right:10px;" href="/az/Document/GetDocView?token=@item.Key" target="_blank">@item.Value;</a>
+                                }
+                            </td>
+
+                            @*/daxil olan sənədin tarixi*@
+                        }
+                        else
+                        {
+                            <td></td>
+
+                        }
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    Html.RenderPartial("_Pager", new BLL.Models.Report.Paging.PagerPartialModel() {Pager = Model.Pager});
+}
+else
+{
+    <div class="row">
+        <div class="col-12 text-center mt-2 ">
+            <span id="docsCount" style="color:red;font-size:30px;">Axtarışa uyğun məlumat tapılmadı.</span>
+        </div>
+    </div>
+}
+<div class="row" style="padding-top:70px;">
+    <div class="col-12 text-right mt-2">
+        <span id="docsCount" style="color: #7fa8b6">Tapılan məlumat sayı : @Model.Pager.TotalItems</span>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+﻿@using GleamTech.AspNet.Mvc
+@using GleamTech.DocumentUltimate.AspNet.UI
+
+@{
+    var documentViewer = new DocumentViewer
+    {
+        Height = 650,
+        Document = TempData["DocumentView"].ToString(),
+        Id = "InsDocDocViewer"
+    };
+
+
+}
+
+@this.RenderBody(documentViewer)

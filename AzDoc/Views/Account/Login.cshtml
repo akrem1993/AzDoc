@@ -1,0 +1,176 @@
+﻿@model AzDoc.Models.Account.LoginViewModel
+
+@{
+    /**/
+
+    Layout = "";
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>E-Sənəd Dövriyyəsi</title>
+    <link rel="icon" type="image/png" href="">
+
+    <!-- bootstrap -->
+    <link href="~/Content/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <!-- fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Comfortaa:400,700" rel="stylesheet">
+
+    <!-- main -->
+    <link href="~/Content/common/style.css" rel="stylesheet" />
+</head>
+
+<body id="login">
+
+    <div id="loader">
+        <div class="loaderContent">
+            <ul class="books_list">
+                <li class="book_item first"></li>
+                <li class="book_item second"></li>
+                <li class="book_item third"></li>
+                <li class="book_item fourth"></li>
+                <li class="book_item fifth"></li>
+                <li class="book_item sixth"></li>
+            </ul>
+            <div class="shelf"></div>
+        </div>
+    </div>
+
+    <main>
+        <canvas id=c></canvas>
+        <div class="container-fluid">
+            <div class="row signRow">
+                <div class="col-lg-6 logo">
+                    <div class="rabita text-center">
+                        <img src="~/Content/images/azdoc.png" alt="" />
+                    </div>
+                </div>
+                <div class="col-lg-6 sign">
+                    <div style="border:1px solid #ffffff36">
+                        <div class="loginType">
+                            <div class="row no-gutters">
+                                <div class="col-3 active" data-lognum='1'>
+                                    <a href="#">
+                                        <img src="~/Content/images/userlogin.png">
+                                    </a>
+                                </div>
+                                @*<div class="col-3" data-lognum='2'>
+                                    <a href="#">
+                                        <img src="~/Content/images/asanimza.png">
+                                    </a>
+                                </div>
+                                <div class="col-3" data-lognum='3'>
+                                    <a href="#">
+                                        <img src="~/Content/images/LDAP.png">
+                                    </a>
+                                </div>
+                                <div class="col-3" data-lognum='4'>
+                                    <a href="#">
+                                        <img src="~/Content/images/eimza.png">
+                                    </a>
+                                </div>*@
+                            </div>
+                        </div>
+                        <div class="form">
+                            @{
+                                Html.EnableClientValidation();
+                                Html.EnableUnobtrusiveJavaScript();
+                            }
+
+                            @using(Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "loginForm", @class = "rForm rForm1" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+                                @Html.TextBoxFor(m => m.UserName, "", new
+                           {
+                               placeholder = "Istifadəçi adı",
+                               type = "text",
+                               @class = "form-control-lg",
+                               id = "test",
+                               style= "width: 100%;"
+                           })
+
+                                @Html.TextBoxFor(m => m.Password, new
+                           {
+                               @placeholder = "Şifrə",
+                               @type = "password",
+                               @class = "form-control-lg",
+                               style = "width: 100%;"
+                           })
+                                
+
+                                <button type="submit" class="btn-lg btn" id="acceptButton">
+                                    @AzDoc.App_LocalResources.RLang.Login
+                                </button>
+
+
+                            }
+                            <div style="padding-top:10px; color: red">
+                                @if(ViewData.ModelState.Values.Any(x => x.Errors.Count >= 1))
+                                {
+                                    <span>@ViewData.ModelState["ErrorMessage"].Errors[0].ErrorMessage</span>
+                                }
+                            </div>
+                            <form class="rForm rForm2 d-none">
+                                <input type="text" id="usermobile" name="usermobile" class="form-control-lg" placeholder="Mobil nömrə">
+                                <input type="password" id="pass2" name="pass2" class="form-control-lg" placeholder="Şifrə">
+                                <button class="btn-lg" disabled="disabled">Daxil ol</button>
+                            </form>
+                            <form class="rForm rForm3 d-none">
+                                <input type="text" id="domainname" name="domainname" class="form-control-lg"
+                                       placeholder="Domen istifadəçi adı">
+                                <input type="password" id="pass3" name="pass3" class="form-control-lg" placeholder="Domen şifrə">
+                                <button class="btn-lg" disabled="disabled">Daxil ol</button>
+                            </form>
+                            <form class="rForm rForm4 d-none">
+                                <input type="text" id="username" name="username" class="form-control-lg" placeholder="İstifadəçi adı">
+                                <input type="password" id="pass" name="pass" class="form-control-lg" placeholder="Şifrə">
+                                <button class="btn-lg" disabled="disabled">Daxil ol</button>
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        @*<div class="rabitaLogo">
+                <img src="~/Content/images/whiteLogo.png" />
+            </div>*@
+    </main>
+    <script src="~/Scripts/jquery/jquery-3.3.1.min.js"></script>
+    <script src="~/Scripts/bootstrap/bootstrap.min.js"></script>
+    <script src="~/Scripts/account/bg.js"></script>
+    <script src="~/Scripts/account/main.js"></script>
+    <script async src="~/Scripts/jquery/jquery-blockUI.js"></script>
+    <script>
+        $('#loader').fadeOut('slow');
+        $(document).ready(function () {
+            /*--------------- LOGIN ------------------*/
+            $("#login .sign .loginType .col-3").click(function () {
+                if (!$(this).hasClass("active")) {
+                    $("#login .sign .loginType .active").removeClass("active");
+                    $(this).addClass("active");
+                    var lognum = $(this).data('lognum');
+                    $("#login .sign .form .rForm").addClass('d-none');
+                    $("#login .sign .form .rForm" + lognum + "").removeClass("d-none");
+                }
+            });
+
+            /*--------------- Left Menu ------------------*/
+        });
+
+        $('#acceptButton').on('click', function () {
+            $(this).attr("disabled", true);
+            $('#loginForm').submit();
+        });
+
+    </script>
+</body>
+
+</html>

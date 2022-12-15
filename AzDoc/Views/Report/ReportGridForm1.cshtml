@@ -1,0 +1,139 @@
+﻿@model BLL.Models.Report.ReportsViewModel
+
+<div class="excelTable" >
+    <table class="table mTable" id="tbForm1">
+        <thead>
+            <tr>
+                <th colspan="16" style="text-align: right">1 nömrəli forma</th>
+            </tr>
+            <tr>
+                <th colspan="16">
+                    Daxil olmuş vətəndaş müraciətlərinə baxılması barədə
+                    MƏLUMAT
+                </th>
+            </tr>
+            <tr>
+                <th colspan="16" style="text-align: right">@ViewData["ReportsSelect"]</th>
+            </tr>
+            <tr>
+                <th scope="col" rowspan="2">Sıra N-si</th>
+                <th scope="col" rowspan="2" style="min-width: 100px;">Daxil olub</th>
+                <th scope="col" rowspan="2" style="max-width: 75px; height: 240px;">
+                    <span style="width: 206px; display: block; transform: translateX(-77px) rotateZ(-90deg);">
+                        Daxil olan müraciətlərin sayı
+                    </span>
+                </th>
+                <th scope="col" colspan="3">Müraciətlərin növləri</th>
+                <th scope="col" colspan="2">Baxılma qaydası</th>
+                <th scope="col" colspan="8">Müraciətlərə baxılmasının vəziyyəti</th>
+            </tr>
+            <tr>
+                <th>Ərizə</th>
+                <th>Şikayət</th>
+                <th>Təklif</th>
+                <th style="max-width: 75px; height: 240px;">
+                    <span style="width: 206px; display: block; transform: translateX(-77px) rotateZ(-90deg);">
+                        Nəzarətə
+                        alınmaqla
+                    </span>
+                </th>
+                <th style="max-width: 75px; height: 240px;">
+                    <span style="width: 206px; display: block; transform: translateX(-77px) rotateZ(-90deg);">
+                        Nəzarətə
+                        alınmadan
+                    </span>
+                </th>
+                <th style="max-width: 75px; height: 240px;">
+                    <span style="width: 206px; display: block; transform: translateX(-77px) rotateZ(-90deg);">
+                        Müsbət həll olunub
+                    </span>
+                </th>
+                <th style="max-width: 75px; height: 240px;">
+                    <span style="width: 206px; display: block; transform: translateX(-77px) rotateZ(-90deg);">
+                        Qismən həll olunub
+                    </span>
+                </th>
+
+                <th style="max-width: 75px; height: 240px;">
+                    <span style="width: 206px; display: block; transform: translateX(-77px) rotateZ(-90deg);">
+                        Əsassız sayılıb
+                    </span>
+                </th>
+                <th style="max-width: 75px; height: 240px;">
+                    <span style="width: 206px; display: block; transform: translateX(-77px) rotateZ(-90deg);">
+                        Müvafiq izahat verilib
+                    </span>
+                </th>
+                <th style="max-width: 75px; height: 240px;">
+                    <span style="width: 206px; display: block; transform: translateX(-77px) rotateZ(-90deg);">
+                        Dövlət proqramlarında icrası nəzərdə tutulub
+                    </span>
+                </th>
+                <th style="max-width: 75px; height: 240px;">
+                    <span style="width: 206px; display: block; transform: translateX(-77px) rotateZ(-90deg);">
+                        İcradadır
+                    </span>
+                </th>
+                <th style="max-width: 75px; height: 240px;">
+                    <span style="width: 206px; display: block; transform: translateX(-77px) rotateZ(-90deg);">
+                        Baxılmaq üçün aidiyyəti təşkilatlara göndərilib
+                    </span>
+                </th>
+                <th style="max-width: 75px; height: 240px;">
+                    <span style="width: 206px; display: block; transform: translateX(-77px) rotateZ(-90deg);">
+                        Baxılmamış saxlanılıb
+                    </span>
+                </th>
+
+            </tr>
+            <tr class="noExl">
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+                <td>7</td>
+                <td>8</td>
+                <td>9</td>
+                <td>10</td>
+                <td>11</td>
+                <td>12</td>
+                <td>13</td>
+                <td>14</td>
+                <td>15</td>
+                <td>16</td>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.ReportForm1Models != null)
+            {
+                foreach (var item in Model.ReportForm1Models)
+                {
+                    <tr>
+                        <td>@item.Line</td>
+                        <td>
+                           @item.Name
+                        </td>
+                        <td>@item.Total1</td>
+                        <td>@item.Total2</td>
+                        <td>@item.Total3</td>
+                        <td>@item.Total4</td>
+                        <td>@item.Total5</td>
+                        <td>@item.Total6</td>
+                        <td>@item.Total7</td>
+                        <td>@item.Total8</td>
+                        <td>@item.Total9</td>
+                        <td>@item.Total10</td>
+                        <td>@item.Total11</td>
+                        <td>@item.Total12</td>
+                        <td>@item.Total13</td>
+                        <td>@item.Total14</td>
+                    </tr>
+                }
+
+
+            }
+        </tbody>
+    </table>
+</div>

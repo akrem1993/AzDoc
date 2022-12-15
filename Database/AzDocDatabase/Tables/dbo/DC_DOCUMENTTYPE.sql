@@ -1,0 +1,6 @@
+CREATE TABLE [dbo].[DC_DOCUMENTTYPE](
+	[TypeId] int identity NOT NULL,
+	[TypeName] nvarchar(100) NULL,
+	[TypeStatus] bit NOT NULL CONSTRAINT [DF__DC_DOCUME__TypeS__65570293]  DEFAULT 1,
+ CONSTRAINT [PK_DC_DOCUMENTTYPE] PRIMARY KEY ([TypeId])
+ )

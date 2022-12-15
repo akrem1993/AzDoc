@@ -1,0 +1,9 @@
+﻿@model BLL.Models.Document.ViewModel.ActionNameViewModel
+
+@foreach (var item in Model.ActionNameModels)
+{
+    <a href="#" id="@item.Id" class="list-group-item list-group-item-action flex-column align-items-start @item.Id">
+        @item.Name
+    </a>
+
+}

@@ -1,0 +1,206 @@
+﻿@model DocumentViewModel
+@{
+    ViewBag.Title = "AddNewDocument";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+    var _lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<div class="col-12">
+    <div class="row breadCrumbRow mt-5">
+        <div class="col-12 text-center" id="basicInformation">
+            <a href="#step1" class="brActive" data-brcrumb="1">
+                @RLang.BasicInfo
+            </a>
+        </div>
+
+    </div>
+</div>
+
+@using (Html.BeginForm("AddNewDocument", "Document", FormMethod.Post, new { id = "AddNewDocument" }))
+{
+
+
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            <div class="editGroup">
+                <h4>@RLang.BasicInfo</h4>
+                <div class="input-group input-group-sm">
+
+                    <div class="col-sm-4" style="padding-left: 0;">
+                        <label class="font-weight-bold">Qeydiyyat tarixi <span style="color:red;font-weight:bold">*</span></label>
+                        @Html.TextBoxFor(model => model.DocumentModel.DocEnterDate, "{0:yyyy-MM-dd}", new
+                        {
+                            @type = "date",
+                            @class = "form-control",
+                            @data_live_search = "true",
+                            @id = "DocEnterDate",
+                            @data_required = "Qeydiyyat tarixini daxil edin"
+                        })
+                    </div>
+                    <div class="col-sm-8" style="padding-left: 0;">
+                        <label class="font-weight-bold">Rezerv sənədin növü<span style="color:red;font-weight:bold">*</span></label>
+                        @Html.DropDownListFor(model => model.DocType.Id,
+                        new SelectList(Model.DocTypes, "Id", "Name", Model.DocumentModel?.TypeOfDocumentId), "Seç", new
+                        {
+                            @id = "DocType",
+                            @class = "selectpicker",
+                            @data_live_search = "true",
+                            @data_width = "100%",
+                            @data_required = "İmza edən şəxsi daxil edin"
+                        })
+                    </div>
+                </div>
+
+                <div class="input-group" id="outogingDoc" style="display:none">
+                    <div class="col-sm-4" style="padding-left: 0;">
+                        <label class="font-weight-bold">İmza edən şəxs<span style="color:red;font-weight:bold">*</span></label>
+                        @Html.DropDownListFor(model => model.SignatoryPerson.Id,
+                            new SelectList(Model.SignatoryPersons, "Id", "Name", Model.DocumentModel?.SignatoryPersonId), "Seç", new
+                            {
+                                @id = "SignatoryPerson",
+                                @class = "selectpicker",
+                                @data_live_search = "true",
+                                @data_width = "100%",
+                                @data_required = "İmza edən şəxsi daxil edin"
+                            })
+
+                    </div>
+                    <div class="col-sm-8" style="padding-left: 0;">
+                        <label class="font-weight-bold">Qurum <span style="color:red;font-weight:bold">*</span> </label>
+                        @Html.DropDownListFor(model => model.Department.Id,
+           new SelectList(Model.Departments, "Id", "Name", Model.DocumentModel?.DepartmentId), "Seç", new
+           {
+               @id = "Department",
+               @class = "selectpicker",
+               @data_live_search = "true",
+               @data_width = "100%",
+               @data_required = "Bölməni daxil edin"
+           })
+                    </div>
+         
+                
+                </div>
+                <div class="input-group" id="insDoc" style="display:none">                 
+                    <div class="col-sm-4" style="padding-left: 0;">
+                        <label class="font-weight-bold">Sənədin növü <span style="color:red;font-weight:bold">*</span></label>
+                        @Html.DropDownListFor(model => model.DocForm.Id,
+           new SelectList(Model.DocForms, "Id", "Name", Model.DocumentModel?.FormOfDocumentId), "Seç", new
+           {
+               @id = "DocForm",
+               @class = "selectpicker",
+               @data_live_search = "true",
+               @data_width = "100%",
+               @data_required = "Bölməni daxil edin"
+           })
+                    </div>
+                </div>
+            </div>
+
+            <div class="editGroup">
+                <h4>Qısa məzmun </h4>
+                @Html.TextAreaFor(model => model.DocumentModel.ShortContent, new
+                    {
+                        @placeholder = "",
+                        @type = "text",
+                        @class = "form-control",
+                        @id = "ShortContent",
+                        @data_required = "Qıza məzmunu daxil edin"
+                    })
+            </div>
+
+            <div class="row mb-5 pb-5 mt-4">
+                <div class="col-12 text-center">
+                    <button class="mBtn mBtn-pr defaultBtn next-step nextBtn" style="width: 175px" type="button" id="ParentButton">
+                        <i class="far fa-save" style="font-size: 1.3em"></i>&nbsp;@RLang.Save
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+}
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('DocEnterDate').value = today;
+            document.getElementsByName("DocumentModel.DocEnterDate")[0].setAttribute('min', today);
+            document.getElementsByName("DocumentModel.DocEnterDate")[0].setAttribute('max', today);
+            //document.getElementsByName("DocumentModel.PlannedDate")[0].setAttribute('min', today);
+
+        });
+
+
+        document.getElementById('DocType').addEventListener('change', function () {
+    if (this.value == 3)  {
+        $("#insDoc").css("display","flex");
+        $("#outogingDoc").css("display","none");
+    }
+    else if (this.value == 12) {
+      $("#insDoc").css("display","none");
+      $("#outogingDoc").css("display","flex");
+    } else {
+       $("#insDoc").css("display","none");
+        $("#outogingDoc").css("display","none");
+    }
+});
+    //window.ShowLoading();
+        $("#ParentButton").click(function () {
+            var formData = $('#AddNewDocument').getFormData();
+            var date = $('#DocEnterDate').val();
+            var signer = $('#SignatoryPerson').val();
+            var dep = $('#Department').val();
+            var docType = $('#DocType').val();
+            if (docType == 12) { }
+            console.log(formData);
+            if (date != '')
+                $("#DocEnterDate").css("border", "1px solid #ccc");
+            if (date == '')
+                $("#DocEnterDate").css("border", "red solid 1px");
+
+            if (signer != '')
+                $("#SignatoryPerson").css("border", "1px solid #ccc");
+            if (signer == '')
+                $("#SignatoryPerson").css("border", "red solid 1px");
+            if (dep != '')
+                $("#Department").css("border", "1px solid #ccc");
+            if (dep == '')
+                $("#Department").css("border", "red solid 1px");
+            if( (formData != '' && date != '' && signer != '' && dep != '') || docType==3) {
+        $.ajax({
+            method: "POST",
+            data: {
+                model: formData               
+            },
+            contenType: 'json',
+            dataType: 'html',
+            url: '@Url.Action("AddNewDocument", "Document", new { area = "ReserveDocs"})',
+            beforeSend: function() {
+                window.ShowLoading();
+            },
+            success: function(response) {           
+                window.location ='/@_lang/ReserveDocs';
+
+                
+            },
+            complete: function() {
+                window.CloseLoading();
+            }
+        }).done(function() {
+            window.CloseLoading();
+        });
+
+    }
+
+});
+   
+
+
+
+    </script>
+        
+        }

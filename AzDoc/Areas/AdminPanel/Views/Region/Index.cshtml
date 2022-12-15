@@ -1,0 +1,103 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+}
+
+<div class="container">
+
+</div>
+
+
+<div class="col-12 modal-header3 mt-4">
+    <div class="row no-gutters" style="border-bottom:1px solid #8080805e; margin: 0 1rem">
+        <div class="col-4">
+            <a href="#" class="individual active" id="country">
+                Ölkələr
+            </a>
+        </div>
+
+        <div class="col-4">
+            <a href="#" id="region">
+                Şəhərlər(rayonlar)
+            </a>
+        </div>
+        <div class="col-4">
+            <a href="#" id="village">
+                Kəndlər
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-12 mainContent ">
+    <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+        <div class="editGroup">
+            <div>
+                <h4>Ölkələr</h4>
+                @Html.Partial(@"~\Areas\AdminPanel\Views\Region\_CountryGridPartial.cshtml")
+            </div>
+        </div>
+    </div>
+    <div class="mainEdit contentItem" id="step2" style="padding-top:1px; display:none;" data-brnum="1">
+        <div class="editGroup">
+            <div>
+                <h4>Şəhərlər</h4>
+                @Html.Partial(@"~\Areas\AdminPanel\Views\Region\_RegionGridPartial.cshtml")
+            </div>
+        </div>
+    </div>
+    <div class="mainEdit contentItem" id="step3" style="padding-top:1px; display:none;" data-brnum="1">
+        <div class="editGroup">
+            <div>
+                <h4>Kəndlər</h4>
+                @Html.Partial(@"~\Areas\AdminPanel\Views\Region\_VillageGridPartial.cshtml")
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function onFilterCountry(sender, args, query) {
+        $('#gridCountries').bindgrid(sender.config.params.pageIndex);
+    }
+
+    function onFilterRegion(sender, args, query) {
+        $('#gridRegions').bindgrid(sender.config.params.pageIndex);
+    }
+
+    function onFilterVillage(sender, args, query) {
+        $('#gridVillages').bindgrid(sender.config.params.pageIndex);
+    }
+
+    $("#country").click(function () {
+        $(this).addClass("active");
+        $("#region").removeClass("active");
+        $("#village").removeClass("active");
+        $('#step1').css('display', 'block');
+        $('#step2').css('display', 'none');
+        $('#step3').css('display', 'none');
+    });
+
+    $("#region").click(function () {
+        $(this).addClass("active");
+        $("#country").removeClass("active");
+        $("#village").removeClass("active");
+        $('#step1').css('display', 'none');
+        $('#step2').css('display', 'block');
+        $('#step3').css('display', 'none');
+    });
+
+
+    $("#village").click(function () {
+        $(this).addClass("active");
+        $("#country").removeClass("active");
+        $("#region").removeClass("active");
+        $('#step1').css('display', 'none');
+        $('#step2').css('display', 'none');
+        $('#step3').css('display', 'block');
+    });
+
+
+</script>

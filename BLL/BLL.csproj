@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AA74C4DD-2F79-4326-BE80-D126871ACA12}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BLL</RootNamespace>
+    <AssemblyName>BLL</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'TestRytn|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\TestRytn\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'PreProRytn|AnyCPU'">
+    <OutputPath>bin\PreProRytn\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.2-beta1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.7\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\Enums\DmsEnums.cs" />
+    <Compile Include="Common\Enums\DocumentEnums.cs" />
+    <Compile Include="Common\Enums\Enum.cs" />
+    <Compile Include="Common\Enums\PermissionEnums.cs" />
+    <Compile Include="CoreAdapters\AccountAdapter.cs" />
+    <Compile Include="CoreAdapters\BlankNumberAdapter.cs" />
+    <Compile Include="CoreAdapters\CoreAdapter.cs" />
+    <Compile Include="CoreAdapters\DirectionAdapter.cs" />
+    <Compile Include="CoreAdapters\DocGridAdapter.cs" />
+    <Compile Include="CoreAdapters\DocInfoAdapter.cs" />
+    <Compile Include="CoreAdapters\DocumentAdapter.cs" />
+    <Compile Include="CoreAdapters\FeedbackAdapter.cs" />
+    <Compile Include="CoreAdapters\FileAdapter.cs" />
+    <Compile Include="CoreAdapters\GridViewAdapter.cs" />
+    <Compile Include="CoreAdapters\LogAdapter.cs" />
+    <Compile Include="CoreAdapters\NotifyAdapter.cs" />
+    <Compile Include="CoreAdapters\ReportAdapter.cs" />
+    <Compile Include="CoreAdapters\SettingAdapter.cs" />
+    <Compile Include="CoreAdapters\TreeAdapter.cs" />
+    <Compile Include="CoreAdapters\VizaAdapter.cs" />
+    <Compile Include="BaseAdapter\AdapterBase.cs" />
+    <Compile Include="CoreAdapters\WaitingDocsAdapter.cs" />
+    <Compile Include="CoreInterfaces\Document\IAcceptVizaDoc.cs" />
+    <Compile Include="CoreInterfaces\Document\ICanceledDoc.cs" />
+    <Compile Include="CoreInterfaces\Document\IConfirmedDoc.cs" />
+    <Compile Include="CoreInterfaces\Document\IRecognizableDoc.cs" />
+    <Compile Include="CoreInterfaces\Document\IReturnedDoc.cs" />
+    <Compile Include="CoreInterfaces\Document\ISendedDoc.cs" />
+    <Compile Include="CoreInterfaces\Document\ISignedDoc.cs" />
+    <Compile Include="CoreInterfaces\Document\IVizaDoc.cs" />
+    <Compile Include="Models\Account\SettingModel.cs" />
+    <Compile Include="Models\Account\UserModel.cs" />
+    <Compile Include="Models\Account\WorkPlaceModel.cs" />
+    <Compile Include="Models\BlankNumber\BlankNumberModel.cs" />
+    <Compile Include="Models\BlankNumber\DocBlankNumbers.cs" />
+    <Compile Include="Models\BlankNumber\DocBlankTypes.cs" />
+    <Compile Include="Models\Direction\Common\GirdViewModel.cs" />
+    <Compile Include="Models\Direction\Direction\DcWorkplace.cs" />
+    <Compile Include="Models\Direction\Direction\DirectionModel.cs" />
+    <Compile Include="Models\Direction\Direction\DocsDirection.cs" />
+    <Compile Include="Models\DocGrid\BaseGridModel.cs" />
+    <Compile Include="Models\DocGrid\DocGridViewModel.cs" />
+    <Compile Include="Models\DocInfo\AnswerDoc.cs" />
+    <Compile Include="Models\DocInfo\BaseDocInfo.cs" />
+    <Compile Include="Models\DocInfo\DeletedFromViza.cs" />
+    <Compile Include="Models\DocInfo\DocFile.cs" />
+    <Compile Include="Models\DocInfo\DocHistory.cs" />
+    <Compile Include="Models\DocInfo\DocPlan.cs" />
+    <Compile Include="Models\DocInfo\DocTask.cs" />
+    <Compile Include="Models\DocInfo\EnteredDoc.cs" />
+    <Compile Include="Models\DocInfo\RelatedDoc.cs" />
+    <Compile Include="Models\Document\BaseElectronDoc.cs" />
+    <Compile Include="Models\Document\ChooseModel.cs" />
+    <Compile Include="Models\Document\DocCountModel.cs" />
+    <Compile Include="Models\Document\DocResult.cs" />
+    <Compile Include="Models\Document\DocumentGroupModel.cs" />
+    <Compile Include="Models\Document\EntityModel\AuthorModel.cs" />
+    <Compile Include="Models\Document\EntityModel\DocumentGridModel.cs" />
+    <Compile Include="Models\Document\EntityModel\FileInfoModel.cs" />
+    <Compile Include="Models\Document\EntityModel\FilterableModel.cs" />
+    <Compile Include="Models\Document\EntityModel\SendForInformationModel.cs" />
+    <Compile Include="Models\Document\DocFileInfo.cs" />
+    <Compile Include="Models\Document\IDocument.cs" />
+    <Compile Include="Models\Document\QrDocModel\IQrDocument.cs" />
+    <Compile Include="Models\Document\PeriodModel.cs" />
+    <Compile Include="Models\Document\ViewModel\ActionNameViewModel.cs" />
+    <Compile Include="Models\Document\ViewModel\DocCountViewModel.cs" />
+    <Compile Include="Models\Document\ViewModel\DocumentGridViewModel.cs" />
+    <Compile Include="Models\Document\ViewModel\DocumentInfoViewModel.cs" />
+    <Compile Include="Models\Document\ViewModel\ElectronicDocumentViewModel.cs" />
+    <Compile Include="Models\Document\ViewModel\FilterableViewModel.cs" />
+    <Compile Include="Models\Document\ViewModel\SendForInformationViewModel.cs" />
+    <Compile Include="Models\Notify\NotifyModel.cs" />
+    <Compile Include="Models\Permission\PermissionModel.cs" />
+    <Compile Include="Models\Report\DashboardViewModel.cs" />
+    <Compile Include="Models\Report\Filter\ReportAllDocsFilter.cs" />
+    <Compile Include="Models\Report\Filter\ReportCitizenFilter.cs" />
+    <Compile Include="Models\Report\Filter\ReportForInformationDocsFilter.cs" />
+    <Compile Include="Models\Report\Filter\ReportInExecutionDocsFilter.cs" />
+    <Compile Include="Models\Report\Filter\ReportIsExecutedDocsFilter.cs" />
+    <Compile Include="Models\Report\IncomingDocs.cs" />
+    <Compile Include="Models\Report\JsonDocIds.cs" />
+    <Compile Include="Models\Report\Paging\Pager.cs" />
+    <Compile Include="Models\Report\Paging\PagerPartialModel.cs" />
+    <Compile Include="Models\Report\Paging\QueryStringHelper.cs" />
+    <Compile Include="Models\Report\RelationDocs.cs" />
+    <Compile Include="Models\Report\ReportAllDocsBodyViewModel.cs" />
+    <Compile Include="Models\Report\ReportAllDocsModel.cs" />
+    <Compile Include="Models\Report\ReportCitizenBodyViewModel.cs" />
+    <Compile Include="Models\Report\ReportCitizenModel.cs" />
+    <Compile Include="Models\Report\ReportForInformationDocsBodyViewModel.cs" />
+    <Compile Include="Models\Report\ReportForInformationDocsModel.cs" />
+    <Compile Include="Models\Report\ReportIsExecutedDocsBodyViewModel.cs" />
+    <Compile Include="Models\Report\ReportIsExecutedDocsModel.cs" />
+    <Compile Include="Models\Report\ReportForm1Model.cs" />
+    <Compile Include="Models\Report\ReportForm2Model.cs" />
+    <Compile Include="Models\Report\ReportModel.cs" />
+    <Compile Include="Models\Report\ReportInExecutionDocsModel.cs" />
+    <Compile Include="Models\Report\ReportInExecutionDocsBodyViewModel.cs" />
+    <Compile Include="Models\Report\ReportInExecutionDocsModelDropDown.cs" />
+    <Compile Include="Models\Report\ReportPdf.cs" />
+    <Compile Include="Models\Report\ReportPdfAndExcelModel.cs" />
+    <Compile Include="Models\Report\ReportPdfOrExcelModel.cs" />
+    <Compile Include="Models\Report\ReportsViewModel.cs" />
+    <Compile Include="Models\WaitingDocs\DocInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CustomHelpers\CustomHelpers.csproj">
+      <Project>{7b2a824e-461e-4cdc-a6fc-749d6650ea58}</Project>
+      <Name>CustomHelpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataCache\DataCache.csproj">
+      <Project>{a9a71371-1be0-4e12-a6ef-4a5f5b4e490f}</Project>
+      <Name>DataCache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LogHelpers\LogHelpers.csproj">
+      <Project>{c311c9b9-f9fa-4437-a798-ec11ac528dfc}</Project>
+      <Name>LogHelpers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Model\Model.csproj">
+      <Project>{4ba0c8d0-4877-4ae6-b222-d52026000b59}</Project>
+      <Name>Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Repository\Repository.csproj">
+      <Project>{56709464-10F3-4C3D-81C8-D7B1C3023183}</Project>
+      <Name>Repository</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
+</Project>

@@ -1,0 +1,27 @@
+﻿@using BLL.Models.Document
+@model BaseElectronDoc
+
+<script>
+    $("#recognizedButton").click(function () {
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        var requestToken =  $("#spanToken").html();
+
+        $.ajax({
+            url: `/az/DocOperation/RecognizedDocument?token=${requestToken}`,
+                    type: "POST",
+                    data: { __RequestVerificationToken: token, executorId:@Model.ExecutorId },
+            beforeSend: function() {
+                window.ShowLoading();
+            },
+            dataType: 'json',
+            success: function () {
+                var pageIndex = $('.jqx-grid').CachedGrid().config.params.pageIndex;
+                $('.jqx-grid').bindgrid(pageIndex, undefined);
+                $('#doubleClickModal').modal('hide');
+            },
+            complete: function() {
+                window.CloseLoading();
+            }
+        });
+    });
+</script>

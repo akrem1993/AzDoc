@@ -1,0 +1,49 @@
+﻿<div class="mModal">
+    <div class="modal fade modalBtn" id="approveDialogModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+                    <span>Verifikasiya etməyə əminsinizmi ?</span>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" id="approveButton" class="mBtn mBtn-pr defaultBtn" style="width: 100%">Verifikasiya et</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" style="width: 100%">Bağla</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#approveButton").click(function () {
+        var requestToken = $("#spanToken").text();
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: `/az/DocOperation/ApproveDocument?token=${requestToken}`,
+            beforeSend: function () {
+                window.ShowLoading();
+            },
+            dataType: 'json',
+            data: { __RequestVerificationToken: token, note: '' },
+            success: function (result) {
+                if (result === 1) {
+                    var pageIndex = $('.jqx-grid').CachedGrid().config.params.pageIndex;
+                    $('.jqx-grid').bindgrid(pageIndex, undefined);
+                    $('#approveDialogModal').modal('hide');
+                    $('#doubleClickModal').modal('hide');
+                }
+            },
+            complete: function () {
+                window.CloseLoading();
+            }
+        });
+    });
+</script>

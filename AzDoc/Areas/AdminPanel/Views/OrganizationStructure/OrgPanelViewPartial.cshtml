@@ -1,0 +1,18 @@
+﻿
+@using AzDoc.App_LocalResources
+@{
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+
+}
+
+<div class="row no-gutters mt-4">
+    <div class="">
+        <div class="newDocBtn">
+            <button id="newOrg" class="mBtn mBtn-pr" style="width: 100%"> <i class="fas fa-plus">Yeni qurum yarat</i></button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,204 @@
+﻿@using BLL.Common.Enums
+
+@{
+    /**/
+
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    var docType = SessionHelper.DocTypeId;
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+    <style>
+        button,
+        [type="button"],
+        [type="reset"],
+        [type="submit"] {
+            -webkit-appearance: none !important;
+        }
+    </style>
+
+    var grid = Html.MhmGrid("gridReserveDocs", "Document", "Document", routeValues: new { area = "ReserveDocs", docType = SessionHelper.DocTypeId })
+       .Columns(cols =>
+       {
+         
+           cols.Column(c =>
+           {
+               c.SetText("Qeydiyyat nömrəsi");
+               c.SetDataField("DocEnterno");
+               c.SetHeaderAlign(TextAlign.Center);
+               c.SetCellsAlign(TextAlign.Left);
+               c.SetMinWidth(50);
+               c.SetMaxWidth(130);
+               c.IsPinned();
+               c.IsFilterable();
+           });           
+           cols.Column(c =>
+           {
+               c.SetText("İmzalayan şəxs");
+               c.SetDataField("Signer");
+               c.SetHeaderAlign(TextAlign.Center);
+               c.SetCellsAlign(TextAlign.Left);
+               c.SetMinWidth(50);
+               c.SetMaxWidth(130);
+               c.IsPinned();
+               c.IsFilterable();
+           });
+        
+           cols.Column(c =>
+           {
+               c.SetText("Sənədin növü");
+               c.SetDataField("DocType");
+               c.SetHeaderAlign(TextAlign.Center);
+               c.SetCellsAlign(TextAlign.Left);
+               c.SetMinWidth(200);
+               c.SetMaxWidth(300);
+            
+
+           });
+           cols.Column(c =>
+           {
+               c.SetText("Sənədin tarixi");
+               c.SetDataField("DocEnterdate", FieldType.Date, "dd.MM.yyyy");
+               c.SetHeaderAlign(TextAlign.Center);
+               c.SetCellsAlign(TextAlign.Left);
+               c.SetMinWidth(100);
+               c.SetMaxWidth(200);
+               c.IsFilterable(Filtertype.Date);
+           });
+        
+           cols.Column(c =>
+           {
+               c.SetText("Qısa məzmun");
+               c.SetDataField("DocDescription");
+               c.SetHeaderAlign(TextAlign.Center);
+               c.SetCellsAlign(TextAlign.Left);
+               c.SetMinWidth(200);
+               c.SetMaxWidth(300);
+               c.IsFilterable();
+           });
+           cols.Column(c =>
+           {
+               c.SetText("Sənədi yaradan");
+               c.SetDataField("CreaterPersonnelName");
+               c.SetHeaderAlign(TextAlign.Center);
+               c.SetCellsAlign(TextAlign.Left);
+               c.SetMinWidth(100);
+               c.SetMaxWidth(200);
+               c.IsFilterable();
+           });
+           cols.Column(c =>
+           {
+               c.SetText("Qurum");
+               c.SetDataField("DocOrganization");
+               c.SetHeaderAlign(TextAlign.Center);
+               c.SetCellsAlign(TextAlign.Left);
+               c.SetMinWidth(200);
+               c.SetMaxWidth(300);            
+               c.IsFilterable();
+           });
+           cols.Column(c =>
+           {
+               c.SetText("");
+               c.SetDataField("ExecutorControlStatus");
+               c.SetHeaderAlign(TextAlign.Center);
+               c.SetCellsAlign(TextAlign.Left);
+               c.SetMinWidth(100);
+               c.SetMaxWidth(200);
+               c.SetHidden();
+               c.IsFilterable(Filtertype.CheckedList);
+           });
+     
+
+       })
+       .AllowCrud()
+       .SetRowDoubleClick("onRowDoubleClick")
+       .AllowSorting(false)
+       .AllowTooltips(false)
+       .AllowPaging(true)
+       .AllowFiltering(true)
+       .AllowFilterRow(true)
+       .AllowColumnOrdering(true)
+       .AllowColumnResizing(true)
+       .SetOnFilter("onFilter")
+       //.SetUnRead("checkUnread")
+       .SetPageSize(35)
+       .SetWidth("100%")
+       .SetHeight("100%");
+}
+
+@{
+    Html.RenderPartial("_BreadCrumbPartial");
+}
+@Html.AntiForgeryToken()
+<div class="col-md-12" id="DocGrid" style="padding-top: 10px; height: 86vh">
+    @grid.GetHtml()
+</div>
+
+
+<div id="popover-content-ActionName"></div>
+
+
+
+
+
+
+
+
+@section scripts{
+
+    <script>
+           function onFilter(sender, args, query) {
+            $('#gridOutgoingDoc').bindgrid(1);
+        }
+        function onRowDoubleClick(event, rowdata) {
+            //window.ShowLoading();
+            //$("#globalDocId").val(rowdata.DocId);
+            //config.electronicDoc.data.docId = rowdata.DocId;
+            //config.infoOperation.data.docId = rowdata.DocId;
+
+            //$.ajax({
+            //    type: 'GET',
+            //    url: config.electronicDoc.url,
+            //    dataType: 'html',
+            //    data: config.electronicDoc.data,
+            //    beforeSend: function () { window.ShowLoading(); },
+            //    success: function (response) {
+            //        $('#ElectronicDocument').html(response);
+            //        $(`[title='${rowdata.DocId}']`).closest('[role="row"]').removeClass('unread');
+            //        $("#doubleClickModal").modal();
+            //        console.log(config.infoOperation.url);
+            //        $.ajax({
+            //            type: 'GET',
+            //            url: config.infoOperation.url,
+            //            dataType: 'json',
+            //            data: config.infoOperation.data,
+            //            success: function (result) {
+            //                if (result != '') {
+            //                    $.ajax({
+            //                        type: 'GET',
+            //                        url: '/az/Document/GetDocView'.buildUrl({ token: result }),
+            //                        dataType: 'html',
+            //                        success: function (docInfoView) {
+            //                            window.CloseLoading();
+            //                            $('#DocInfo').html(docInfoView);
+            //                        }
+            //                    });
+            //                }
+            //            },
+            //            complete: function () {
+            //                window.CloseLoading();
+            //            }
+            //        });
+            //    },
+            //    complete: function () {
+            //        window.CloseLoading();
+            //    }
+            //});
+
+        }
+    </script>
+}

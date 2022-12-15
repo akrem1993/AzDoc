@@ -1,0 +1,48 @@
+﻿@using AzDoc.Helpers
+@using AzDoc.App_LocalResources
+@{
+    var lang = SessionHelper.DefaultLang;
+}
+<table>
+    <tr>
+        <td class="tdFP">
+            <select id="DefaultPagesLanguages" class="form-control selectpicker" data-width="100%" data-container="body"></select>
+        </td>
+        <td>
+            <button class="btn btn-primary" id="btnChangeLanguage" style="font-size:12px" onclick="SaveLang()">
+                @RLang.Save
+            </button>
+        </td>
+    </tr>
+</table>
+
+<script>
+    
+    $.ajax({
+        type: "GET",
+        url: "/az/Settings/ChangeDefaultLanguage",
+        success: function (model) {
+            console.log(model);
+            $.each(model, function () {
+                $("#DefaultPagesLanguages").append($("<option></option>").val(this.Id).html(this.Name));
+            });
+
+            $('.selectpicker').selectpicker('refresh');
+        }
+    });
+
+
+    $("#btnChangeLanguage").click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/az/Settings/ChangeDefaultLanguage",
+            dataType: "json",
+            data: { langId: $("#DefaultPagesLanguages").val() },
+            success: function (response) {
+                if (response.result == true)
+                    toastr.success("Əməliyyat uğurlu oldu");
+            }
+        });
+    });
+</script>
+

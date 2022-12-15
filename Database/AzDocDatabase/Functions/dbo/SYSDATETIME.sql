@@ -1,0 +1,11 @@
+CREATE FUNCTION [dbo].[SYSDATETIME]
+(
+	
+)
+RETURNS datetime2
+AS
+BEGIN
+	RETURN dateadd(HOUR,4,GETUTCDATE())
+
+END
+

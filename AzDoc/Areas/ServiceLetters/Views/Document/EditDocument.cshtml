@@ -1,0 +1,250 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@using ServiceLetters.Common.Enums
+@{
+    ViewBag.Title = "EditDocument";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<link href="~/Content/common/md-form-design.css" rel="stylesheet" />
+<style>
+    .bootstrap-select .dropdown-menu {
+        max-width: 100% !important;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    .container-fluid {
+        font-size: 80% !important;
+    }
+
+    .card-header-custom {
+        background-color: #5c91af !important;
+        padding: 0.4em 1.25rem !important;
+    }
+
+    .icon-size {
+        font-size: 1.2em;
+    }
+</style>
+<div class="col-12">
+    <div class="row breadCrumbRow mt-5">
+        <div class="col-6 text-center" id="basicInformation">
+            <a href="#step1" class="brActive" data-brcrumb="1">
+                @RLang.BasicInfo
+            </a>
+        </div>
+
+        <div class="col-6 text-center" id="attachmentDocuments">
+            <a href="#step2" data-brcrumb="2">@RLang.EDocuments</a>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("EditDocument", "Operation", FormMethod.Post, new { id = "EditDocument" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            @Html.Partial("BasicInformationPartial")
+        </div>
+
+        <div class="connectDoc contentItem d-none" id="step2" style="padding-top:1px" data-brnum="2">
+            @Html.Partial("~/Views/Document/AttachmentDocumentsPartial.cshtml")
+        </div>
+    </div>
+
+}
+
+@section scripts{
+    <script src="~/Scripts/serviceletters/form-wizard.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/serviceletters/serviceletters.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/AttachmentFile.js?v=@AppVersion.Version"></script>
+
+    <script>
+
+        $('#fakeButton').click();
+
+        function deleteRowAuthor(adrId, element) {
+
+            Swal.fire({
+                title: 'Bu sətir cədvəldən silinəcək',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Ləğv et',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/@lang/ServiceLetters/Document/DeleteDocument',
+                        dataType: 'html',
+                        data: { rowId: adrId, formTypeId: 0 },
+                        success: function(result) {
+                            if (result == @((int) Result.Success)) {
+                                $(element).parents("tr").remove();
+                                document.getElementById('hidden_Supervision').style.display = 'none';
+                                $("#Supervision").prop("checked", false);
+                                Swal.fire({
+                                    type: 'success',
+                                    title: 'Məlumat silindi',
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        };
+
+        function deleteRowRelated(relatedId, element) {
+
+            Swal.fire({
+                title: 'Bu sətir cədvəldən silinəcək',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Ləğv et',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/@lang/ServiceLetters/Document/DeleteDocument',
+                        dataType: 'html',
+                        data: { rowId: relatedId, formTypeId: 1 },
+                        success: function(result) {
+                            if (result == @((int) Result.Success)) {
+
+                                var answerDocId = $(element).parents("tr").attr('data-docid'); // daxil olan sened
+                                DeleteJointExecutors(answerDocId); // vizalardan musterek icracilarin silinmesi
+
+                                $(element).parents("tr").remove();
+                                $("#relatedDocTable").find("tr.rowSelector").length == 0
+                                    ? $("#relatedDocTable").hide()
+                                    : "";
+                                $("#answerDocTable").find("tr.data-row").length == 0
+                                    ? $("#answerDocTable").hide()
+                                    : "";
+                                Swal.fire({
+                                    type: 'success',
+                                    title: 'Məlumat silindi',
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+
+        function deleteTask(taskId,element) {
+            Swal.fire({
+                title: 'Bu sətir cədvəldən silinəcək',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Ləğv et',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/@lang/ServiceLetters/Document/DeleteDocument',
+                            dataType: 'html',
+                            data: { rowId: taskId,formTypeId:2  },
+                            success: function (result) {
+                                if (result == @((int)Result.Success)) {
+                                    $(element).parents("tr").remove();
+                                    SAlertDelete(1);
+                                }
+                            }
+                        });
+                }
+            });
+        }
+
+        $("#ParentButton").click(function () {
+            var passedValue = $(this).closest('table tbody:tr:first').attr('data-customValue');
+
+            if ($(".table-custom").find("tr.rowSelector").length === 0) {
+                return toastr.warning(" Qoşma sənədi daxil edin.");
+            }
+
+            if (vizaPersonList.length == 0) {
+                return toastr.warning("Sənədin vizaları təyin olunmayıb.");
+            }
+
+            var isMainCount = 0;
+            var pageCopyCount = 0;
+
+            $.each($("input[name='isMain']"),
+                function() {
+                    if ($(this).attr('checked') === 'checked') {
+                        ++isMainCount;
+                    }
+                });
+
+            $.each($("i[name='icon']"),
+                function() {
+                    if ($.trim($(this).text()) === "") {
+                        $(this).closest("span").css('border', '1px solid red');
+                        ++pageCopyCount;
+                    }
+                });
+
+            if (isMainCount === 0) {
+                $.each($("input[name='isMain']"),
+                    function() {
+                        $(this.parentElement).css('border', 'solid red 1px');
+                    });
+                toastr.warning("Bütün məcburi xanaların doldurulduğuna əmin olun.");
+            }
+
+            if (isMainCount !== 0 && pageCopyCount === 0) {
+
+                if (vizaPersonList.length == 0)
+                    return toastr.warning("Sənədin vizaları təyin olunmayıb.");
+
+                var formData = $('#EditDocument').getFormData();
+                formData.WhomAddressModels = $('#tbWhomAddress').tableToJsonList();
+                formData.RelatedDocModels = $('#relatedDocTable').tableToJsonList();
+                formData.AuthorModels = $('#dataTableOrgAuthor').tableToJsonList();
+                formData.AnswerByLetterModels = $('#answerDocTable').tableToJsonList();
+                formData.VizaDataJson = JSON.stringify(vizaPersonList);
+
+                var token = $('input[name="__RequestVerificationToken"]').val();
+                var searchParams = new URLSearchParams(window.location.search);
+                var requestToken = searchParams.get('token');
+                $.ajax({
+                    type: 'POST',
+                    url: `/@lang/ServiceLetters/Operation/EditDocument?token=${requestToken}`,
+                    dataType: 'json',
+                    data: { __RequestVerificationToken: token, model: formData, passedValue: passedValue },
+                    beforeSend: function() {
+                        window.ShowLoading();
+                    },
+                    success: function(response) {
+                        if (response) {
+                            window.location = '/@lang/ServiceLetters';
+                        }
+                    },
+                    complete: function() {
+                        window.CloseLoading();
+                    }
+                });
+            }
+
+        });
+
+    </script>
+}

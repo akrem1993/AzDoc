@@ -1,0 +1,22 @@
+﻿@using AzDoc.Helpers
+
+<script>
+    $("#resolution").click(function () {
+        $.ajax({
+            url: '/az/Direction/DirectionModal',
+            type: 'GET',
+            dataType: 'html',
+            data: { docId: @SessionHelper.ResolutionDocId },
+            beforeSend: function() {
+                window.ShowLoading();
+            },
+            success: function(response) {
+                $('#dynamiccontext').html(response);
+                unblockInputs();
+            },
+            complete: function() {
+                window.CloseLoading();
+            }
+        });
+    });
+</script>

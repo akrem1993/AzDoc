@@ -1,0 +1,10 @@
+CREATE TABLE [dbo].[DC_RESOLUTION_RIGHT](
+	[ResolutionRightId] int identity NOT NULL,
+	[FromWorkplaceId] int NOT NULL,
+	[ToWorkplaceId] int NOT NULL,
+	[Status] bit NOT NULL CONSTRAINT [DF_DC_RESOLUTION_RIGHT_Status]  DEFAULT 1,
+	[InsteadOfConfirmWorkplaceId] int NULL,
+    CONSTRAINT [PK_DC_RESOLUTION_RIGHT] PRIMARY KEY ([ResolutionRightId]),
+    CONSTRAINT [FK_DC_RESOLUTION_RIGHT_DC_WORKPLACE] FOREIGN KEY([FromWorkplaceId]) REFERENCES [dbo].[DC_WORKPLACE] ([WorkplaceId]),
+    CONSTRAINT [FK_DC_RESOLUTION_RIGHT_DC_WORKPLACE1] FOREIGN KEY([ToWorkplaceId]) REFERENCES [dbo].[DC_WORKPLACE] ([WorkplaceId])
+)

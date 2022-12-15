@@ -1,0 +1,155 @@
+﻿@using AzDoc.App_LocalResources
+@model BLL.Models.Report.DashboardViewModel
+@{
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+<div class="row">
+    <div class="input-group mb-3">
+        <div class="col-4">
+            <label>Sənədin növü </label>
+            @Html.DropDownListFor(model => model.Menu.Id,
+                new SelectList(Model.Menus, "Id", "Name", Model.Menu.Id), "Seç", new
+                {
+                    @id = "Menu",
+                    @class = "selectpicker",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+                })
+        </div>
+    </div>
+
+
+    <div class="col-7">
+        <div class="charts mt-4 mb-5" style="height: 61vh">
+            <canvas id="chartBar" style="max-height: 100%"></canvas>
+        </div>
+    </div>
+    <div class="col-5">
+        <div class="charts mt-4 mb-5" style="height: 61vh">
+            <canvas id="chartPie" style="max-height: 100%"></canvas>
+        </div>
+    </div>
+
+</div>
+<script>
+
+    $(document).ready(function () {
+        $("#Menu").change(function () {
+            var docTypeId = $(this).val();
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/Report/DashBoard/',
+                dataType: 'html',
+                data: { docTypeId: docTypeId },
+                success: function (response) {
+                    $('#Dashboard').html(response);
+                    $.ajax({
+                        type: 'GET',
+                        url: '/@lang/Report/Reports',
+                        dataType: 'html',
+                        success: function (response) {
+                            $('#Reports').html(response);
+                            $('.selectpicker').selectpicker('refresh');
+
+                        }
+                    });
+                },
+                complete: function () {
+                    window.CloseLoading();
+                }
+            });
+
+
+        });
+
+        $('.selectpicker').selectpicker('refresh');
+        var data = @Html.Raw(ViewBag.json);
+        var ctx = document.getElementById("chartBar").getContext('2d');;
+        var chartBar = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Object.values(data.DashboardsBar).map(function (a) { return a.Name }),
+                datasets: [{
+                    label: Object.values(data.MenuNames).map(function (a) { return a.Name }),
+                    data: Object.values(data.DashboardsBar).map(function (a) { return a.Id }),
+                    lineTension: 0,
+                    backgroundColor: '#8ebccb',
+                    borderColor: '#4f6870',
+                    borderWidth: 4,
+                    pointBackgroundColor: '#007bff'
+                }]
+            },
+            options: {
+                legend: {
+                    labels: {
+                        fontColor: '#18191b'
+                    }
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            color: "#ccc",
+                        },
+                        ticks: {
+                            fontColor: "#18191b",
+                            beginAtZero: true
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            color: "#ccc",
+                        },
+                        ticks: {
+                            fontColor: "#18191b",
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        var ctx = document.getElementById("chartPie").getContext('2d');;
+        var chartPie = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.values(data.DashboardsPie).map(function (a) { return a.Name }),
+                datasets: [{
+                    data: Object.values(data.DashboardsPie).map(function (a) { return a.Id }),
+                    lineTension: 0,
+                    backgroundColor: ['#e95b54','#fbce4a','#3caf85','#309fdb','#854e9b','#9e3533','#daa05d','#8ebccb'],
+                    borderWidth: 0,
+                    pointBackgroundColor: '#007bff'
+                }]
+            },
+                options: {
+                    legend: {
+                        labels: {
+                            fontColor: '#18191b'
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            display:false
+                        }],
+                        yAxes: [{
+                            display:false
+                        }]
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+               }
+        });
+
+
+
+    });
+
+
+
+</script>

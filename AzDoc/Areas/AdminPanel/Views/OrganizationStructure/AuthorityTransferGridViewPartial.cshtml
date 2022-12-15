@@ -1,0 +1,147 @@
+﻿@using AzDoc.Helpers
+@using BLL.Common.Enums
+@using Widgets
+
+@{
+    Layout = null;
+
+    <style>
+        button,
+        [type="button"],
+        [type="reset"],
+        [type="submit"] {
+            -webkit-appearance: none !important;
+        }
+    </style>
+    var grid = Html.MhmGrid("gridAuthorityTransfer", "GetAuthorityTransferInfo", "OrganizationStructure", routeValues: new { area = "AdminPanel" })
+               .Columns(cols =>
+               {
+                   cols.Column(c =>
+                   {
+                       c.SetText("");
+                       c.SetDataField("AuthorityId", FieldType.Number);
+                       c.SetHeaderAlign(TextAlign.Center).IsFilterable();
+                       c.SetWidth(35);
+                       c.IsCrud("x", "x");
+                       c.SetRenderer("<a><i class='fas fa-edit'></i></a>",
+                       htmlAttributes: new
+                       {
+                           @class = "operation-button",
+                           fn_onclick = "EditAuthorityTransfer",
+                           title = "Səlahiyyət ötürülməsinin redaktəsi"
+                       });
+                   });
+                   //cols.Column(c =>
+                   //{
+                   //    c.SetText("");
+                   //    c.SetDataField("AuthorityId1", FieldType.Number);
+                   //    c.SetHeaderAlign(TextAlign.Center).IsFilterable();
+                   //    c.SetWidth(35);
+                   //    c.IsCrud("x", "x");
+                   //    c.SetRenderer("<a><i class='fas fa-ban'></i></a>",
+                   //    htmlAttributes: new
+                   //    {
+                   //        @class = "operation-button",
+                   //        fn_onclick = "AuthorityTransferDisable",
+                   //        title = "Səlahiyyət ötürülməsinin deaktiv edilməsi"
+                   //    });
+                   //});
+                   cols.Column(c =>
+                   {
+                       c.SetText("");
+                       c.SetDataField("AuthorityId2", FieldType.Number);
+                       c.SetHeaderAlign(TextAlign.Center).IsFilterable();
+                       c.SetWidth(35);
+                       c.IsCrud("x", "x");
+                       c.SetRenderer("<a><i class='fas fa-trash'></i></a>",
+                           htmlAttributes: new
+                           {
+                               @class = "operation-button",
+                               fn_onclick = "AuthorityTransferRemove",
+                               title = "Səlahiyyət ötürülməsinin silinməsi"
+                           });
+                   });
+
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>Kimdən</b>");
+                       c.SetDataField("TransferredFromPerson");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.IsFilterable();
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>Kimə</b>");
+                       c.SetDataField("TransferredToPerson");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.IsFilterable();
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>Səbəb</b>");
+                       c.SetDataField("TransferReason");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.IsFilterable();
+                       c.SetMaxWidth(160);
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>Başlama tarixi</b>");
+                       c.SetDataField("BeginDate");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Center);
+                       c.IsFilterable();
+                       c.SetMaxWidth(160);
+                   });
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>Bitmə tarixi</b>");
+                       c.SetDataField("EndDate");
+                       c.ColumnType = "datetime";
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Center);
+                       c.IsFilterable();
+                       c.SetMaxWidth(160);
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>Qeyd</b>");
+                       c.SetDataField("TransferNote");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Center);
+                       c.IsFilterable();
+                       c.SetMinWidth(300);
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("<b>Status</b>");
+                       c.SetDataField("AuthorityStatus");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Center);
+                       c.IsFilterable();
+                       c.SetMaxWidth(80);
+                   });
+
+               })
+               .AllowCrud()
+               .AllowSorting(false)
+               .AllowTooltips(false)
+               .AllowPaging(true)
+               .AllowFiltering(true)
+               .AllowFilterRow(true)
+               .AllowColumnOrdering(true)
+               .AllowColumnResizing(true)
+               .SetOnFilter("onFilter")
+               .SetPageSize(35)
+               .SetWidth("100%")
+               .SetHeight("100%");
+
+
+}
+@grid.GetHtml()

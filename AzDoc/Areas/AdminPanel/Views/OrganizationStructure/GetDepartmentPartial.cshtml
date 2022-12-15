@@ -1,0 +1,115 @@
+﻿@model Admin.Model.ViewModel.PassDepartmentViewModel
+@using DMSModel
+@using Model.DB_Tables
+@{
+    RouteData routeData = ViewContext.RouteData;
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+    var _lang = routeValueDictionary["lang"] ?? "az";
+}
+<div class="row">
+    <input type="hidden" name="DeptId" value="@Model.Department.DepartmentId" />
+    <div class="col-sm-12">
+        <div class="form-group">
+            <label>Qurum adı</label>
+            <select id="TopOrgId" name="TopOrgId" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                <option value="-1">Seçin</option>
+                @foreach (DC_ORGANIZATION org in Model.Organisations)
+                {
+                    <option value="@org.OrganizationId" @(Model.Department.DepartmentOrganization == org.OrganizationId ? "selected" : "")>@org.OrganizationShortname</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="form-group">
+            <label>Tipi</label>
+            <select id="DeptTypeId" name="DeptTypeId" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                <option>Seçin</option>
+                @foreach (DC_DEPARTMENTTYPE deptType in Model.DeptTypes)
+                {
+                    <option value="@deptType.TypeId" @(Model.Department.DepartmentTypeId == deptType.TypeId ? "selected" : "")>@deptType.TypeName</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="form-group">
+            <label>Adı</label>
+            <input id="DeptName" type="text" name="DeptName" class="form-control" value="@Model.Department.DepartmentName" />
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="form-group">
+            <label>Tabe olduğu</label>
+            <select id="TopDeptId" name="TopDeptId" class="form-control gx selectpicker" data-live-search="true" data-width="100%" disabled>
+                <option value="">Seçin</option>
+                @foreach (DC_DEPARTMENT dept in Model.Departments)
+                {
+                    <option value="@dept.DepartmentId" @(Model.Department.DepartmentTopId == dept.DepartmentId ? "selected" : "")>@dept.DepartmentName</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <div class="form-group">
+            <label>İndeksi</label>
+            <input id="DeptIndex" type="text" name="DeptIndex" class="form-control" value="@Model.Department.DepartmentIndex" />
+        </div>
+    </div>
+</div>
+<script>
+    
+    $(document).ready()
+    {
+        function Refresh() {
+            $('.selectpicker').selectpicker('refresh');
+        }
+
+         if ($('#TopOrgId').val() == -1) {
+            $("#TopOrgId").on('change',
+                function() {
+                   $("#TopDeptId").removeAttr('disabled')
+                   Refresh();
+                   if ($('#TopOrgId').val() === 'Seçin') {
+                       $('#TopDeptId').prop('disabled', true);
+                   }
+                   Refresh();
+                   var selectedOrgs = $(this).find('option:selected').val();
+                   var select = $('#TopDeptId');
+                   if (selectedOrgs === -1) {
+                       select.empty();
+                       Refresh();
+                       select.prop('disabled', true);
+                       return;
+                    }
+                    select.empty().append($("<option selected >Seçin</option>").val("-1"));
+                    $.ajax({
+                        url: '/@_lang/AdminPanel/OrganizationStructure/GetDepartmentWhileCreate',
+                        type: 'GET',
+                        data: { orgId: selectedOrgs },
+                        success: function(data) {
+                            $.each(data,
+                                function() {
+                                    select.append($("<option></option>").val(this.Id).html(this.Name));
+                                });
+                            Refresh();
+                        },
+                        error:
+                            function(data) {
+                                consoleLog(data.message());
+                            }
+                    });
+                });
+        }
+        else
+        {
+            $('#TopDeptId').removeAttr('disabled');
+             Refresh();
+        }
+    }
+       
+
+   
+
+    
+</script>

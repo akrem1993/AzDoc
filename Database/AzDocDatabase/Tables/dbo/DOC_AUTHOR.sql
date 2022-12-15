@@ -1,0 +1,20 @@
+CREATE TABLE [dbo].[DOC_AUTHOR](
+	[AuthorId] int identity NOT NULL,
+	[AuthorName] nvarchar(250) NULL,
+	[AuthorSurname] nvarchar(250) NULL,
+	[AuthorLastname] nvarchar(250) NULL,
+	[AuthorForma] nvarchar(50) NULL,
+	[AuthorOrganizationId] int NULL,
+	[AuthorDepartmentname] nvarchar(200) NULL,
+	[AuthorSexId] int NULL,
+	[AuthorPositionId] int NULL,
+	[AuthorPhone] nvarchar(200) NULL,
+	[AuthorFax] nvarchar(200) NULL,
+	[AuthorEmail] nvarchar(200) NULL,
+	[AuthorStatus] bit NULL CONSTRAINT [DF__DOC_AUTHO__Autho__1352D76D]  DEFAULT 1,
+	[AuthorDepartmentId] int NULL,
+ CONSTRAINT [PK_DOC_AUTHOR] PRIMARY KEY ([AuthorId]),
+ CONSTRAINT [FK_DOC_AUTHOR_DC_ORGANIZATION1] FOREIGN KEY([AuthorOrganizationId]) REFERENCES [dbo].[DC_ORGANIZATION] ([OrganizationId]),
+ CONSTRAINT [FK_DOC_AUTHOR_DC_POSITION] FOREIGN KEY([AuthorPositionId]) REFERENCES [dbo].[DC_POSITION] ([PositionId]),
+ CONSTRAINT [FK_DOC_AUTHOR_DC_SEX] FOREIGN KEY([AuthorSexId]) REFERENCES [dbo].[DC_SEX] ([SexId])
+)

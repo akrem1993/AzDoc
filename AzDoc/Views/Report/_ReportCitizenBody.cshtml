@@ -1,0 +1,100 @@
+﻿@using BLL.Models.Report
+@using AzDoc.Helpers
+@model ReportCitizenBodyViewModel
+<style>
+    .mTable2 tbody tr td {
+        max-width: 260px;
+        text-align: left;
+    }
+
+        .mTable2 tbody tr td a {
+            white-space: nowrap;
+        }
+
+    .tableFixHead {
+        overflow-y: auto;
+        height: 100px;
+    }
+
+        .tableFixHead thead th {
+            position: sticky;
+            top: -1px;
+        }
+
+    .mTable thead tr td, .mTable thead tr th {
+        vertical-align: middle !important;
+    }
+</style>
+
+
+@if (Model?.ReportCitizenModel != null && Model.Pager.TotalItems > 0)
+{
+    int count = (Model.Pager.CurrentPage - 1) * Model.Pager.PageSize;
+
+    <div class="row">
+
+        <div class="col-12 mt-3" style="max-height: 60vh; overflow-y: auto">
+            <table class=" tableFixHead table table-striped table-sm mTable mTable2" id="tableReportExecution">
+                <thead>
+                    <tr>
+                        <th>Sıra sayı №</th>
+                        <th>Qeydiyyat tarixi</th>
+                        <th>Qeydiyyat nömrəsi</th>
+                        <th>Sənədin statusu</th>
+                        <th>Müraciətin forması</th>
+                        <th>İcranın nəticəsi</th>
+                        <th>Haradan daxil olub</th>
+                        <th>Kimdən daxil olub </th>
+                        <th>Kimdən daxil olub (Vətəndaşın adı, soyadı, ata adı)</th>
+                        <th>Vətəndaşın sosial statusu</th>
+                        <th>Sənədin qısa məzmunu</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var doc in Model.ReportCitizenModel)
+                    {
+                        count++;
+                    <tr>
+                        <td>@count</td>
+                        <td>@doc.DocEnterDate.ToString("dd.MM.yyyy")</td>
+                        <td><a href="/az/Document/GetDocView?token=@doc.TokenForDocId" target="_blank">@doc.DocEnterno</a></td>
+                        <td>@doc.DocumentStatusName</td>
+                        <td>@doc.FormName</td>
+                        <td>@doc.DocResultName</td>
+                        <td>@doc.EntryFromWhere</td>
+                        <td>@doc.EntryFromWho</td>
+                        <td>@doc.EntryFromWhoCitizenName</td>
+                        <td>@doc.SocialName</td>
+                        <td title="@doc.DocDescription">
+                            @if (doc.DocDescription?.Length >= 30)
+                            {
+                                @($"{doc.DocDescription.Substring(0, 30)} ...")
+                            }
+                            else
+                            {
+                                @doc.DocDescription;
+                            }
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    Html.RenderPartial("_Pager", new BLL.Models.Report.Paging.PagerPartialModel() { Pager = Model.Pager });
+}
+else
+{
+    <div class="row">
+        <div class="col-12 text-center mt-2 ">
+            <span id="docsCount" style="color:red;font-size:30px;">Axtarışa uyğun məlumat tapılmadı.</span>
+        </div>
+    </div>
+}
+<div class="row" style="padding-top:70px;">
+    <div class="col-12 text-right mt-2">
+        <span id="docsCount" style="color: #7fa8b6">Tapılan məlumat sayı : @Model.Pager.TotalItems</span>
+    </div>
+</div>

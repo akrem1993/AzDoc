@@ -1,0 +1,222 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@using ServiceLetters.Model.EntityModel
+@using Smdo.AzDoc.Models;
+@model SmdoDocumentModel
+
+<style>
+    .isChecked {
+        background: #ddd;
+    }
+
+    .check {
+        pointer-events: none;
+    }
+
+    .tr-header > th, #tr > td {
+        border: #ccc solid 1px;
+        text-align: center !important;
+        vertical-align: middle;
+    }
+
+    #ShortContent {
+        height: 100px !important;
+    }
+
+    .btn-light {
+        color: #212529;
+        background-color: #f8f9fa;
+        border-color: #cccccc !important;
+    }
+
+    .tableRelated {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+        text-align: left !important;
+        height: 200px;
+        display: block;
+        overflow: scroll
+    }
+
+    .tr-header-related > th, #tr > td {
+        border: #ccc solid 1px;
+        text-align: left !important;
+        vertical-align: middle;
+    }
+
+    .form-control, .btn {
+        font-size: 0.8rem !important;
+    }
+
+    .card-body {
+        padding: 0.5rem !important;
+    }
+
+    .rowSelector {
+    }
+
+    .td-bold {
+        font-weight: bold;
+    }
+
+    .operationIcons {
+        font-size: 1.7em;
+    }
+</style>
+<link href="~/Content/jquery-editable-select/jquery-editable-select.min.css" rel="stylesheet" />
+<div class="editGroup">
+    <h4>@RLang.BasicInfo</h4>
+
+    <div class="input-group ">
+
+        <div class="col-sm-4">
+            <label class="font-weight-bold">Sənədin növü <span style="color:red;font-weight:bold">*</span> </label>
+            @Html.DropDownListFor(model => model.DocFormId,
+                new SelectList(Model.DocForms, "Id", "Name",34), new
+                {
+                    @class = "selectpicker",
+                    @id = "TypeOfDocument",
+                    @data_live_search = "true",
+                    @data_width = "100%"
+                })
+        </div>
+
+        <div class="col-sm-4">
+            <label class="font-weight-bold">
+                Qeydiyyat tarixi
+                <span style=" color: red;font-weight: bold">*</span>
+            </label>
+            @Html.TextBoxFor(model => model.DocEnterDate, "{0:yyyy-MM-dd}", new
+            {
+                @type = "date",
+                @class = "form-control",
+                @id = "DocEnterDate",
+                @data_required = "Zehmet olmasa Qeydiyyat tarixini daxil edin"
+            })
+        </div>
+
+
+        <div class="col-sm-4">
+            <label class="font-weight-bold">İmza edən şəxs</label>
+            <span style=" color: red;font-weight: bold">*</span>
+            @Html.DropDownListFor(model => model.SignPersonId,
+                new SelectList(Model.SignPersons, "Id", "Name",1), new
+                {
+                    @id = "SignatoryPerson",
+                    @class = "selectpicker",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+                    @data_required = "Zehmet olmasa İmza edən şəxsi daxil edin"
+                })
+        </div>
+
+
+        <div class="col-sm-4">
+            <label class="font-weight-bold">Göndərilmə forması</label>
+            <span style=" color: red;font-weight: bold">*</span>
+            @Html.DropDownListFor(model => model.SendFormId,
+                new SelectList(Model.SendForms, "Id", "Name",1), new
+                {
+                    @id = "SignatoryPerson",
+                    @class = "selectpicker",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+                    @data_required = "Zehmet olmasa İmza edən şəxsi daxil edin"
+                })
+        </div>
+
+        <div class="col-sm-4">
+            <label class="font-weight-bold">Ölkə</label>
+            @Html.DropDownListFor(model => model.ReceiverCountryId,
+                new SelectList(Model.ReceiverCountry, "Id", "Name",1), new
+                {
+                    @class = "selectpicker",
+                    @id = "ConfirmingPerson",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+
+                })
+        </div>
+
+        <div class="col-sm-4">
+            <label class="font-weight-bold">Qurum</label>
+            @Html.DropDownListFor(model => model.ReceiverMinistryId,
+                new SelectList(Model.ReceiverMinistry, "Id", "Name", 1), new
+                {
+                    @class = "selectpicker",
+                    @id = "ConfirmingPerson",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+
+                })
+        </div>
+
+        <div class="col-sm-4">
+            <label class="font-weight-bold">Rəhbər edən şəxs</label>
+            @Html.DropDownListFor(model => model.ReceiverMinisterId,
+                new SelectList(Model.ReceiverMinister, "Id", "Name",1), new
+                {
+                    @class = "selectpicker",
+                    @id = "ConfirmingPerson",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+
+                })
+        </div>
+    </div>
+    <br />
+    <div class="col-sm-4">
+        <div class="custom-file" style="width: 100%">
+            <input type="file" name="fileBase" class="custom-file-input"
+                   accept=".pdf,.jpg,.png,.doc, .docx" id="fileBrowse">
+            <label class="custom-file-label" for="btnBrowse" data-browse="@RLang.Browse">...</label>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="editGroup">
+    <h4>Qısa məzmun<span style="color: red;font-weight: bold">*</span></h4>
+    <textarea name="Note" class="form-control" placeholder="" id="ShortContent">Test qisa mezmun</textarea>
+</div>
+
+<div id="DocView">
+    @*@Html.Partial("DocumentDisplay")*@
+</div>
+
+
+
+
+
+
+<div class="row mb-5 pb-5 mt-4">
+    <div class="col-12 text-center">
+        <button type="button" onclick="window.history.go(-1); return false;" class="btn btn-light btn-lg" title="Geriyə" data-toggle="modal" data-target="#signatureDialogModal">
+            <i class="fas fa-arrow-left operationIcons" style="color: #de4f4f"></i>
+            Geriyə
+        </button>
+
+        @*@if (!Model.HasSign)
+        {
+            <button type="button" id="sign" class="btn btn-light btn-lg" title="İmzala" data-toggle="modal" data-target="#signatureDialogModal">
+                <i class="fas fa-fingerprint operationIcons" style="color: #4e9a46"></i>
+                <span>Imzala</span>
+            </button>
+        }
+
+        <button type="button" id="sendButton" @(!Model.HasSign ? "disabled" : "") class="btn btn-light btn-lg" title="Göndər">
+            <i class="fas fa-paper-plane operationIcons" style="color: #005487"></i>
+            Göndər
+        </button>*@
+
+        <button type="button" onclick="window.history.go(-1); return false;"  class="btn btn-light btn-lg" title="Yadda saxla">
+            <i class="fas fa-save operationIcons" style="color: #005487"></i>
+            Yadda saxla
+        </button>
+
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-editable-select/jquery-editable-select.min.js?v=@AppVersion.Version"></script>

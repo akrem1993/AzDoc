@@ -1,0 +1,116 @@
+﻿
+@using AzDoc.Helpers
+@using BLL.Common.Enums
+@using Widgets
+
+@{
+    Layout = null;
+
+    <style>
+        button,
+        [type="button"],
+        [type="reset"],
+        [type="submit"] {
+            -webkit-appearance: none !important;
+        }
+    </style>
+
+
+    var grid = Html.MhmGrid("gridDepartmentStructure", "GetDepartments", "OrganizationStructure", routeValues: new { area = "AdminPanel" })
+               .Columns(cols =>
+               {
+                   cols.Column(c =>
+                   {
+                       c.SetText("");
+                       c.SetDataField("Id1", FieldType.Number);
+                       c.SetHeaderAlign(TextAlign.Center).IsFilterable();
+                       c.SetWidth(35);
+                       c.IsCrud("x", "x");
+                       c.SetRenderer("<a><i class='fas fa-edit'></i></a>",
+                       htmlAttributes: new
+                       {
+                           @class = "operation-button",
+                           fn_onclick = "DeptEdit",
+                           title = "Departament məlumatlarının dəyişdirilməsi"
+                       });
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("");
+                       c.SetDataField("Id", FieldType.Number);
+                       c.SetHeaderAlign(TextAlign.Center).IsFilterable();
+                       c.SetWidth(35);
+                       c.IsCrud("x", "x");
+                       c.SetRenderer("<a><i class='fas fa-trash'></i></a>",
+                       htmlAttributes: new
+                       {
+                           @class = "operation-button",
+                           fn_onclick = "OrgRemove",
+                           title = "Departamentin silinməsi"
+                       });
+                   });
+
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("Departamentin Adı");
+                       c.SetDataField("Name");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.SetMinWidth(50);
+                       c.SetMaxWidth(130);
+                       c.IsFilterable();
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("Üst departamenti");
+                       c.SetDataField("ParentName");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.SetMinWidth(50);
+                       c.SetMaxWidth(130);
+                       c.IsFilterable();
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("Qurumu");
+                       c.SetDataField("OrgName");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.SetMinWidth(50);
+                       c.SetMaxWidth(130);
+                       c.IsFilterable();
+                   });
+
+                   cols.Column(c =>
+                   {
+                       c.SetText("İndeks");
+                       c.SetDataField("DeptIndex");
+                       c.SetHeaderAlign(TextAlign.Center);
+                       c.SetCellsAlign(TextAlign.Left);
+                       c.SetMinWidth(50);
+                       c.SetMaxWidth(130);
+                       c.IsFilterable();
+                   });
+
+
+               })
+               .AllowCrud()
+               .AllowSorting(false)
+               .AllowTooltips(false)
+               .AllowPaging(true)
+               .AllowFiltering(true)
+               .AllowFilterRow(true)
+               .AllowColumnOrdering(true)
+               .AllowColumnResizing(true)
+               .SetOnFilter("onFilterDept")
+               .SetPageSize(35)
+               .SetWidth("100%")
+               .SetHeight("100%");
+
+
+}
+@grid.GetHtml()

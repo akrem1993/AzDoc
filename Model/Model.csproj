@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
+  <Import Project="..\packages\EntityFramework.6.3.0\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{4BA0C8D0-4877-4AE6-B222-D52026000B59}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Model</RootNamespace>
+    <AssemblyName>Model</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'TestRytn|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\TestRytn\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'PreProRytn|AnyCPU'">
+    <OutputPath>bin\PreProRytn\</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.3.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.3.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DB Tables\AC_CELL.cs" />
+    <Compile Include="DB Tables\AC_CONTROL.cs" />
+    <Compile Include="DB Tables\AC_DOC_TYPE_CELL.cs" />
+    <Compile Include="DB Tables\AC_FILTER.cs" />
+    <Compile Include="DB Tables\AC_MENU.cs" />
+    <Compile Include="DB Tables\AC_SEARCH_COLUMNS.cs" />
+    <Compile Include="DB Tables\AC_SQL_QUERY.cs" />
+    <Compile Include="DB Tables\AC_SQL_QUERYTYPE.cs" />
+    <Compile Include="DB Tables\AC_TABLE.cs" />
+    <Compile Include="DB Tables\AC_VIEW.cs" />
+    <Compile Include="DB Tables\DC_APPLICATION.cs" />
+    <Compile Include="DB Tables\DC_COUNTRY.cs" />
+    <Compile Include="DB Tables\DC_DEPARTMENT.cs" />
+    <Compile Include="DB Tables\DC_DEPARTMENTTYPE.cs" />
+    <Compile Include="DB Tables\DC_DEPARTMENT_POSITION.cs" />
+    <Compile Include="DB Tables\DC_DOCUMENTTYPE.cs" />
+    <Compile Include="DB Tables\DC_EDUCATIONLEVEL.cs" />
+    <Compile Include="DB Tables\DC_FAMILYSTATUS.cs" />
+    <Compile Include="DB Tables\DC_NATION.cs" />
+    <Compile Include="DB Tables\DC_NUMBERING.cs" />
+    <Compile Include="DB Tables\DC_NUMBERINGFUNCTION.cs" />
+    <Compile Include="DB Tables\DC_NUMBERINGTYPE.cs" />
+    <Compile Include="DB Tables\DC_OPERATION.cs" />
+    <Compile Include="DB Tables\DC_OPERATIONTYPE.cs" />
+    <Compile Include="DB Tables\DC_ORGANIZATION.cs" />
+    <Compile Include="DB Tables\DC_ORGANIZATIONTYPE.cs" />
+    <Compile Include="DB Tables\DC_PERSONNEL.cs" />
+    <Compile Include="DB Tables\DC_PHONETYPE.cs" />
+    <Compile Include="DB Tables\DC_POSITION.cs" />
+    <Compile Include="DB Tables\DC_POSITION_GROUP.cs" />
+    <Compile Include="DB Tables\DC_RANK.cs" />
+    <Compile Include="DB Tables\DC_REGION.cs" />
+    <Compile Include="DB Tables\DC_REPRESENTER.cs" />
+    <Compile Include="DB Tables\DC_REQUEST.cs" />
+    <Compile Include="DB Tables\DC_REQUESTANSWER.cs" />
+    <Compile Include="DB Tables\DC_REQUESTFILES.cs" />
+    <Compile Include="DB Tables\DC_REQUESTSTATUS.cs" />
+    <Compile Include="DB Tables\DC_REQUESTTYPE.cs" />
+    <Compile Include="DB Tables\DC_RIGHT.cs" />
+    <Compile Include="DB Tables\DC_RIGHT_TYPE.cs" />
+    <Compile Include="DB Tables\DC_ROLE.cs" />
+    <Compile Include="DB Tables\DC_ROLE_OPERATION.cs" />
+    <Compile Include="DB Tables\DC_SETTING.cs" />
+    <Compile Include="DB Tables\DC_SEX.cs" />
+    <Compile Include="DB Tables\DC_SOCIALSTATUS.cs" />
+    <Compile Include="DB Tables\DC_TREE.cs" />
+    <Compile Include="DB Tables\DC_USER.cs" />
+    <Compile Include="DB Tables\DC_VACATION.cs" />
+    <Compile Include="DB Tables\DC_VACATION_TYPE.cs" />
+    <Compile Include="DB Tables\DC_WORKPLACE.cs" />
+    <Compile Include="DB Tables\DC_WORKPLACE_ROLE.cs" />
+    <Compile Include="DB Tables\DC_YURIDICALFORM.cs" />
+    <Compile Include="DB Tables\DMSColumns.cs" />
+    <Compile Include="DB Tables\DMSControls.cs" />
+    <Compile Include="DB Tables\DMSTableRelation.cs" />
+    <Compile Include="DB Tables\DMSTables.cs" />
+    <Compile Include="DB Tables\DMS_APP_VERSION.cs" />
+    <Compile Include="DB Tables\DM_ACTION.cs" />
+    <Compile Include="DB Tables\DM_ORGGROUP_SCHEMA.cs" />
+    <Compile Include="DB Tables\DM_OrgGroup_Type.cs" />
+    <Compile Include="DB Tables\DM_ORG_SCHEMA.cs" />
+    <Compile Include="DB Tables\DM_SCHEMA.cs" />
+    <Compile Include="DB Tables\DM_STEP.cs" />
+    <Compile Include="DB Tables\DM_STEP_USER.cs" />
+    <Compile Include="DB Tables\DOC.cs" />
+    <Compile Include="DB Tables\DOCS_ADDITION.cs" />
+    <Compile Include="DB Tables\DOCS_ADDITIONDATA.cs" />
+    <Compile Include="DB Tables\DOCS_ADDRESSINFO.cs" />
+    <Compile Include="DB Tables\DOCS_AGREEMENTTYPE.cs" />
+    <Compile Include="DB Tables\DOCS_AGREEMENT_SCHEME.cs" />
+    <Compile Include="DB Tables\DOCS_ApplicantDoc.cs" />
+    <Compile Include="DB Tables\DOCS_APPLICATION.cs" />
+    <Compile Include="DB Tables\DOCS_AUTHOR_NOTES.cs" />
+    <Compile Include="DB Tables\DOCS_DIRECTIONCHANGE.cs" />
+    <Compile Include="DB Tables\DOCS_DIRECTIONS.cs" />
+    <Compile Include="DB Tables\DOCS_EXECUTOR.cs" />
+    <Compile Include="DB Tables\DOCS_FILE.cs" />
+    <Compile Include="DB Tables\DOCS_FILEINFO.cs" />
+    <Compile Include="DB Tables\DOCS_FILETICKETS.cs" />
+    <Compile Include="DB Tables\DOCS_READSTATUS.cs" />
+    <Compile Include="DB Tables\DOCS_RELATED.cs" />
+    <Compile Include="DB Tables\DOCS_RELATEDTYPE.cs" />
+    <Compile Include="DB Tables\DOCS_STEP.cs" />
+    <Compile Include="DB Tables\DOCS_VIZA.cs" />
+    <Compile Include="DB Tables\DOC_ADRTYPE.cs" />
+    <Compile Include="DB Tables\DOC_AGREEMENTTYPE.cs" />
+    <Compile Include="DB Tables\DOC_APPLIERTYPE.cs" />
+    <Compile Include="DB Tables\DOC_APPLYTYPE.cs" />
+    <Compile Include="DB Tables\DOC_AUTHOR.cs" />
+    <Compile Include="DB Tables\DOC_DESCRIPTION.cs" />
+    <Compile Include="DB Tables\DOC_DIRECTIONTYPE.cs" />
+    <Compile Include="DB Tables\DOC_DIRECTION_TEMPLATE.cs" />
+    <Compile Include="DB Tables\DOC_DOCFORM.cs" />
+    <Compile Include="DB Tables\DOC_DOCUMENTSTATUS.cs" />
+    <Compile Include="DB Tables\DOC_DOCUMENTSTATUS_DOCTYPE.cs" />
+    <Compile Include="DB Tables\DOC_DUPLICATE.cs" />
+    <Compile Include="DB Tables\DOC_EXECUTIONSTATUS.cs" />
+    <Compile Include="DB Tables\DOC_FORM.cs" />
+    <Compile Include="DB Tables\DOC_FORM_DOCTYPE.cs" />
+    <Compile Include="DB Tables\DOC_NUMBER.cs" />
+    <Compile Include="DB Tables\DOC_NUMBERS.cs" />
+    <Compile Include="DB Tables\DOC_OPERATION.cs" />
+    <Compile Include="DB Tables\DOC_PERIOD.cs" />
+    <Compile Include="DB Tables\DOC_POOL.cs" />
+    <Compile Include="DB Tables\DOC_QUESTION.cs" />
+    <Compile Include="DB Tables\DOC_RECEIVED_FORM.cs" />
+    <Compile Include="DB Tables\DOC_RESULT.cs" />
+    <Compile Include="DB Tables\DOC_SELECTED_TEMPLATELABEL.cs" />
+    <Compile Include="DB Tables\DOC_SENDSTATUS.cs" />
+    <Compile Include="DB Tables\DOC_STEP.cs" />
+    <Compile Include="DB Tables\DOC_TAKENMEASURE.cs" />
+    <Compile Include="DB Tables\DOC_TEMPLATE.cs" />
+    <Compile Include="DB Tables\DOC_TEMPLATELABEL.cs" />
+    <Compile Include="DB Tables\DOC_TEMPLATETYPE.cs" />
+    <Compile Include="DB Tables\DOC_TOPIC.cs" />
+    <Compile Include="DB Tables\DOC_TOPIC_TYPE.cs" />
+    <Compile Include="DB Tables\DOC_TYPE.cs" />
+    <Compile Include="DB Tables\DOC_TYPE_EXCHANGE.cs" />
+    <Compile Include="DB Tables\DOC_TYPE_GROUP.cs" />
+    <Compile Include="DB Tables\DOC_UNDERCONTROLSTATUS.cs" />
+    <Compile Include="DB Tables\DOC_VIEWSTATUS.cs" />
+    <Compile Include="DB Tables\DOC_VIZASTATUS.cs" />
+    <Compile Include="DB Tables\RelationalOrganisations.cs" />
+    <Compile Include="DB Tables\AuthorityTransfer.cs" />
+    <Compile Include="DB Tables\UserLimitOrganizations.cs" />
+    <Compile Include="DB Tables\Village.cs" />
+    <Compile Include="DB Views\CitizenRequestsDocs.cs" />
+    <Compile Include="DB Views\OrgRequestsDocs.cs" />
+    <Compile Include="DB Views\OutGoingDocs.cs" />
+    <Compile Include="DB Views\ServiceLettersDocs.cs" />
+    <Compile Include="DB Views\VW_DOCS_VIZA.cs" />
+    <Compile Include="DB Views\VW_DOCUMENTINFO.cs" />
+    <Compile Include="DB Views\VW_DOCUMENTS.cs" />
+    <Compile Include="DB Views\VW_DOC_FILES.cs" />
+    <Compile Include="DB Views\VW_DOC_TYPES.cs" />
+    <Compile Include="DB Views\VW_DUPLICATEDOCUMENTS.cs" />
+    <Compile Include="DB Views\VW_PERSONS.cs" />
+    <Compile Include="DB Views\VW_RESOLUTION_RIGHT.cs" />
+    <Compile Include="DB Views\VW_ROLES.cs" />
+    <Compile Include="DB Views\VW_USER_INFO.cs" />
+    <Compile Include="DTO\ComboBoxtem.cs" />
+    <Compile Include="DTO\DocInitParameters.cs" />
+    <Compile Include="DTO\DuplicateDoc.cs" />
+    <Compile Include="Entity\AuditableEntity.cs" />
+    <Compile Include="Entity\Entity.cs" />
+    <Compile Include="Entity\IAuditableEntity.cs" />
+    <Compile Include="Entity\IEntity.cs" />
+    <Compile Include="Method parameters\PRInChangeWorkplaceUser.cs" />
+    <Compile Include="ModelInterfaces\RoleInfo.cs" />
+    <Compile Include="Models\FeedBack\FeedBackFile.cs" />
+    <Compile Include="Models\FeedBack\FeedBackMain.cs" />
+    <Compile Include="Models\FeedBack\FeedBackMessage.cs" />
+    <Compile Include="Models\FeedBack\FeedBackViewModel.cs" />
+    <Compile Include="Models\FeedBack\JsonViewModel.cs" />
+    <Compile Include="Models\FeedBack\RequestDetailsViewModel.cs" />
+    <Compile Include="Models\FeedBack\RequestViewModel.cs" />
+    <Compile Include="Models\File\DocsFileInfoModel.cs" />
+    <Compile Include="Models\GridVIewModel\FilterModel.cs" />
+    <Compile Include="Models\GridVIewModel\GridModel.cs" />
+    <Compile Include="Models\Log\LogModel.cs" />
+    <Compile Include="Models\Viza\DocCreatorModel.cs" />
+    <Compile Include="Models\Viza\VizaModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TransferReasons.cs" />
+    <Compile Include="WorkSpace\AuthorNote.cs" />
+    <Compile Include="WorkSpace\DashboardData.cs" />
+    <Compile Include="WorkSpace\SessionInfo.cs" />
+    <Compile Include="WorkSpace\SqlResult.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.3.0\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.3.0\build\EntityFramework.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+  </Target>
+  <Import Project="..\packages\EntityFramework.6.3.0\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.targets')" />
+</Project>

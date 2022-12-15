@@ -1,0 +1,152 @@
+﻿@model Admin.Model.ViewModel.TopicRelatedModel.TopicViewModel
+@using AzDoc.Helpers
+@using AzDoc.App_LocalResources
+
+@{
+    ViewBag.Title = "EditUser";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+    var lang = routeValueDictionary["lang"] ?? "az";
+
+}
+
+<link href="~/Content/adminPanel/bootstrap-datepicker3.css" rel="stylesheet" />
+
+
+<link href="~/Content/jquery-editable-select/jquery-editable-select.min.css" rel="stylesheet" />
+
+<form id="topicForm" name="topicForm">
+
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            <div class="editGroup">
+
+                <h4>@(Model.IsEdit ? "Alt mövzunun redaktəsi" : "Yeni  alt mövzunun yaradılması")</h4>
+
+                <div class="row">
+
+                    <input type="hidden" name="TopicId" value="@Model.TopicInfo.TopicId" />
+
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="TopicName">Alt mövzu</label>
+                            <input type="text" name="TopicName" class="form-control" id="TopicName" value="@Model.TopicInfo.TopicName" />
+                        </div>
+                    </div>
+                   
+                    @*<div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="TopicTypeStatus">Status</label>
+                                <input type="checkbox" name="TopicTypeStatus" class="form-control" id="TopicTypeStatus" value="@Model.TopicTypeStatus" />
+                            </div>
+                        </div>*@
+
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label>Mövzu</label>
+                            <select name="TopicTypeId" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                                <option>Seçin</option>
+                                @foreach (var type in Model.TopicTypeInfos)
+                                {
+                                    <option value="@type.TopicTypeId" @(Model.TopicInfo.TopicTypeId == type.TopicTypeId ? "selected" : "")>@type.TopicTypeName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="TopicIndex">İndeks</label>
+                            <input type="text" name="TopicIndex" class="form-control" id="TopicIndex" value="@Model.TopicInfo.TopicIndex" />
+                        </div>
+                    </div>
+                   
+
+                </div>
+                <br />
+            </div>
+
+
+        </div>
+        <br />
+    </div>
+
+    <div class="row mb-5 pb-5 mt-4">
+        <div class="col-12 text-center">
+            <button type="button" class="mBtn mBtn-sec mr-2" onclick="window.history.go(-1); return false;">
+                @RLang.PrevStep
+            </button>
+            <button id="submitForm" type="button" class="mBtn mBtn-pr next-step">
+                @RLang.Save
+            </button>
+        </div>
+    </div>
+</form>
+
+
+
+<script src="~/Scripts/jquery-editable-select/jquery-editable-select.min.js?v=@AppVersion.Version"></script>
+
+<script>
+
+
+
+
+
+     $(document).on("click", "#submitForm", function ()
+     {
+
+         var form = document.forms.namedItem("topicForm");
+               var oData = new FormData(form);
+         var isEdit = '@Model.IsEdit' === 'True';
+         var message = isEdit ? 'Alt mövzu redaktə edildi' : 'Yeni alt mövzu yaradıldı';
+
+                $.ajax({
+                    url: "/@lang/AdminPanel/OrganizationStructure/@(Model.IsEdit ? "EditTopic":"CreateTopic")",
+                    type: 'POST',
+                    data: oData,
+                    dataType: 'Json',
+                    contentType: false,
+                    processData: false,
+                    success: function (response) {
+                        if (response) {
+
+                            toastr.success(message);
+
+                            //if (isEdit) {
+                                setTimeout(function () {
+                                    window.location.href = '/@lang/AdminPanel/OrganizationStructure/TopicIndex';
+                                }, 1000);
+                            //}
+
+
+                        }
+                        else {
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Xəta baş verdi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        }
+
+
+                    },
+                    error: function (response) {
+                    },
+                    beforeSend: function () {
+                        window.ShowLoading();
+                    },
+                    complete: function () {
+                        window.CloseLoading();
+                    }
+                });
+
+
+
+        });
+
+
+</script>

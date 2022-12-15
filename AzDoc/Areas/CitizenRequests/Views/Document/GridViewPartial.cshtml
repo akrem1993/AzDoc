@@ -1,0 +1,344 @@
+﻿@using AzDoc.Helpers
+@using BLL.Common.Enums
+@using Widgets
+
+@{
+    Layout = null;
+    <style>
+        button,
+        [type="button"],
+        [type="reset"],
+        [type="submit"] {
+            -webkit-appearance: none !important;
+        }
+    </style>
+    var grid = Html.MhmGrid("gridCitizenRequests", "Document", "Document", routeValues: new { area = "CitizenRequests", docType = SessionHelper.DocTypeId })
+        .Columns(cols =>
+        {
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetDataField("DocId", FieldType.Number);
+                c.SetHeaderAlign(TextAlign.Center).IsFilterable();
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='line'></i><i class='line'></i><i class='line'></i></a>",
+                htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    data_toggle = "popover",
+                    data_container = "body",
+                    data_trigger = "focus",
+                    data_placement = "right",
+                    type = "button",
+                    data_html = "true",
+                    href = "#",
+                    id = "ActionName",
+                    fn_onclick = "GetPopoverActions"
+                });
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetDataField("", FieldType.Number);
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.IsCrud("x", "x");
+                c.SetRenderer("<a><i class='fas fa-eye'></i></a>", htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    fn_onclick = "DocView",
+                    title = "Qeydiyyat nəzarət vərəqəsi"
+                });
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Qeydiyyat nömrəsi");
+                c.SetDataField("DocEnterno");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(50);
+                c.SetMaxWidth(130);
+                c.IsPinned();
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Qeydiyyat tarixi");
+                c.SetDataField("DocEnterdate", FieldType.Date, "dd.MM.yyyy");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(50);
+                c.SetMaxWidth(130);
+                c.IsPinned();
+                c.IsFilterable(Filtertype.Date);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Son icra müddəti");
+                c.SetDataField("DocLastExecutionDate", FieldType.Date, "dd.MM.yyyy");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(50);
+                c.SetMaxWidth(130);
+                c.IsFilterable(Filtertype.Date);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Sənədin statusu");
+                c.SetDataField("DocDocumentstatusId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(50);
+                c.SetMaxWidth(130);
+                c.IsFilterable(Filtertype.CheckedList, filterItems: CacheHelper.GetFilter(DocFilter.DocStatusCts), filterField: "DocDocumentstatusId");
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Mövcud status");
+                c.SetDataField("DocLastOperationStatus");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(300);
+                c.SetMaxWidth(400);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Mövcud əməliyyatçı");
+                c.SetDataField("DocLastOperationPerson");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(300);
+                c.SetMaxWidth(400);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("İcraçılar");
+                c.SetDataField("TaskTo");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetMaxWidth(300);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Vətəndaşın məlumatları");
+                c.SetDataField("CitizenInfo");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetMaxWidth(300);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Ünvan");
+                c.SetDataField("AppAddress");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetMaxWidth(300);
+                c.IsFilterable();
+            });
+            cols.Column(c =>
+            {
+                c.SetText("Hardan daxil olub");
+                c.SetDataField("DocAuthorInfo");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetMaxWidth(300);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Kimdən daxil olub");
+                c.SetDataField("Signer");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetMaxWidth(300);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Mövzunun növü");
+                c.SetDataField("DocTopicTypeId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(300);
+                c.SetMaxWidth(400);
+                c.IsFilterable(Filtertype.CheckedList, filterItems: CacheHelper.GetFilter(DocFilter.TopicTypeCts), filterField: "DocTopicTypeId");
+            });
+            
+            cols.Column(c =>
+            {
+                c.SetText("Sənədin mətni");
+                c.SetDataField("FileText");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(300);
+                c.SetMaxWidth(400);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Qısa məzmun");
+                c.SetDataField("DocDescription");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetMaxWidth(300);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Kimə ünvanlanıb");
+                c.SetDataField("WhomAdressed");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(300);
+                c.SetMaxWidth(400);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Daxil olma forması");
+                c.SetDataField("DocFormId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(200);
+                c.SetMaxWidth(300);
+                c.IsFilterable(Filtertype.CheckedList, filterItems: CacheHelper.GetFilter(DocFilter.DocFormId), filterField: "DocFormId");
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Sənədin nömrəsi");
+                c.SetDataField("DocDocno");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(130);
+                c.SetMaxWidth(200);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Müraciətin növü");
+                c.SetDataField("ApplytypeId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetMaxWidth(200);
+                c.IsFilterable(Filtertype.CheckedList, filterItems: CacheHelper.GetFilter(DocFilter.ApplyTypeId), filterField: "ApplytypeId");
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Müraciətin forması");
+                c.SetDataField("FormId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetMaxWidth(200);
+                c.IsFilterable(Filtertype.CheckedList, filterItems: CacheHelper.GetFilter(DocFilter.FormId), filterField: "FormId");
+
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Sənədin tarixi");
+                c.SetDataField("DocDate", FieldType.Date, "d");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetMaxWidth(200);
+                c.IsFilterable(Filtertype.Date);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Sənədi yaradan");
+                c.SetDataField("CreaterPersonnelName");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetMaxWidth(200);
+                c.IsFilterable();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetDataField("ExecutorControlStatus");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetMaxWidth(200);
+                c.SetHidden();
+                c.IsFilterable(Filtertype.CheckedList);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("İcra müddəti");
+                c.SetDataField("ExecutionTimeout");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetMaxWidth(200);
+                c.IsFilterable();
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("Executor");
+                c.SetDataField("ExecutorId");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.SetMinWidth(100);
+                c.SetMaxWidth(200);
+                c.IsFilterable();
+                c.SetHidden();
+            });
+
+        })
+        .AllowCrud()
+        .SetRowDoubleClick("GridRowDoubleClick")
+        .AllowSorting(false)
+        .AllowTooltips(false)
+        .AllowPaging(true)
+        .AllowFiltering(true)
+        .AllowFilterRow(true)
+        .AllowColumnOrdering(true)
+        .AllowColumnResizing(true)
+        .SetCellsClass("SetRowCell")
+        .SetOnFilter("onFilter")
+        .SetPageSize(35)
+        .SetWidth("100%")
+        .SetHeight("100%");
+}
+
+@grid.GetHtml()
+
+@Html.Partial("~/Views/Document/_GridDocOptions.cshtml")

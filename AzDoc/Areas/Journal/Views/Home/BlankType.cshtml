@@ -1,0 +1,57 @@
+﻿
+@using Journal.Model.EntityModel
+
+
+@{
+
+    @*Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";*@
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+
+
+
+}
+
+<div class="form-group" >
+
+    <br />
+
+    @if (@Model != null)
+    {
+        <select id="BlankType" class="form-control selectpicker" data-live-search="true" data-width="100%">
+            <option value="-1" selected="selected">Seçin</option>
+
+            @foreach (BlankTypeModel item in Model)
+            {
+                <option value="@item.Id">@item.BlankType</option>
+            }
+
+        </select>
+    }
+    </div>
+
+<script>
+    $(document).ready(function () {
+        Refresh();
+    });
+
+    function Refresh() {
+        $('.selectpicker').selectpicker('refresh');
+    }
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+

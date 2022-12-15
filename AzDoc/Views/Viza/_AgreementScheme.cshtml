@@ -1,0 +1,761 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@{
+    //uint count = 0;
+    int? maxOrder = 0;
+
+    var jsonData = Html.Raw(ViewData["VizaDataJson"]);
+    int jsonLength = string.IsNullOrWhiteSpace(jsonData.ToString()) ? 0 : jsonData.ToString().Length;
+
+}
+<style>
+    .table-title {
+        text-align: center;
+        vertical-align: middle !important;
+        border: #ccc solid 1px;
+    }
+
+    .td-style {
+        text-align: left !important;
+        vertical-align: middle !important;
+        border: #ccc solid 1px;
+    }
+
+    .tr-style {
+        text-align: center;
+    }
+
+    td {
+        vertical-align: middle;
+        text-align: center;
+    }
+</style>
+<input type="hidden" name="VizaDataJson"  />
+<!-- Agreement Scheme Partial-->
+<div class="mModal">
+    <div class="modal fade container" id="agreeModal" role="dialog" tabindex="-1" style=" right: 0" data-keyboard="false" data-backdrop="static">
+        @*<div class="modal-dialog" style="width: auto;padding: initial;margin: auto;float: inherit">*@
+        <div class="modal-dialog" role="document" style="max-width: 80%">
+            <!-- Modal content-->
+            <div class="modal-content" style="background: #ffffff">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Faylın vizaya göndərilməsi</span>
+                </div>
+                <div class="modal-body" style="padding: 0 15px !important">
+                    <p>
+                        <div class="card">
+                            <div class="container" style="margin-top: 10px">
+                                <div class="row">
+                                    <div class="col-9">
+                                        <span style="font-size: medium; font-weight: bold">Məsul şəxs:</span>
+                                    </div>
+                                    <div class="col-3">
+                                        <span style="font-size: medium; font-weight: bold">Qrup №:</span>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-9">
+                                        <select id="resPerson" class="form-control selectpicker" multiple data-live-search="true" data-width="100%" data-actions-box="true" data-container="body"></select>
+                                    </div>
+                                    <div class="col-2">
+                                        <input type="number" id="orderIndex" class="form-control" name="name" value="" oninput="validity.valid||(value='');" />
+                                    </div>
+                                    <div class="col-1" style="padding-left: 0">
+                                        <i class="fas fa-plus-circle" style="font-size: 2em;" id="addVizaBtn" title="Əlavə et"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="container" id="agreeModalContent" style="margin-top: 20px">
+                                <div id="addExecBtn" style="display:none">
+                                    <button type="button" id="getJointExecutors" onclick="GetJointExecutors()" class="btn btn-primary">Müştərək icraçıları əlavə et</button>
+                                    <hr />
+                                </div>
+                                <table class="table table-hover mTable" style="border: #ccc solid 1px; text-align: center" id="agreementTable">
+
+                                    <thead style="background-color: #337ab7; color:azure">
+                                        <tr>
+                                            <td class="table-title">Məsul şəxs</td>
+                                            <td class="table-title">Qrup nömrəsi</td>
+                                            <td class="table-title">Şef</td>
+                                            <td class="table-title"><button type="button" class="btn btn-danger" id="removeAllBtn" title="Bütün sətirləri sil">Sil</button></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+
+
+                            </div>
+                        </div>
+                    </p>
+                </div>
+                <div class="modal-footer" style="border: 0">
+                    <button type="button" id="closeVizaBtn" class="btn btn-secondary">@RLang.Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    var sessionworkplaceid =@SessionHelper.WorkPlaceId;
+    var docid=@SessionHelper.CurrentDocId;
+    var approverPersonInSession = 0;
+    var defaultChiefInSession=0;
+    var vizaPersonList = [];
+    var exsistsIsJoint = 0;
+    var notExistsIsJoint = 0;
+    var documentCreatorInSession = 0;
+    var IsSameDepartment = false;
+    
+  
+     
+
+    $('#addVizaBtn').click(function () {
+        var select = $('#resPerson');
+        var selectDiv = $(select).closest('div');
+        var selecteds = $(select).val().length; //secilmis wexsler
+        var orderIndex = $('#orderIndex').val(); // qrup nomresi
+        var invalidCount = 0;
+        var isOrderExists = false;
+        var isChiefExists = false;
+
+        if (selecteds == 0) {
+            invalidCount++;
+            $(selectDiv).css("border", "1px solid red");
+            toastr.warning('Zəhmət olmasa seçdiyiniz məsul şəxsi əlavə edin');
+        }
+
+        if (invalidCount == 0)
+            $(selectDiv).css("border", "");
+
+        if (orderIndex == "") {
+            invalidCount++;
+            $('#orderIndex').addClass("is-invalid");
+            toastr.warning('" Qrup № "-ni daxil edin');
+        }
+
+        if (invalidCount != 0)
+            return;
+
+        if ($('#orderIndex').hasClass("is-invalid"))
+            $('#orderIndex').removeClass("is-invalid").addClass("is-valid");
+
+        $(vizaPersonList).each(function (index, object) {
+            if (object.orderIndex == orderIndex && orderIndex == 1 && object.isDeleted == 0)
+                isOrderExists = true;
+
+            if (object.orderIndex == orderIndex && object.isChief == 1 && object.isDeleted==0) {
+                isChiefExists = true;
+            }
+        });
+
+        if ((selecteds > 1 && orderIndex == "1") || isOrderExists)
+            return toastr.warning('1-ci qrup nömrəsi ilə yanız bir şəxs seçilə bilər');
+
+        if (isChiefExists) {
+            return toastr.warning('Daxil etdiyiniz qrup nömrəsi şefin qrup nömrəsi ilə eyni ola bilməz.');
+        }
+
+
+        var personObject = {};
+        var workplaceId = "";
+        var personName = "";
+
+        $(select).find('option:selected').each(function () {
+            workplaceId = $(this).val();
+            personName = $(this).text();
+
+            personObject = {
+                vizaId: null,
+                workplaceId: parseInt(workplaceId),
+                personName: personName,
+                orderIndex: parseInt(orderIndex),
+                isChief: 0,
+                isJoint: 0, //mushterek icraci
+                answerDocs: null, // daxil olan senedler
+                isDeleted: 0,
+                defaultChief: 0,
+                vizaConfirmed: 0
+            };
+
+            if (AddDataToVizaPersonList(personObject))
+                AddPersonsToVizaTable(personObject);
+        });
+
+        SortVizaTable();
+        SetMaxOrderIndex();
+        ClearAddData();
+    });
+
+    function SetMaxOrderIndex() {
+        var maxOrder = Math.max.apply(Math, vizaPersonList.filter(o => o.isDeleted != 1).map(function (o) { return o.orderIndex; }));
+        if (maxOrder == -Infinity) {
+            maxOrder = 1;
+        }
+
+        $('#orderIndex').val(maxOrder);
+    }
+
+    function ClearAddData() {
+        var select = $('#resPerson');
+        //$('#orderIndex').val('');
+        $(select).find('option').each(function () { this.selected = false });
+        $(select).selectpicker('refresh');
+    }
+
+    function AddPersonsToVizaTable(personsObject) {
+        var vizaTable = $('#agreementTable');
+        var trMarkUp = "";
+
+        var workplaceId = "";
+        var personName = "";
+        var orderIndex = "";
+        //var defaulChief = 0;
+        var isChief = 0;
+       var vizaConfirmed = 0;
+
+        $(personsObject).each(function () {
+            vizaId = this.vizaId;
+            workplaceId = this.workplaceId;
+            personName = this.personName;
+            orderIndex = this.orderIndex;
+            isChief = this.isChief;
+            defaultChief = this.defaultChief;
+            isJoint = this.isJoint;
+            vizaConfirmed = this.vizaConfirmed;
+           // alert("isJoint: " + isJoint + ";" + "defaultChiefInSession: " + defaultChiefInSession + "approverPersonInSession: " + approverPersonInSession)
+            if (this.isDeleted == 1) return;
+
+            trMarkUp = `<tr class='tr-style' style='background-color:${isChief == 1 ? '#48a8dc36' : ''}; background-color:${vizaConfirmed == 1 ? '#d3eddf' : ''}'>` +
+                            `<td hidden>` +
+                                `<input type='hidden' name='vizaId' value='${vizaId}' />` +
+                            `</td >` +
+                            `<td hidden>` +
+                                `<input type='hidden' name='workplaceId' value='${workplaceId}' />` +
+                            `</td >` +
+                                `<td class='td-style'>${personName}</td>` +
+                `<td class='tr-style' ${vizaConfirmed == 0 ? 'ondblclick="EditOrderIndex(this)"':''}>`+
+                                `<input type="number" ${vizaConfirmed==1 ? 'disabled':''} name="orderIndex" class="form-control" value="${orderIndex}" onblur="SaveOrderIndex(this)" oninput="validity.valid||(value='');" min="1"/>` +
+                                `<input type='hidden' name='oldOrderIndex' value='${orderIndex}' />`+
+                            `</td >` +
+                            `<td class='tr-style'>` +
+                `<input type='checkbox'   onchange="SetChief(this)" ${isChief == 1 ? 'checked' : ''} name='isChief' ${defaultChief == 1 || vizaConfirmed==1 || approverPersonInSession == 1 ? 'disabled' : ''}/>` +
+                            `</td>` +
+                            `<td class='tr-style'>` +
+                `<i class='fas fa-trash-alt' ${defaultChief == 1 || isJoint == 1 && defaultChiefInSession != 1 && approverPersonInSession != 1 || vizaConfirmed==1 ? '' : 'onclick="DeleteViza(this)"'}  title='Sil' style='padding: unset;color:${defaultChief == 1 || isJoint == 1 && defaultChiefInSession != 1 && approverPersonInSession != 1 || vizaConfirmed==1? 'grey;font-size:1.6em' : 'red;font-size:1.6em' }'></i>` +
+                            `</td>` +
+                        `</tr >`;
+
+            $(vizaTable).find('tbody').append(trMarkUp);
+
+            RefreshTable(vizaTable);
+
+
+        });
+    }
+
+
+    function DeleteViza(element) {
+
+        var tr = $(element).closest('tr');
+        var workplaceId = $(tr).find('[name="workplaceId"]').val();
+
+        Swal.fire({
+            title: 'Bu sətir cədvəldən silinəcək',
+            type: 'warning',
+            showCancelButton: true,
+            allowOutsideClick: false,
+            cancelButtonText: 'Ləğv et',
+            confirmButtonText: 'Təsdiqlə'
+        }).then((result) => {
+            if (result.value) {
+                $(vizaPersonList).each(function (index, object) {
+                    if (object.workplaceId == workplaceId) {
+                        if (object.vizaId != null) {
+                            object.isDeleted = 1;
+                        } else
+                            vizaPersonList.splice(index, 1);
+                    }
+                });
+
+                RefreshOrderIndexs(tr);
+                SortVizaTable();
+                SetMaxOrderIndex();
+                RefreshTable();
+            }
+        });
+    };
+
+    function RefreshOrderIndexs(tr) {
+        var orderCount = 1;
+        var previousOrder = undefined;
+        $(vizaPersonList).each(function (index, object) {
+
+            if (object.isDeleted == 1) return;
+
+            var currentObject = object;
+            var currentOrder = currentObject.orderIndex;
+            var newOrder = currentOrder;
+
+            newOrder = orderCount == 1 ? 1 : newOrder;
+
+            while (newOrder - previousOrder > 1)
+                newOrder--;
+
+            previousOrder = newOrder;
+            currentObject.orderIndex = newOrder;
+            vizaPersonList[index] = currentObject;
+
+            orderCount++;
+        });
+    }
+
+    function EditOrderIndex(element) {
+        $(element).find('input').removeAttr('disabled').select();
+    }
+
+    function SaveOrderIndex(element) {
+        var newOrderIndex = parseInt($(element).val());
+        var oldOrderIndex = parseInt($(element).next().val());
+        var workplaceId = $(element).closest('tr').find('[name="workplaceId"]').val();
+        var currentObjectIsChief = $(element).parent().next().children().prop("checked");
+        var isExistChiefsOrderGroup = false;
+        var currentObject = {};
+        var currentIndex = 0;
+        var isExists = false;
+        var isChiefExists = false;
+
+        if (!newOrderIndex) {
+            $(element).val(oldOrderIndex);
+            return toastr.warning('Qrup nömrəsi boş ola bilməz');
+        }
+
+        $(vizaPersonList).each(function (index, object) {
+            if (object.orderIndex == newOrderIndex && newOrderIndex == 1 && object.isDeleted != 1 && newOrderIndex != oldOrderIndex) {
+                isExists = true;
+            }
+
+            if (object.orderIndex == newOrderIndex && object.isChief == 1 && newOrderIndex != oldOrderIndex) {
+                isChiefExists = true;
+            }
+
+            if (object.orderIndex == newOrderIndex && currentObjectIsChief == true && newOrderIndex != oldOrderIndex) {
+                isExistChiefsOrderGroup = true;
+            }
+
+            if (object.workplaceId == parseInt(workplaceId) && object.isDeleted != 1) {
+                currentIndex = index;
+                currentObject = object;
+            }
+        });
+
+        if (isExists) {
+            $(element).val(oldOrderIndex);
+            return toastr.warning('1-ci qrup nömrəsi ilə yanız bir şəxs seçilə bilər');
+        }
+
+        if (isChiefExists) {
+            $(element).val(oldOrderIndex);
+            return toastr.warning('Daxil etdiyiniz qrup nömrəsi şefin qrup nömrəsi ilə eyni ola bilməz.');
+        }
+
+        if (isExistChiefsOrderGroup) {
+            $(element).val(oldOrderIndex);
+            return toastr.warning('Şefin daxil etdiyiniz qrup nömrəsi digər qrup nömrəsi ilə eyni ola bilməz.');
+        }
+
+        $(element).next().val(newOrderIndex);
+        currentObject.orderIndex = newOrderIndex;
+        vizaPersonList[currentIndex] = currentObject;
+        SortVizaTable();
+        //$(element).attr('disabled', 'disabled');
+    }
+
+    function SetChief(element) {
+        var tr = $(element).closest('tr');
+        var workplaceId = $(tr).find('[name="workplaceId"]').val();
+        var checked = $(element).prop('checked');
+        if (defaultChiefInSession != 1) {
+            $.ajax({
+                type: "GET",
+                url: "/az/Viza/IsSameDepartment",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: { vizaWorkplaceid: workplaceId },
+                async: false,
+                success: function (response) {
+                    if (response == true) {
+                        IsSameDepartment = 1;
+                    }
+                    else {
+                        IsSameDepartment = 0;
+                    }
+                }
+            });
+            if (IsSameDepartment != 1 && checked) {
+                $(element).prop('checked', false);
+                checked = $(element).prop('checked');
+                return toastr.warning("Yalniz şöbədaxili şəxsləri şef seçə bilərsiniz");
+            }
+            else
+                if (IsSameDepartment != 1 && !checked) {
+                    $(element).prop('checked', true);
+                    checked = $(element).prop('checked');
+                }
+        }
+        var chiefIndex = undefined;
+        var chiefOrderIndex = undefined;
+        var sameOrderCount = 0;
+       
+
+        $(vizaPersonList).each(function (index, object) {
+            if (object.workplaceId == workplaceId && object.isDeleted != 1) {
+                object.isChief = checked ? 1 : 0;
+                chiefIndex = index;
+                chiefOrderIndex = object.orderIndex;
+            }
+        });
+
+        if (checked) {
+            sameOrderCount = vizaPersonList.filter(v => v.orderIndex == chiefOrderIndex && v.isDeleted != 1).length;
+            $(vizaPersonList).each(function (index, object) {
+                if (object.orderIndex >= chiefOrderIndex && index != chiefIndex && sameOrderCount > 1 && object.isDeleted != 1) {
+                    object.orderIndex = object.orderIndex + 1;
+                }
+            });
+        }
+
+        SortVizaTable();
+    }
+
+    function ShowAddExecButton() {
+        var answerDocCount = $('#answerDocTable tbody').find('tr').length;
+        if (answerDocCount)
+            $('#addExecBtn').css("display", "block");
+        else
+            $('#addExecBtn').css("display", "none");
+    }
+
+    function DeleteJointExecutors(answerDocId) { //cavab senedi silinerken mushterek icracilarin vizadan silinmesi
+        answerDocId = parseInt(answerDocId);
+        //vizaPersonList = vizaPersonList.filter(v => v.answerDocs == null || (v.answerDocs?.indexOf(answerDocId) == -1 || (v.answerDocs?.indexOf(answerDocId) != -1 && v.answerDocs?.length > 1))
+        //    && (v.answerDocs.length >= 1 || v.answerDocs.length == 0));
+
+        $(vizaPersonList).each(function (i, o) {
+            if (o.answerDocs?.indexOf(answerDocId) != -1 && o.isJoint == 1) {
+                o.answerDocs.splice(o.answerDocs?.indexOf(answerDocId), 1);
+            }
+
+            if (o.isJoint == 1 && o.answerDocs?.indexOf(answerDocId) == -1 && o.answerDocs?.length == 0)
+                o.isDeleted = 1;
+        });
+
+        SortVizaTable();
+        RefreshTable();
+    }
+
+    function GetJointExecutors(answerDocId) {
+      //  var searchParams = new URLSearchParams(window.location.search);
+      //  var requestToken = searchParams.get('token');
+        var newDocid = $("#spanToken").html();
+        var answerDocs = [];
+        if (!answerDocId)
+            $('#answerDocTable tbody tr').each(function () {
+                answerDocs.push($(this).attr('data-docid'));
+            });
+        else
+            answerDocs.push(answerDocId);
+
+        $.ajax({
+            type: "GET",
+            url: `/az/Viza/GetJointExecutors`,
+            // url: `/az/Viza/GetJointExecutors?token=${requestToken}`,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: { answerDocs: JSON.stringify(answerDocs), currentDocid: newDocid},
+            success: function (response) {
+                if (!response.length) {
+
+                    return toastr.warning("Sənədin müştərək icraçıları yoxdur.");
+                }
+                SetMaxOrderIndex();
+                var maxOrderIndex = parseInt($('#orderIndex').val()) + 1;
+                $(response).each(function () {
+                    var personObject = {
+                        vizaId: null,
+                        workplaceId: this.WorkplaceId,
+                        personName: this.VizaPersonName,
+                        orderIndex: maxOrderIndex,
+                        isChief: this.IsChief,
+                        isJoint: 1,
+                        answerDocs: [this.AnswerDocId],
+                        isDeleted: 0,
+                        defaultChief: 0,
+                        vizaConfirmed: this.vizaConfirmed
+                    };
+
+                    if (AddDataToVizaPersonList(personObject)) {
+                        AddPersonsToVizaTable(personObject);
+                    };
+                });
+            }
+        });
+    }
+
+    function AddDataToVizaPersonList(dataObject) {
+        var workplaceId = dataObject.workplaceId;
+        var personName = dataObject.personName;
+        var answerDocs = dataObject.answerDocs;
+        var isWorkplaceExists = false;
+
+        $(vizaPersonList).each(function (index, object) {
+            if (object.workplaceId == workplaceId && object.isDeleted != 1) {
+                isWorkplaceExists = true;
+
+                object.isJoint = 1;
+                object.answerDocs = object.answerDocs?.indexOf(answerDocs[0]) == -1 ? object.answerDocs.concat(answerDocs) : object.answerDocs;
+
+                //var newObject = {
+                //    vizaId: object.vizaId,
+                //    workplaceId: object.workplaceId,
+                //    personName: object.personName,
+                //    orderIndex: object.orderIndex,
+                //    isChief: object.isChief,
+                //    isJoint: true,
+                //    answerDocs: object.answerDocs?.indexOf(answerDocs[0]) == -1 ? object.answerDocs.concat(answerDocs) : object.answerDocs
+                //};
+            }
+        });
+
+        if (isWorkplaceExists) {
+            toastr.warning(`"${personName}" vizalarda mövcud olduğu üçün əlavə olunmadı.`);
+            return false;
+        }
+
+        vizaPersonList.push(dataObject);
+        return true;
+    }
+
+    function SortVizaTable() {
+        vizaPersonList = vizaPersonList.filter(o => o.vizaId != null || o.isDeleted == 0);
+        vizaPersonList.sort((a, b) => a.orderIndex - b.orderIndex);
+        $('#agreementTable').find('tbody').empty();
+        $(vizaPersonList).each(function () {
+            AddPersonsToVizaTable(this);
+        });
+    }
+
+    $('#closeVizaBtn').click(function () {
+        GetJointExecutorsToCheckAdding();
+        var existsChief = false;
+        var existsFirstGroupChief = false;
+        var AddedIsJoint=false;
+        if (vizaPersonList.length != 0) {
+            $(vizaPersonList).each(function () {
+                if (this.isChief == 1 && this.isDeleted!=1)
+                {
+                    existsChief = true;
+                }
+                if (this.isChief == 1 && this.orderIndex==1 && this.isDeleted!=1) {
+                    existsFirstGroupChief = true;
+                }
+                if (this.isJoint == 1 && exsistsIsJoint == 1 && this.isDeleted!=1) {
+                    AddedIsJoint = true;
+                }
+
+            });
+
+            if (!existsChief)
+            {
+                return toastr.warning('Zəhmət olmasa "Şef"-i təyin edin.');
+            };
+
+            if (!existsFirstGroupChief) {
+                return toastr.warning('Zəhmət olmasa 1-ci qrup ilə olan "Şef"-i təyin edin.');
+            };
+            if (!AddedIsJoint && exsistsIsJoint==1) {
+                return toastr.warning('Zəhmət olmasa müştərək icraçı əlavə edin.');
+            };
+        }
+        ClearAddData();
+        $("#agreeModal").modal('hide');
+    });
+
+    function GetAgreementModal() {
+        //RAZILASMA SXEMI ACILANDA MESUL SEXSI DOLDURUR
+        var select = $("#resPerson");
+        if ($(select).text() == "") { // eger select doludursa yeniden dolmur
+            select = $(select).empty().selectpicker({ noneSelectedText: 'Məsul şəxsi seçin' });
+            $.ajax({
+                type: "GET",
+                url: "/az/Viza/GetResponsePerson",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+               
+                async: false,
+                success: function (response) {
+                    $.each(response, function () {
+                        select.append($("<option></option>").val(this.Id).html(this.Name));
+                    });
+
+                    $(select).selectpicker('refresh');
+                }
+            });
+        }
+       // IsApproverPersonInSessionOrCreator();
+        ShowAddExecButton();
+        SetMaxOrderIndex();
+        $("#agreeModal").modal('show');
+       
+    };
+
+    $('#removeAllBtn').click(function () {
+        Swal.fire({
+            title: 'Bütün sətirlər cədvəldən silinəcək',
+            type: 'warning',
+            showCancelButton: true,
+            allowOutsideClick: false,
+            cancelButtonText: 'Ləğv et',
+            confirmButtonText: 'Təsdiqlə'
+        }).then((result) => {
+            if (result.value) {
+                $(vizaPersonList).each(function (index, object) {
+                    if ((object.defaultChief != 1 && object.isJoint == 1 && defaultChiefInSession == 1 && object.vizaConfirmed != 1) || object.defaultChief != 1 && object.isJoint != 1 && object.vizaConfirmed != 1 || (object.defaultChief != 1 && object.isJoint == 1 && approverPersonInSession == 1 && object.vizaConfirmed != 1))
+                    {
+                            object.isDeleted = 1;
+                    }
+                });
+                $('#orderIndex').val(1);
+                SortVizaTable();
+                RefreshTable();
+            }
+        });
+    });
+
+
+    $(document).ready(function () {
+        if (@jsonLength > 0) {
+            console.log(@jsonData);
+            vizaPersonList = $.parseJSON(@jsonData);
+            ParseJsonToObject();
+            IsDeafaultChiefInSession();
+            IsApproverPersonInSessionOrCreator();
+            SortVizaTable();
+        }
+        $('#orderIndex').attr("min", (@maxOrder+1));
+        RefreshTable();
+    });
+
+    function GetJointExecutorsToCheckAdding() {
+        var newDocid = $("#spanToken").html();
+        //var searchParams = new URLSearchParams(window.location.search);
+       // var requestToken = searchParams.get('token');
+        var answerDocs = [];
+            $('#answerDocTable tbody tr').each(function () {
+                answerDocs.push($(this).attr('data-docid'));
+            });
+        answerDocs.push();
+        $.ajax({
+            type: "GET",
+           // url: `/az/Viza/GetJointExecutors?token=${requestToken}`,
+            url: `/az/Viza/GetJointExecutors`,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            async: false,
+            data: { answerDocs: JSON.stringify(answerDocs), currentDocid: newDocid},
+            success: function (response) {
+
+                if (response.length>0) {
+
+                    exsistsIsJoint = 1;
+                }
+                if (response.length<1) {
+
+                    notExsistsIsJoint = 1;
+                }
+            }
+        });
+    };
+
+
+    function ParseJsonToObject() {
+        $(vizaPersonList).each(function (index, object) {
+            object.answerDocs = $.parseJSON(object.answerDocs);
+        });
+    }
+    function IsDeafaultChiefInSession() {
+        $(vizaPersonList).each(function (index, object) {
+            if (object.defaultChief == 1 &&  object.workplaceId == sessionworkplaceid) {
+                defaultChiefInSession = 1;
+            }
+
+        });
+    }
+    function IsApproverPersonInSessionOrCreator() {
+        var newDocid = $("#spanToken").html();
+      
+        var documentCreatorWorkplaceId;
+        var countvizalist=0;
+        var docStatus;
+        var countPersonInVizaList = $(vizaPersonList).length;
+       // var searchParams = new URLSearchParams(window.location.search);
+        //var requestToken = searchParams.get('token');
+        if (newDocid !="")
+        {
+            $.ajax({
+                type: "GET",
+                url: `/az/Viza/GetDocumentCreator`,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: { currentDocid: newDocid },
+                async: false,
+                success: function (response) {
+                    $(response).each(function () {
+                        documentCreatorWorkplaceId = this.doccreatorworkplaceid;
+                        docStatus = this.documentstatusid;
+                        $(vizaPersonList).each(function (index, object) {
+                            if (object.workplaceId != sessionworkplaceid) {
+                                countvizalist++;
+                            }
+                        });
+                        //eger senedi yaradanla yoxlayan wexs eyni olarsa, teyin edirik sessiyadakinin hansi olmasini
+                        if (countvizalist == countPersonInVizaList && sessionworkplaceid == documentCreatorWorkplaceId && docStatus != 39) //sessiyadaki wexs viza siyahisinda yoxdur
+                        {
+                            documentCreatorInSession = 1;
+                        }
+                        if (docStatus == 39)
+                        {
+                            approverPersonInSession = 1;
+                        }
+                    });
+                }
+            });
+        }
+           
+    }
+
+    function HideTable(table) {
+        $(table).hide();
+    }
+
+    function ShowTable(table) {
+        $(table).show();
+    }
+
+    function RefreshTable(table) {
+        if (table == "" || table == undefined)
+            table = $('#agreementTable');
+
+        var trLength = $(table).find('tbody tr').length;
+        if (trLength==0)
+            return HideTable(table);
+
+        return ShowTable(table);
+    }
+
+</script>

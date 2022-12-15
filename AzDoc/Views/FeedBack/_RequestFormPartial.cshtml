@@ -1,0 +1,97 @@
+﻿@using AzDoc.App_LocalResources
+@{
+    var types = (IEnumerable<SelectListItem>)ViewData["Menu"];
+}
+
+<div style="padding:10px">
+    @using (Html.BeginForm("FeedbackRequest", "Feedback", FormMethod.Post, new { id = "requestForm", enctype = "multipart/form-data" }))
+    {
+        @Html.AntiForgeryToken()
+        <span>Müraciətin növü</span>
+        <br />
+        @Html.DropDownList("RequestType", types, new
+            {
+                @class = "form-control col-md-3", id = "RequestTypeId", name = "RequestType"
+            })
+
+        <br />
+        <div class="form-group">
+            <span for="exampleFormControlTextarea1">Müraciətin mətni:</span>
+            <textarea class="form-control" style=" height: 170px;" id="RequestText" name="RequestTxtMemo"></textarea>
+        </div>
+        <br />
+        <div class="input-group padTop">
+            <input id="fileNames" type="text" value="..." class="form-control" disabled="disabled">
+            <span class="input-group-btn">
+                <button id="fileClear" type="button" class="btn btn-danger" style="display: none;">
+                    <i class="fa fa-times " aria-hidden="true"></i> Sil
+                </button>
+                <div class="btn btn-default image-preview-input">
+                    <i class="fa fa-folder-open folderColor" aria-hidden="true"></i>
+                    <span id="imageTitle">Faylı seçin</span>
+                    <input type="file" accept=".jpg,.png,.doc,.docx,.xlsx,.xls,.pdf" multiple name="files" id="file" />
+                </div>
+            </span>
+        </div>
+        <div class="padTop" id="name"></div>
+
+        <div style="padding-top: 20px; text-align: center;">
+            <button type="submit" id="formSubmit" class="btn btn-success ld-ext-right" disabled name="SaveRequestButton">
+                @RLang.Save
+                <div class="ld ld-ring ld-spin-fast" style="font-size:1.5em"></div>
+            </button>
+        </div>
+
+    }
+</div>
+
+<script async src="~/Scripts/feedback/InputFile.js"></script>
+<script>
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("PingFtp","FeedBack")',
+        success: function (data) {
+            if (!data) {
+                $('#fileNames').val('Fayl serveri işləmir, fayl əlavə etməyə alınmayacaq');
+                $('#file').remove();
+                $('#imageTitle').addClass("fa fa-times");
+                $('#imageTitle').css('color', 'red');
+                $('#imageTitle').text('');
+            }
+        },
+        error: function (e) {
+            toastr.error(e.responseText);
+        }
+    });
+
+    $('#RequestText').on('input',
+        function () {
+            if (this.value === '') {
+                $('#formSubmit').attr('disabled', '');
+            } else {
+                $('#formSubmit').removeAttr('disabled', '');
+            }
+        });
+
+    $('#requestForm').submit(function (e) {
+        e.preventDefault();
+
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: new FormData(this),
+            contentType: false,
+            cache: false,
+            processData: false,
+            beforeSend: function () {
+                $('#formSubmit').addClass('running');
+            },
+            success: function (data) {
+                $('#requestBody').html(data);
+            },
+            complete: function () {
+                $('#formSubmit').removeClass('running');
+            }
+        });
+    });
+</script>

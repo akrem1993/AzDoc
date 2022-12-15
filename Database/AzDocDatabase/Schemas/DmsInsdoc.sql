@@ -1,0 +1,1 @@
+﻿CREATE SCHEMA [dms_insdoc]

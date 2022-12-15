@@ -1,0 +1,23 @@
+CREATE TABLE [dbo].[DMSColumns](
+	[Id] int identity NOT NULL,
+	[Name] nvarchar(50) NOT NULL,
+	[DisplayName] nvarchar(100) NOT NULL,
+	[IdControl] int NOT NULL,
+	[IdTableTransaction] int NOT NULL,
+	[IdTableGrid] int NOT NULL,
+	[OrderNo] int NOT NULL,
+	[DefaultValue] nvarchar(100) NULL,
+	[Width] int NOT NULL,
+	[IsPK] bit NOT NULL,
+	[IsVirtual] bit NOT NULL,
+	[AllowNulls] bit NOT NULL,
+	[ErrorMessage] nvarchar(200) NULL,
+	[Visible] bit NOT NULL,
+	[RelatedIdControl] int NOT NULL,
+	[SQLQuery] nvarchar(1000) NULL,
+	[ImagePath] nvarchar(100) NULL,
+ CONSTRAINT [PK_dbo.DMSColumns] PRIMARY KEY ([Id]),
+ CONSTRAINT [FK_dbo.DMSColumns_dbo.DMSControls_IdControl] FOREIGN KEY([IdControl]) REFERENCES [dbo].[DMSControls] ([Code]),
+ CONSTRAINT [FK_dbo.DMSColumns_dbo.DMSTables_IdTableGrid] FOREIGN KEY([IdTableGrid]) REFERENCES [dbo].[DMSTables] ([Id]),
+ CONSTRAINT [FK_dbo.DMSColumns_dbo.DMSTables_IdTableTransaction] FOREIGN KEY([IdTableTransaction]) REFERENCES [dbo].[DMSTables] ([Id])
+ )

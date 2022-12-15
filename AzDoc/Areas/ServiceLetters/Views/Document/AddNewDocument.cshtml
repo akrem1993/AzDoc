@@ -1,0 +1,216 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@using BLL.Common.Enums
+@{
+    ViewBag.Title = "AddNewDocument";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+    int docType = SessionHelper.DocTypeId;
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<link href="~/Content/common/md-form-design.css" rel="stylesheet" />
+<style>
+    .display-none {
+        display: none;
+    }
+
+    .display-block {
+        display: block;
+    }
+
+    .card-header-custom {
+        background-color: #5c91af !important;
+        padding: 0.4em 1.25rem !important;
+    }
+
+    .icon-size {
+        font-size: 1.2em;
+    }
+</style>
+
+<div class="col-12">
+    <div class="row breadCrumbRow mt-5">
+        <div class="col-6 text-center" id="basicInformation">
+            <a href="#step1" class="brActive" data-brcrumb="1">
+                @RLang.BasicInfo
+            </a>
+        </div>
+
+        <div class="col-6 text-center" id="attachmentDocuments">
+            <a href="#step2" data-brcrumb="2">@RLang.EDocuments</a>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("CreateDocument", "Operation", FormMethod.Post, new { id = "AddNewDocument" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            @Html.Partial("BasicInformationPartial")
+        </div>
+
+        <div class="connectDoc contentItem d-none" id="step2" style="padding-top:1px" data-brnum="2">
+            @Html.Partial("~/Views/Document/AttachmentDocumentsPartial.cshtml")
+        </div>
+    </div>
+
+}
+
+@section scripts{
+    <script>
+
+        $("#ParentButton").click(function () {
+            //mushterek icrachilarin elave olub olunmamasini yoxlayiriq
+            var newDocid = $("#spanToken").html();
+            var answerDocs = [];
+            $('#answerDocTable tbody tr').each(function () {
+                answerDocs.push($(this).attr('data-docid'));
+            });
+            answerDocs.push();
+            $.ajax({
+                type: "GET",
+                url: `/az/Viza/GetJointExecutors`,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                async: false,
+                data: { answerDocs: JSON.stringify(answerDocs), currentDocid: newDocid },
+                success: function (response) {
+
+                    if (response.length > 0) {
+
+                        exsistsIsJoint = 1;
+                    }
+                    if (response.length < 1) {
+
+                        notExsistsIsJoint = 1;
+                    }
+                }
+            });
+            var AddedIsJoint = false;
+            if (vizaPersonList.length != 0) {
+                $(vizaPersonList).each(function () {
+                    if (this.isJoint == 1 && exsistsIsJoint == 1 && this.isDeleted != 1) {
+                        AddedIsJoint = true;
+                    }
+                });
+                if (!AddedIsJoint && exsistsIsJoint == 1) {
+                    return toastr.warning('Zəhmət olmasa müştərək icraçı əlavə edin.');
+                };
+            }
+
+            if ($(".table-custom").find("tr.rowSelector").length === 0) {
+                return toastr.warning(" Qoşma sənədi daxil edin.");
+            }
+
+            var isMainCount = 0;
+            var pageCopyCount = 0;
+
+            $.each($("input[name='isMain']"),
+                function() {
+                    if ($(this).attr('checked') === 'checked') {
+                        ++isMainCount;
+                    }
+                });
+
+            $.each($("i[name='icon']"),
+                function() {
+                    if ($.trim($(this).text()) === "") {
+                        $(this).closest("span").css('border', '1px solid red');
+                        ++pageCopyCount;
+                    }
+                });
+
+            if (isMainCount === 0) {
+                $.each($("input[name='isMain']"),
+                    function() {
+                        $(this.parentElement).css('border', 'solid red 1px');
+                    });
+                toastr.warning("Bütün məcburi xanaların doldurulduğuna əmin olun.");
+            }
+
+            if (isMainCount !== 0 && pageCopyCount === 0) {
+
+                if (vizaPersonList.length == 0)
+                    return toastr.warning("Sənədin vizaları təyin olunmayıb.");
+
+                var fileInfoId = $('#fileInfoId').val();
+                var formData = $('#AddNewDocument').getFormData();
+                formData.WhomAddressModels = $('#tbWhomAddress').tableToJsonList();
+                formData.RelatedDocModels = $('#relatedDocTable').tableToJsonList();
+                formData.AnswerByLetterModels = $('#answerDocTable').tableToJsonList();
+                formData.VizaDataJson = JSON.stringify(vizaPersonList);
+
+                var token = $('input[name="__RequestVerificationToken"]').val();
+                $.ajax({
+                    type: 'POST',
+                    url: '/@lang/ServiceLetters/Operation/CreateDocument',
+                    dataType: 'json',
+                    async: false,
+                    data: { __RequestVerificationToken: token, model: formData, fileInfoId: fileInfoId },
+                    beforeSend: function () {
+                        window.ShowLoading();
+                    },
+                    success: function(response) {
+                        if (response === 1)
+                            window.location = '/@lang/ServiceLetters';
+                        else if (response === -1)
+                            toastr.warning("Qurum rəhbərini vizaya əlavə edin.");
+                    },
+                    complete: function () {
+                        window.CloseLoading();
+                    }
+                });
+            }
+           
+        });
+
+        $(document).ready(function () {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('DocEnterDate').value = today;
+            document.getElementsByName("DocumentModel.DocEnterDate")[0].setAttribute('min', today);
+            document.getElementsByName("DocumentModel.PlannedDate")[0].setAttribute('min', today);
+        });
+
+        function deleteRowRelated(relatedId, element) {
+            Swal.fire({
+                title: 'Bu sətir cədvəldən silinəcək',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Ləğv et',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+
+                    var answerDocId = $(element).parents("tr").attr('data-docid'); // daxil olan sened
+                    DeleteJointExecutors(answerDocId);// vizalardan musterek icracilarin silinmesi
+
+                    $(element).parents("tr").remove();
+                    $("#relatedDocTable").find("tr.rowSelector").length == 0
+                        ? $("#relatedDocTable").hide()
+                        : "";
+                    $("#answerDocTable").find("tr.data-row").length == 0
+                        ? $("#answerDocTable").hide()
+                        : "";
+
+                    Swal.fire({
+                        type: 'success',
+                        title: 'Məlumat silindi',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                }
+            });
+        }
+    </script>
+
+    <script src="~/Scripts/serviceletters/form-wizard.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/serviceletters/serviceletters.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/AttachmentFile.js?v=@AppVersion.Version"></script>
+}

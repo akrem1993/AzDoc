@@ -1,0 +1,114 @@
+﻿@model Admin.Model.ViewModel.UserInfoViewModel
+@{
+    var itemCount = 0;
+}
+<head>
+    <title>İstifadəçi haqqında məlumatlar  </title>
+</head>
+@if (!Request.IsAjaxRequest())
+{
+    <link href="~/Content/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/fontawesome/css/all.min.css" rel="stylesheet" />
+    <link href="~/Content/common/style.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery/jquery-3.3.1.min.js"></script>
+}
+<div id="view">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-10">
+                <div class="mainView">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="viewGroup appealing">
+                                <h4>Şəxsi məlumatlar</h4>
+                                <table class="table mTable">
+                                    <thead>
+                                        <tr>
+                                            <td>Adı</td>
+                                            <td>Soyadı</td>
+                                            <td>Ata adı</td>
+                                            <td>Doğum tarixi</td>
+                                            <td>Cinsi</td>
+                                            <td>İş nömrəsi</td>
+                                            <td>E-poçt</td>
+                                            <td>Mobil nömrəsi</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>@Model.PersonnelName</td>
+                                            <td>@Model.PersonnelSurname</td>
+                                            <td>@Model.PersonnelLastname</td>
+                                            <td>@(Model.PersonnelBirthdate?.ToString("d") ?? "")</td>
+                                            <td>@Model.SexName</td>
+                                            <td>@Model.PersonnelPhone</td>
+                                            <td>@Model.PersonnelEmail</td>
+                                            <td>@Model.PersonnelMobile</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    @foreach (var item in Model.JsonWorkPlace)
+                    {
+                        itemCount++;
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="viewGroup appealing">
+                                    @if (@itemCount > 1)
+                                    {
+                                        <h4>Vəzifə @itemCount</h4>
+                                    }
+                                    else
+                                    {
+                                        <h4>Vəzifə</h4>
+                                    }
+                                    <table class="table mTable">
+                                        <tbody>
+                                            <tr>
+                                                <td class="heading">Qurum</td>
+                                                <td>@item.OrganizationShortname</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="heading">Alt Qurum</td>
+                                                <td>@item.SubOrgName</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="heading">Departament</td>
+                                                <td>@item.DepartmentName</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="heading">Şöbə</td>
+                                                <td>@item.BranchName</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="heading">Sektor</td>
+                                                <td>@item.SectorName</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="heading">Vəzifəsi</td>
+                                                <td>@item.DepartmentPositionName</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="heading">İmtiyazları</td>
+                                                <td>@item.RoleComment </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                     }
+                </div>
+                <a href="#" onclick="myFunction()" class="circleBtn" style="position: fixed; top: 40px; right: 5%;"><i class="fas fa-print"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        function myFunction() {
+            window.print();
+        }
+    </script>  
+<script src="~/Scripts/common/printThis.min.js"></script>

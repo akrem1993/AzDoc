@@ -1,0 +1,197 @@
+﻿@model InsDoc.Model.ViewModel.DocumentInfoViewModel
+@{
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+
+    var isPartial = Request.IsAjaxRequest() ? 1 : 0;
+}
+
+<head>
+    <title>Qeydiyyat vərəqəsi @(Model.DocEnterNo ?? Model.DocDocNo) </title>
+    @if (!Request.IsAjaxRequest())
+    {
+        <link href="~/Content/bootstrap/bootstrap.min.css" rel="stylesheet" />
+        <link href="~/Content/fontawesome/css/all.min.css" rel="stylesheet" />
+        <link href="~/Content/common/style.css" rel="stylesheet" />
+        <script src="~/Scripts/jquery/jquery-3.3.1.min.js"></script>
+        <script src="~/Scripts/bootstrap/bootstrap.min.js"></script>
+        <script src="~/Scripts/jquery/jquery-blockUI.js"></script>
+        @GleamTechHelper.Head
+        @GleamTechHelper.Js
+    }
+</head>
+
+
+<style>
+    @@media print {
+        .btn {
+            display: none;
+        }
+    }
+</style>
+<span id="spanToken" style="display: none">@ViewData["Token"]</span>
+<div id="view">
+    <div class="container-fluid" style="padding-left: 15px!important">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-12">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="headingRow">
+                            <h3>@Model.OrgName</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mainView">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="viewHeading">
+                                <h3>Qeydiyyat nəzarət vərəqəsi</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="docContent" class="viewGroup appealing">
+                                <div class="col-12">
+                                    <h4 class="text-center">@Model.DocTypeName</h4>
+
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            @if (!string.IsNullOrWhiteSpace(Model.DocEnterNo))
+                                            {
+                                                <tr>
+                                                    <th scope="col">Qeydiyyat nömrəsi</th>
+                                                    <td class="custom-table-cell">@Model.DocEnterNo</td>
+                                                    <th scope="col">Qeydiyyat tarixi</th>
+                                                    <td class="custom-table-cell">@Model.DocEnterDate.Value.ToString("d")</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th scope="col">İmza edən şəxs</th>
+                                                    <td class="custom-table-cell" colspan="3">@Model.SignatoryPerson</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Təsdiq edən şəxs</th>
+                                                    <td class="custom-table-cell" colspan="3">@Model.ConfirmPerson</td>
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <th scope="col">Layihə nömrəsi</th>
+                                                    <td class="custom-table-cell">@Model.DocDocNo</td>
+                                                    <th scope="col">Layihə tarixi</th>
+                                                    <td class="custom-table-cell">@Model.DocDocDate.Value.ToString("d")</td>
+                                                </tr>
+
+                                                <tr>
+                                                    <th scope="col">Hardan və kimdən daxil olub</th>
+                                                    <td class="custom-table-cell" colspan="3"></td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Təsdiq edən şəxs</th>
+                                                    <td class="custom-table-cell" colspan="3"></td>
+                                                </tr>
+                                            }
+
+
+                                            @if (!string.IsNullOrEmpty(Model.RedirectedPersons))
+                                            {
+                                                <tr>
+                                                    <th scope="col">Kimə ünvanlanıb</th>
+                                                    <td class="custom-table-cell" colspan="3">@Model.RedirectedPersons</td>
+                                                </tr>
+                                            }
+
+                                            <tr>
+                                                <th scope="col">Sənədin növü</th>
+                                                <td class="custom-table-cell">@Model.FormName</td>
+                                                <th scope="col">Sənədin statusu</th>
+                                                <td class="custom-table-cell">@Model.DocumentStatusName</td>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+
+                                <div class="col-12">
+                                    <h4 class="text-center">Sənədin qısa məzmunu</h4>
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            <tr>
+                                                <td>@Model.Description</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                @Html.Partial("~/Views/DocInfo/_DocFiles.cshtml", Model.DocFiles)
+
+                                @Html.Partial("~/Views/DocInfo/_AnswerDoc.cshtml", Model.AnswerDocs)
+
+                                @Html.Partial("~/Views/DocInfo/_EnteredDoc.cshtml", Model.EnteredDocs)
+
+                                @Html.Partial("~/Views/DocInfo/_RelatedDoc.cshtml", Model.RelatedDocs)
+
+                                @Html.Partial("~/Views/DocInfo/_DocTasks.cshtml", Model.DocTasks)
+
+                                @Html.Partial("~/Views/DocInfo/_DeletedFromViza.cshtml", Model.DeletedFromViza)
+
+                                @Html.Partial("~/Views/DocInfo/_DocHistory.cshtml", Model.DocHistory)
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="#" class="circleBtn" style="position: fixed; top: 40px; right: 5%;" id="print"><i class="fas fa-print"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/common/printThis.min.js"></script>
+<script>
+    $('#print').click(function () {
+        $('#view').printThis();
+    });
+
+
+    function fileShow(docInfoId) {
+
+        if (1 == @isPartial) return;
+
+        if (parseInt($("#currentDocInfoId").text()) == docInfoId) {
+            $("#trDocFileView").show();
+            $("#trDocClose").show();
+            return;
+        }
+
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/InsDoc/Document/DocumentDisplay',
+                dataType: 'html',
+                data: { docInfoId: docInfoId },
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                success: function (response) {
+                    $("#docDisplay").html(response);
+                    $("#currentDocInfoId").text(docInfoId);
+                    $("#trDocFileView").show();
+                    $("#trDocClose").show();
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+        });
+    };
+
+    $('#closeDocViewer').click(function () {
+        $("#trDocFileView").hide();
+        $("#trDocClose").hide();
+    });
+
+</script>

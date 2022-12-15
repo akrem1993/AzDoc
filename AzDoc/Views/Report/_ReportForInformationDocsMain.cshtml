@@ -1,0 +1,513 @@
+﻿@using AzDoc.Helpers
+
+
+<div id="reportDiv">
+    <div style="border:1px solid #18191b">
+        <div class="row" style="margin:10px;text-align:center;">
+            <div class="input-group mb-3">
+                <div class="col-lg-1 col-md-3 d-flex align-items-center">
+                    <a href="#" class="squareBtn mt-3" style="color: white" data-toggle="modal" data-target="#reportFormModal">
+                        Forma
+                    </a>
+                </div>
+                @if ((SessionHelper.OrganizationId == 1 && SessionHelper.DepartmentTopDepartmentId == -1)
+                     || SessionHelper.WorkPlaceId == 24 || SessionHelper.WorkPlaceId == 43 || SessionHelper.WorkPlaceId == 44
+                     || SessionHelper.WorkPlaceId == 47 || SessionHelper.WorkPlaceId == 5018
+                     || SessionHelper.WorkPlaceId == 7698 || SessionHelper.WorkPlaceId == 8638 || SessionHelper.WorkPlaceId == 8660 || SessionHelper.WorkPlaceId == 9266)
+                {
+                    <div class="col-lg-2 col-md-5">
+                        <label>Hara daxil olub</label><br />
+                        <select class="selectpicker" data-width="100%" id="executorOrganizationType">
+                            <option value="-1">Ümumi</option>
+                            <option value="1">Nazirlik strukturu</option>
+                            <option value="0">Qurumlar</option>
+                        </select>
+                    </div>
+                }
+                else
+                {
+                    <input type="hidden" id="executorOrganizationType" value="1" />//Bashqa qurumun strukturu
+                }
+                <div class="col-lg-4 col-md-7">
+                    <label>Bölmə və ya şöbələr</label> <br />
+                    <div class="searchSelectTree mb-3">
+                        <div class="form-control">
+                            <div class="span" id="dropDownDepartment">Seç</div>
+                        </div>
+                        <div class="downContent treeListContent">
+                            <div class="down">
+                                <ul id="mainContentForDepartment"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <label>Tarix</label>
+                    <input style="" type="text" id="intervalDateForForInformationDocs" daterange class="form-control " placeholder="mm.dd.yyyy">
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <label>Sənəd növü</label>
+                    <select class="selectpicker" data-width="100%" id="docType" style="">
+                        @*<option value="-1">Ümumi</option>*@
+                        <option value="2">Vətəndaş müraciətləri</option>
+                        <option value="1">Təşkilat müraciətləri</option>
+                        <option value="18">Xidməti məktublar</option>
+                        <option value="4">Xaric olan sənədlər</option>
+                        <option value="3">Sərəncamverici sənədlər</option>
+                        <option value="27">Əməkdaş müraciətləri</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="input-group mb-3">
+                <div class="col-3 citizenBox">
+                    <div class="">
+                        <label>Müraciətlərə baxılmanın vəziyyəti</label><br />
+                        <select class="selectpicker" data-width="100%" id="docResult" data-live-search="true">
+                            <option value="">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <label>Sənədin statusu</label><br />
+                    <select class="selectpicker" data-width="100%" id="docDocumentStatus" data-live-search="true" @*multiple title="Sənədin statuslarından ən azı birini seçin."*@>
+                        <option value="">Seç</option>
+                    </select>
+                </div>
+                <div class="col-3 citizenTopicBox">
+                    <div class="">
+                        <label>Mövzu</label><br />
+                        <select class="selectpicker" data-width="100%" id="citizenTopicType" data-live-search="true">
+                            <option value="">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 employeeTopicBox notShowColumn">
+                    <div class="">
+                        <label>Mövzu</label><br />
+                        <select class="selectpicker" data-width="100%" id="employeeAppealsTopicType" data-live-search="true">
+                            <option value="">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenEmpApplyBox">
+                    <div class="">
+                        <label>Alt Mövzu</label><br />
+                        <select class="selectpicker" data-width="100%" id="citizenTopics" data-live-search="true">
+                            <option value="">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                @*<div class="col-3 employeeTopicBox notShowColumn">
+                        <div class="">
+                            <label>Alt Mövzu</label><br />
+                            <select class="selectpicker" data-width="100%" id="employeeTopics" data-live-search="true">
+                                <option value="">Seç</option>
+                            </select>
+                        </div>
+                    </div>*@
+            </div>
+            <div class="input-group mb-3">
+                <div class="col-3 citizenEmpApplyBox">
+                    <div class="">
+                        <label>Sosial status</label><br />
+                        <select class="selectpicker " data-width="100%" id="socialStatus" data-live-search="true">
+                            <option value="">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenEmpApplyBox">
+                    <div class="">
+                        <label id="docFormName">Müraciətin forması</label><br />
+                        <select class="selectpicker " data-width="100%" id="docForm" data-live-search="true">
+                            <option value="">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenEmpApplyBox">
+                    <div class="">
+                        <label>Müraciətin növü</label><br />
+                        <select class="selectpicker " data-width="100%" id="docApplyType" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenEmpApplyBox">
+                    <div class="">
+                        <label>Şikayət olunan qurum</label>
+                        <select class="selectpicker " data-width="100%" id="docStructure" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenEmpApplyBox">
+                    <div class="">
+                        <label>Şikayət olunan alt qurum</label>
+                        <select class="selectpicker " data-width="100%" id="docSubStructure" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <label>Hardan daxil olub</label>
+                    <select class="selectpicker " data-width="100%" id="entryFromWhere">
+                        <option value="-1">Ümumi</option>
+                        <option value="1">Azərbaycan Respublikası Prezidentinin Administrasiyası </option>
+                        <option value="2">Azərbaycan Respublikasının Milli Məclisi</option>
+                        <option value="3">Azərbaycan Respublikasının Nazirlər Kabineti </option>
+                        <option value="4">Azərbaycan Respublikasının İnsan Hüquqları üzrə Müvəkkili (Ombudsman) </option>
+                        <option value="5">Azərbaycan Respublikasının Baş Prokurorluğu </option>
+                        <option value="-2">Digər</option> Yuxarida goturulen qurumlar xaric digerleri hansi ki nazirilik daxili nezere alinmayib
+                        <option value="-3">Daxili (NRYTN rəhbərlik )</option>
+                    </select>
+                </div>
+                <div class="col-3">
+                    <div class="orgcitizenBox">
+                        <label>Nəzarət</label>
+                        <select class="selectpicker " data-width="100%" id="docControlStatus">
+                            <option value="-1">Ümumi</option>
+                            <option value="1">Nəzarətdədir</option>
+                            @*<option value="0">Nəzarətdə deyil</option>*@
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="controlBox notShowColumn">
+                        <label>Nəzarətə götürən</label>
+                        <select class="selectpicker " data-width="100%" id="docControlStatusStructures">
+                            <option value="-1">Ümumi</option>
+                            <option value="1">Azərbaycan Respublikası Prezidentinin Administrasiyası </option>
+                            <option value="2">Azərbaycan Respublikasının Milli Məclisi</option>
+                            <option value="3">Azərbaycan Respublikasının Nazirlər Kabineti </option>
+                            <option value="4">Azərbaycan Respublikasının İnsan Hüquqları üzrə Müvəkkili (Ombudsman) </option>
+                            <option value="5">Azərbaycan Respublikasının Baş Prokurorluğu </option>
+                            <option value="-2">Digər</option> @*Yuxarida goturulen qurumlar xaric digerleri hansi ki nazirilik daxili nezere alinmayib*@
+                            <option value="-3">Daxili (NRYTN rəhbərlik )</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3 citizenBox">
+                    <div class="">
+                        <label>Rayon</label><br />
+                        <select class="selectpicker " data-width="100%" id="citizenRegion" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3  citizenBox">
+                    <div class="">
+                        <label>Kənd</label><br />
+                        <select class="selectpicker " data-width="100%" id="citizenVillage" data-live-search="true">
+                            <option value="-1">Seç</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <div class="col-9" style="text-align:right;">
+
+                </div>
+                <div class="col-3" style="text-align:right;">
+                    <br />
+                    <button type="button" class="mBtn mBtn-pr" style="" id="submitFilter">
+                        Axtar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="reportBodyPartial" style="display:block !important;">
+    </div>
+    <div class="col-6 text-left mt-2">
+        <div class="mBtnGroup" style="margin-bottom: 6px">
+            <button type="button" class="mBtn mBtn-pr" id="excellServerSide">Excel-ə çevir @*server side*@</button>
+            <button type="button" class="mBtn mBtn-pr" id="pdfServerSide">PDF-ə çevir</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    var columns = ["citizenNameColumn", "topicTypeColumn", "topicColumn", "docResultColumn", "complainedOfDocStructure", "complainedOfDocSubStructure"];
+
+
+    function getInputValuesSetToData(page = null) {
+        let data;
+        let intervalDate = $('#intervalDateForForInformationDocs').val();
+
+        let docType = parseInt($("#docType option:selected").val());
+        let executorOrganizationType = parseInt($("#executorOrganizationType option:selected").val()); //required
+        if (Object.is(executorOrganizationType, NaN))
+            executorOrganizationType = parseInt($("#executorOrganizationType").val());
+
+        let complainedOfDocStructure = parseInt($("#docStructure option:selected").val()); //Leyla
+        let complainedOfDocSubStructure = parseInt($("#docSubStructure option:selected").val());
+        let organizationDepartmentOrOrganizations = parseInt($("#dropDownDepartment").attr("data-id")); //required
+        let topicType = parseInt($("#citizenTopicType option:selected").val());
+        let topicTypeEmployee = parseInt($("#employeeAppealsTopicType option:selected").val());
+        let topic = parseInt($("#citizenTopics option:selected").val());
+        let regions = parseInt($("#citizenRegion option:selected").val());//citizenRegion
+        let villages = parseInt($("#citizenVillage option:selected").val());//citizenVillage
+        let socialStatusId = parseInt($("#socialStatus option:selected").val());
+        let docFormId = parseInt($("#docForm option:selected").val());
+        let docDocumentStatus = parseInt($("#docDocumentStatus option:selected").val());
+        let entryFromWhere = parseInt($("#entryFromWhere option:selected").val());
+        let docControlStatus = parseInt($("#docControlStatus option:selected").val());
+        let docControlStatusStructures = parseInt($("#docControlStatusStructures option:selected").val());
+
+        let docApplyType = parseInt($("#docApplyType option:selected").val())
+
+        let docResult = parseInt($("#docResult option:selected").val());
+
+        if (page) {
+            if (localStorage.getItem("forInformationReport")) {
+                data = JSON.parse(localStorage.getItem("forInformationReport"));
+                data.page = page;
+            }
+            else {
+                data = {
+                    page: page,
+                    "docTypeId": docType,
+                    "organizationDepartmentOrOrganizations": organizationDepartmentOrOrganizations,
+                    "executorOrganizationType": executorOrganizationType,
+                    "intervalDate": intervalDate,
+                    "topicType": topicType,
+                    "topicTypeEmployee": topicTypeEmployee,
+                    "topic": topic,
+                    "regions": regions,
+                    "villages": villages,
+                    "complainedOfDocStructure": complainedOfDocStructure,
+                    "complainedOfDocSubStructure": complainedOfDocSubStructure,
+                    "socialStatusId": socialStatusId,
+                    "docFormId": docFormId,
+                    "docDocumentStatus": docDocumentStatus,
+                    "docResult": docResult,
+                    "docApplyType": docApplyType,
+                    "entryFromWhere": entryFromWhere,
+                    "docControlStatus": docControlStatus,
+                    "docControlStatusStructures": docControlStatusStructures
+                }
+                let dataForStorage = JSON.stringify(data);
+                localStorage.setItem("forInformationReport", dataForStorage);
+            }
+        }
+        else {
+            var objHeaders = [];
+            var headers = $('#tableReportExecution th');
+            for (var i = 0; i <= headers.length; i++) {
+                var current = $(`#tableReportExecution th:nth-child(${i})`)[0];
+                if (current != undefined && $(current).css('display') !== 'none') {
+                    objHeaders.push($(`#tableReportExecution th:nth-child(${i})`).text());
+                }
+            }
+
+            if (localStorage.getItem("forInformationReport")) {
+                data = JSON.parse(localStorage.getItem("forInformationReport"));
+                data.page = page;
+                data["objHeaders"] = objHeaders;
+            }
+            else {
+                data = {
+                    "objHeaders": objHeaders,
+                    "docTypeId": docType,
+                    "organizationDepartmentOrOrganizations": organizationDepartmentOrOrganizations,
+                    "executorOrganizationType": executorOrganizationType,
+                    "intervalDate": intervalDate,
+                    "topicType": topicType,
+                    "topicTypeEmployee": topicTypeEmployee,
+                    "topic": topic,
+                    "regions": regions,
+                    "villages": villages,
+                    "complainedOfDocStructure": complainedOfDocStructure,
+                    "complainedOfDocSubStructure": complainedOfDocSubStructure,
+                    "socialStatusId": socialStatusId,
+                    "docFormId": docFormId,
+                    "docDocumentStatus": docDocumentStatus,
+                    "docResult": docResult,
+                    "docApplyType": docApplyType,
+                    "entryFromWhere": entryFromWhere,
+                    "docControlStatus": docControlStatus,
+                    "docControlStatusStructures": docControlStatusStructures
+                }
+            }
+        }
+        return data;
+    }
+
+    function refreshTable(page = 1) {
+        if (page) {
+            let data = getInputValuesSetToData(page);
+            $.ajax({
+                type: "GET",
+                url: urlForForInformationDocs,
+                data: data,
+                cache: false,
+                beforeSend: function () {
+                    window.ShowLoading();
+                },
+                complete: function () {
+                    window.CloseLoading();
+                },
+                success: function (response) {
+                    $('#reportBodyPartial').html(response);
+                    $('.selectpicker').selectpicker('refresh');
+                }
+            });
+        }
+    }
+
+    function RemoveCitizensDropdowns() {
+        document.getElementById("citizenTopics").selectedIndex = "Seç";
+        document.getElementById("citizenTopicType").selectedIndex = "Seç";
+        document.getElementById("docDocumentStatus").selectedIndex = "Seç";
+        document.getElementById("socialStatus").selectedIndex = "Seç";
+        document.getElementById("docForm").selectedIndex = "Seç";
+        document.getElementById("docApplyType").selectedIndex = "Seç";
+        document.getElementById("docSubStructure").selectedIndex = "Seç";
+        document.getElementById("docStructure").selectedIndex = "Seç";
+        document.getElementById("docControlStatusStructures").selectedIndex = "Ümumi";
+
+        $('#entryFromWhere').val(-1);
+        $('#docControlStatus').val(-1);
+        //$('#docControlStatusStructures').val(-1);
+        $('#citizenDocResult').val('');
+        $('.citizenBox').addClass("notShowColumn");
+        $('.citizenTopicBox').addClass("notShowColumn");
+    }
+
+    $('#intervalDateForForInformationDocs').daterangepicker(datePickerParameters);
+
+    $(document).on('click', '.btnPaging', btnPagingEvent);
+
+    $('#citizenTopicType').change(citizenTopicTypeChangeEvent)
+    $('#employeeAppealsTopicType').change(employeeAppealsTopicTypeChangeEvent)
+
+    $('#citizenRegion').change(function () { citizenRegionChangeEvent(reportTypeEnum.All) });
+    $('#executorOrganizationType').change(executorOrganizationChangeEvent)     //fill dropdown for organizations
+    $(".searchSelectTree .form-control").click(selectTreeEvent);
+    $('#docStructure').change(docStructureChangeEvent);
+
+    $('#docControlStatus').change(function () {
+        let changeStatus = $(this).val();
+        if (changeStatus == 1) {
+            if ($('.controlBox').hasClass("notShowColumn")) {
+                $('.controlBox').removeClass("notShowColumn");
+            }
+        }
+        else {
+            $("#docControlStatusStructures").val(-1);
+            $('.controlBox').addClass("notShowColumn");
+        }
+        $('.selectpicker').selectpicker("refresh");
+    });
+
+
+    $('#docType').change(function () {
+        let docType = parseInt($("#docType option:selected").val());
+
+        switch (docType) {
+            case docTypeEnum.OrganizationRequest:
+                {
+                    RemoveCitizensDropdowns();
+
+                    if ($('.orgcitizenBox').hasClass("notShowColumn"))
+                        $('.orgcitizenBox').removeClass("notShowColumn");
+
+                    $("#docFormName").text("Sənədin növü");
+                    $('.controlBox').addClass("notShowColumn");
+                    $('.citizenBox').addClass("notShowColumn");
+                    $('.citizenTopicBox').addClass("notShowColumn");
+                    $('.citizenEmpApplyBox').addClass("notShowColumn");
+                    $('.employeeTopicBox').addClass("notShowColumn");
+                    break;
+                }
+            case docTypeEnum.CitizenRequest:
+                {
+                    $("#docFormName").text("Müraciətin forması");
+                    $('#docControlStatus').val(-1);
+                    $('#entryFromWhere').val(-1);
+                    // $('#docControlStatusStructures').val(-1);
+                    document.getElementById("citizenTopics").selectedIndex = "Seç";
+                    document.getElementById("citizenTopicType").selectedIndex = "Seç";
+                    document.getElementById("docDocumentStatus").selectedIndex = "Seç";
+                    document.getElementById("socialStatus").selectedIndex = "Seç";
+                    document.getElementById("docForm").selectedIndex = "Seç";
+                    document.getElementById("docApplyType").selectedIndex = "Seç";
+                    document.getElementById("docSubStructure").selectedIndex = "Seç";
+                    document.getElementById("docStructure").selectedIndex = "Seç";
+                    document.getElementById("docResult").selectedIndex = "Seç";
+                    document.getElementById("citizenRegion").selectedIndex = "Seç";
+                    document.getElementById("citizenVillage").selectedIndex = "Seç";
+                    document.getElementById("docControlStatusStructures").selectedIndex = "Ümumi";
+
+                    $('.controlBox').addClass("notShowColumn");
+
+                    if ($('.orgcitizenBox').hasClass("notShowColumn"))
+                        $('.orgcitizenBox').removeClass("notShowColumn");
+                    if ($('.citizenTopicBox').hasClass("notShowColumn"))
+                        $('.citizenTopicBox').removeClass("notShowColumn");
+                    if ($('.citizenBox').hasClass("notShowColumn"))
+                        $('.citizenBox').removeClass("notShowColumn");
+                    if ($('.citizenEmpApplyBox').hasClass("notShowColumn"))
+                        $('.citizenEmpApplyBox').removeClass("notShowColumn");
+                    if ($('.citizenOrgEmpApplyBox').hasClass("notShowColumn"))
+                        $('.citizenOrgEmpApplyBox').removeClass("notShowColumn");
+
+                    $('.employeeTopicBox').addClass("notShowColumn");
+                    break;
+                }
+            case docTypeEnum.EmployeeAppeals:
+                {
+                    RemoveCitizensDropdowns();
+
+                    if ($('.citizenEmpApplyBox').hasClass("notShowColumn"))
+                        $('.citizenEmpApplyBox').removeClass("notShowColumn");
+
+
+                    $("#docFormName").text("Müraciətin forması");
+                    $('.citizenBox').addClass("notShowColumn");
+                    $('.orgcitizenBox').addClass("notShowColumn");
+                    $('.controlBox').addClass("notShowColumn");
+
+                    if ($('.employeeTopicBox').hasClass("notShowColumn"))
+                        $('.employeeTopicBox').removeClass("notShowColumn");
+
+
+
+                    break;
+                }
+            default:
+                {
+                    RemoveCitizensDropdowns();
+                    $('.orgcitizenBox').addClass("notShowColumn");
+                    $('.controlBox').addClass("notShowColumn");
+                    break;
+                }
+        }
+        $('.selectpicker').selectpicker("refresh");
+    });
+
+    $('#submitFilter').click(function () {
+        localStorage.removeItem("forInformationReport")
+        refreshTable();
+    })   //search
+
+    // #region Server Side Pdf Excell
+
+    $('#excellServerSide').on('click', function () {
+        downloadFileEvent(urlForInformationDocsExcell, urlDownloadExcellFile)
+    });
+
+    $('#pdfServerSide').on('click', function () {
+        downloadFileEvent(urlForInformationDocsPdf, urlDownloadPdfFile)
+    });
+
+    // #endregion
+
+    $(document).ready(function () {
+        localStorage.removeItem("forInformationReport");
+        console.log("a");
+        getDropDownModel(reportTypeEnum.ForInformation);
+    });
+
+</script>
+

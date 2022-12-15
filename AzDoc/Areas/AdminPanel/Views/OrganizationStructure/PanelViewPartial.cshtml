@@ -1,0 +1,37 @@
+﻿@using AzDoc.App_LocalResources
+@{
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+
+}
+
+<div class="row no-gutters mt-4">
+    <div class="">
+        <div class="newDocBtn">
+            <button id="newUser" class="mBtn mBtn-pr" style="width: 100%"> <i class="fas fa-plus">Yeni istifadəçi yarat</i></button>
+        </div>
+    </div>
+    <div class="col-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="\">Ana səhifə</a></li>
+                <li class="breadcrumb-item"><a href="#">Admin</a></li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    İstifadəçilər
+                </li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+
+
+
+<script>
+    $("#newUser").click(function () {
+        window.location ='/@lang/AdminPanel/OrganizationStructure/GetCreateUser';
+    });
+</script>

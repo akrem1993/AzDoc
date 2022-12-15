@@ -1,0 +1,160 @@
+﻿@using InsDoc.Model.EntityModel
+@model InsDoc.Model.ViewModel.DocumentViewModel
+
+<style>
+    .rowSelector {
+    }
+</style>
+
+<link href="~/Content/jquery-editable-select/jquery-editable-select.min.css" rel="stylesheet" />
+<div class="editGroup">
+    <h4>@RLang.BasicInfo</h4>
+    <div class="input-group input-group-sm">
+        <div class="col-sm-6">
+            <label class="font-weight-bold">
+                Sənədin növü
+                <span style="color: red; font-weight:bold">*</span>
+            </label>
+            @Html.DropDownListFor(model => model.TypeOfDocument.Id,
+                new SelectList(Model.TypeOfDocuments, "Id", "Name", Model.DocumentModel.TypeOfDocumentId), "Seç", new
+                {
+                    @class = "selectpicker",
+                    @id = "TypeOfDocument",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+                    @data_required = "Sənədin növünü seçin"
+                })
+
+        </div>
+        <div class="col-sm-6">
+            <label class="font-weight-bold">
+                İmza edən şəxs
+                <span style=" color: red;font-weight: bold">*</span>
+            </label>
+            @Html.DropDownListFor(model => model.SignatoryPerson.Id,
+                new SelectList(Model.SignatoryPersons, "Id", "Name", Model.DocumentModel.SignatoryPersonId), "Seç", new
+                {
+                    @id = "SignatoryPerson",
+                    @class = "selectpicker",
+                    @data_live_search = "true",
+                    @data_width = "100%",
+                    @data_required = "İmza edən şəxsi seçin"
+                })
+        </div>
+        
+        @if (Model.DocumentModel.SubtypeOfDocumentId!=-1 ||Model.DocumentModel.TypeOfDocumentId == 28)
+        {
+            <div class="col-sm-6" id="hidden_SubtypeOfDocument" >
+                <label class="font-weight-bold">Sənədin alt növü</label>
+                @Html.DropDownListFor(model => model.SubtypeOfDocument.Id,
+                    new SelectList(Model.SubtypeOfDocuments, "Id", "Name", Model.DocumentModel.SubtypeOfDocumentId), "Seç", new
+                    {
+                        @class = "selectpicker",
+                        @id = "SubtypeOfDocument ",
+                        @data_live_search = "true",
+                        @data_width = "100%"
+                    })
+            </div>
+        }
+        else
+        {
+            <div class="col-sm-6" id="hidden_SubtypeOfDocument" style="display: none">
+                <label class="font-weight-bold">Sənədin alt növü</label>
+                @Html.DropDownListFor(model => model.SubtypeOfDocument.Id,
+                    new SelectList(Model.SubtypeOfDocuments, "Id", "Name", Model.DocumentModel.SubtypeOfDocumentId), "Seç", new
+                    {
+                        @class = "selectpicker",
+                        @id = "SubtypeOfDocument ",
+                        @data_live_search = "true",
+                        @data_width = "100%"
+                    })
+            </div>
+        }
+
+
+        <div class="col-sm-6">
+            <label class="font-weight-bold">Təsdiq edən şəxs</label>
+            @Html.DropDownListFor(model => model.ConfirmingPerson.Id,
+                new SelectList(Model.ConfirmingPersons, "Id", "Name", Model.DocumentModel.ConfirmingPersonId), "Seç", new
+                {
+                    @class = "selectpicker",
+                    @id = "ConfirmingPerson",
+                    @data_live_search = "true",
+                    @data_width = "100%"
+
+                })
+        </div>
+    </div>
+
+</div>
+
+
+@Html.Partial("RedirectPersons")
+
+<div class="editGroup">
+    <h4>Əlaqəli sənəd</h4>
+
+    <div class="input-group input-group-sm">
+        <input type="text" id="searchRelatedDoc" class="form-control custom" placeholder="Sənədi axtar..." title="Əlaqəli sənəd">
+        <input type="hidden" name="next5" value="5" />
+    </div>
+
+    <table id="relatedDocTable" class="table table-hover table-sm" style=" margin-top: 10px; width: 0 !important;" aria-readonly="true">
+        <thead>
+            <tr class="tr-header">
+                <th scope="col" class="thead">Daxil olma nömrəsi</th>
+                <th scope="col" class="thead">Hardan daxil olub</th>
+                <th scope="col" class="thead">Sil</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var item in Model.RelatedDocModels ?? Enumerable.Empty<RelatedDocModel>())
+            {
+                <tr id="tr" class="data-row ">
+                    <td style='text-align:center!important'>@item.DocEnterno</td>
+                    <td style='text-align:center!important'>@(item.DocumentInfo ?? "---")</td>
+                    <td style='text-align: center !important'>
+                        <a href="javascript:void(0);" onclick="deleteRowRelated(@item.RelatedId, this)" id="deleteRowDataTable" class="remove btn btn-light">
+                            <span class='fas fa-trash-alt icon-size' style='color: red'></span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+<div class="editGroup">
+    <h4>Qısa məzmun</h4>
+    @Html.TextAreaFor(model => model.DocumentModel.ShortContent, new
+    {
+        @placeholder = "",
+        @type = "text",
+        @class = "form-control",
+        @id = "ShortContent",
+        @data_required = "Qısa məzmunu yazın"
+    })
+</div>
+
+
+<div class="row mb-5 pb-5 mt-4">
+    <div class="col-12 text-center">
+        <button type="button" class="mBtn mBtn-sec mr-2" onclick="window.history.go(-1); return false;">
+            @RLang.PrevStep
+        </button>
+        <button id="next-step-2" type="button" class="mBtn mBtn-pr next-step">
+            @RLang.NextStep
+        </button>
+
+    </div>
+</div>
+
+
+<script>
+    $("#relatedDocTable").find(".data-row").length === 0
+        ? $("#relatedDocTable").hide()
+        : $("#relatedDocTable").show();
+</script>
+
+<script src="~/Scripts/jquery-editable-select/jquery-editable-select.min.js?v=@AppVersion.Version"></script>

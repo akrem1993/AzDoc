@@ -1,0 +1,385 @@
+﻿@model Admin.Model.ViewModel.RoleDetailsViewModel
+@using AzDoc.Helpers
+@using Admin.Model.ViewModel.RoleRelatedModels
+@using AzDoc.App_LocalResources
+
+@{
+    ViewBag.Title = "EditUser";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+    var lang = routeValueDictionary["lang"] ?? "az";
+
+    int i = 0;
+
+}
+
+
+<style>
+    .selectedRow {
+        background: gray;
+    }
+
+    .roleTable {
+        overflow-y: scroll;
+        height: 400px;
+        display: block;
+    }
+</style>
+
+<link href="~/Content/adminPanel/bootstrap-datepicker3.css" rel="stylesheet" />
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="headingRow">
+            <h3>@(Model.IsEdit ? "Rolun redaktəsi" : "Yeni rolun yaradılması")</h3>
+        </div>
+    </div>
+</div>
+
+
+<link href="~/Content/jquery-editable-select/jquery-editable-select.min.css" rel="stylesheet" />
+
+<form id="userForm" name="userForm">
+
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            <div class="editGroup">
+
+                <h4>Rol məlumatları</h4>
+
+                <div class="row">
+
+                    <input type="hidden" name="RoleId" value="@Model.RoleId" />
+
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="PersonnelName">Rol adı</label>
+                            <input type="text" name="RoleName" class="form-control" id="PersonnelName" value="@Model.RoleName" />
+                        </div>
+                    </div>
+                </div>
+
+
+                <br />
+            </div>
+
+
+            <div class="row">
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label>Operations</label>
+                        <select id="Operations" name="Operations" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                            <option value="">Seçin</option>
+                            @foreach (OperationCustomModel operation in Model.AllOperations)
+                            {
+                                <option value="@operation.OperationId">@operation.OperationName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label>Rights</label>
+                        <select id="Rights" name="Rights" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                            <option value="">Seçin</option>
+                            @foreach (RightCustomModel right in Model.AllRights)
+                            {
+                                <option value="@right.RightId">@right.RightName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label>RightTypes</label>
+                        <select id="RightTypes" name="RightTypes" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                            <option value="">Seçin</option>
+                            @foreach (RightTypesCustom rightType in Model.AllRightTypes)
+                            {
+                                <option value="@rightType.RightTypeId">@rightType.RightTypeName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-1">
+                    <button id="updateRolOperationsBtn" type="button" style="width: 45px;margin-top: 30px;" class="form-control"><i class="fas fa-plus"></i></button>
+                </div>
+
+
+            </div>
+
+            <table class="table table-hover roleTable">
+                <thead>
+                    <tr>
+                        <td>Əməliyyat</td>
+                        <th>Hüquq</th>
+                        <th>Hüquq tipi</th>
+                        <th>Dəyişikliklər</th>
+                    </tr>
+                </thead>
+                <tbody id="roleOperationTBody">
+
+                    @foreach (RoleOperationCustomModel roleOperation in Model.RoleOperations)
+                    {
+
+                        <tr is-selected="false" operation-id="@roleOperation.OperationId" right-id="@roleOperation.RightId" right-type-id="@roleOperation.RightTypeId">
+                            <td>
+                                <div>
+                                    <input type="hidden" name="RoleOperations.Index" value="@(++i)" />
+                                    <input type="hidden" name="RoleOperations[@i].RoleOperationId" value="@roleOperation.RoleOperationId" />
+                                    <input class="OperationId" name="RoleOperations[@i].OperationId" type="hidden" value="@roleOperation.OperationId" />
+                                    <input class="RightId" name="RoleOperations[@i].RightId" type="hidden" value="@roleOperation.RightId" />
+                                    <input class="RightTypeId" name="RoleOperations[@i].RightTypeId" type="hidden" value="@roleOperation.RightTypeId" />
+                                </div>
+                                <div class="operation"> @roleOperation.OperationName</div>
+                            </td>
+                            <td class="right">@roleOperation.RightName</td>
+                            <td class="rightType">@roleOperation.RightTypeName</td>
+                            <td style="text-align:center;">
+                                <i class="fas fa-edit editRoleOperation"></i>
+                                <i class="fas fa-ban removeRoleOperation"></i>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+
+
+        </div>
+        <br />
+    </div>
+
+    <div class="row mb-5 pb-5 mt-4">
+        <div class="col-12 text-center">
+            <button type="button" class="mBtn mBtn-sec mr-2" onclick="window.history.go(-1); return false;">
+                @RLang.PrevStep
+            </button>
+            <button id="submitForm" type="button" class="mBtn mBtn-pr next-step">
+                @RLang.Save
+            </button>
+        </div>
+    </div>
+</form>
+
+
+
+
+<script src="~/Scripts/jquery-editable-select/jquery-editable-select.min.js?v=@AppVersion.Version"></script>
+
+<script>
+
+
+
+
+
+      $(document).ready(function () {
+
+
+        $("#userForm").validate({
+            wrapper: "p",
+            rules: {
+                RoleName: {
+                    required: true,
+                    remote: {
+                        url: "/@lang/AdminPanel/OrganizationStructure/CheckRoleExists",
+                        type: "post",
+                        data: { roleId: "@Model.RoleId" }
+                    }
+                }
+
+
+            },
+            messages: {
+                RoleName: {
+                    required: "Rolu daxil edin",
+                    remote:"Bu adda rol artıq mövcuddur"
+                }
+            },
+
+            highlight: function (element) {
+                $(element).css("border", "#FFBABA solid 1px");
+            },
+            unhighlight: function (element) {
+                $(element).css("border", "#d4d4d4 solid 1px");
+            },
+            errorPlacement: function (error, element) {
+
+                $(error).appendTo(element.parents(".form-group"));
+
+            }
+
+        });
+
+    });
+
+
+    $("#updateRolOperationsBtn").click(function () {
+
+        var row = $(".selectedRow");
+
+        var rowIndex = parseInt("@i") + 1;
+
+        var operationText = $('#Operations :selected').text();
+        var operationVal = $('#Operations :selected').val();
+
+
+        if (operationVal === '')
+        {
+
+            toastr.info("Əməliyyat xanasını daxil edin");
+
+            return;
+        }
+
+
+
+        var rightText = $('#Rights :selected').text();
+        var rightVal = $('#Rights :selected').val();
+
+        var rightTypeText = $('#RightTypes :selected').text();
+        var rightTypeVal = $('#RightTypes :selected').val();
+
+        if (row.length !== 0) {
+
+            row.find(".OperationId").val(operationVal);
+            row.find(".operation").text(operationText);
+
+            row.find(".RightId").val(rightVal);
+            row.find(".right").text(rightText);
+
+            row.find(".RightTypeId").val(rightTypeVal);
+            row.find(".rightType").text(rightTypeText);
+        }
+        else
+        {
+            var trHtml = `<tr is-selected="false" operation-id="${operationVal}" right-id="${rightVal}" right-type-id="${rightTypeVal}">
+                            <td>
+                                <div>
+                                    <input type="hidden" name="RoleOperations.Index" value="${rowIndex}" />
+                                    <input type="hidden" name="RoleOperations[${rowIndex}].RoleOperationId" value="" />
+                                    <input class="OperationId" name="RoleOperations[${rowIndex}].OperationId" type="hidden" value="${operationVal}" />
+                                    <input class="RightId" name="RoleOperations[${rowIndex}].RightId" type="hidden" value="${rightVal}" />
+                                    <input class="RightTypeId" name="RoleOperations[${rowIndex}].RightTypeId" type="hidden" value="${rightTypeVal}" />
+                                </div>
+                                <div class="operation">${operationText}</div>
+                            </td>
+                            <td class="right">${rightVal !== '' ? rightText:'' }</td >
+                            <td class="rightType">${rightTypeVal !== '' ? rightTypeText : '' }</td>
+                            <td style="text-align:center;">
+                                <i class="fas fa-edit editRoleOperation"></i>
+                                <i class="fas fa-ban removeRoleOperation"></i>
+                            </td>
+                        </tr>`;
+
+
+
+            $("#roleOperationTBody").prepend(trHtml);
+
+        }
+
+
+    });
+
+
+    $(document).on("click", ".editRoleOperation", function () {
+
+        var row = $(this).parents("tr");
+        $("tr").removeClass("selectedRow");
+        row.addClass("selectedRow");
+
+        var operationId = row.attr("operation-id");
+        var rightId = row.attr("right-id");
+        var rightTypeId = row.attr("right-type-id");
+
+
+
+        $('#Operations option:selected').removeAttr('selected');
+        $('#Rights option:selected').removeAttr('selected');
+        $('#RightTypes option:selected').removeAttr('selected');
+
+
+        $('#Operations option[value="' + operationId + '"]').attr("selected", "selected");
+        $('#Rights option[value="' + rightId + '"]').attr("selected", "selected");
+        $('#RightTypes option[value="' + rightTypeId + '"]').attr("selected", "selected");
+
+        $('#Operations').selectpicker('refresh');
+        $('#Rights').selectpicker('refresh');
+        $('#RightTypes').selectpicker('refresh');
+
+    });
+
+
+    $(document).on("click", ".removeRoleOperation", function () {
+        var element = $(this).parents("tr");
+
+         Swal.fire({
+                title: 'Role əməliyyatı silinsinmi?',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Ləğv et',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+                    element.remove();
+                }
+            });
+    });
+
+
+
+
+
+    $("#submitForm").click(function () {
+
+
+        var isFormValid = $("#userForm").valid();
+
+
+        if (isFormValid) {
+
+
+            var form = document.forms.namedItem("userForm");
+            var oData = new FormData(form);
+
+
+            $.ajax({
+                url: "/@lang/AdminPanel/OrganizationStructure/@(Model.IsEdit ? "PostEditRole" : "PostCreateRole")",
+                type: 'POST',
+                data: oData,
+                dataType: 'Json',
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    if (result) {
+                        toastr.success("Rol əməliyyatları uğurla tamamlandı");
+                    }
+                    else {
+                        toastr.error("Xəta baş verdi");
+                    }
+                },
+                error: function (response) {
+                },
+                beforeSend: function () {
+                    window.ShowLoading();
+                },
+                complete: function () {
+                    window.CloseLoading();
+                }
+            });
+        }
+
+
+        });
+
+
+
+</script>
+<script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+

@@ -1,0 +1,250 @@
+﻿@using CustomHelpers.Classes
+@using OutgoingDoc.Enum
+@model DocumentInfoViewModel
+@{
+    var docStatus = new[] {(int)DocumentStatus.Draft,
+(int)DocumentStatus.IsViza,
+(int)DocumentStatus.Signing,
+(int)DocumentStatus.Disposed
+};
+    string parent = ",";
+    int count = 0;
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<head>
+    <title>Qeydiyyat vərəqəsi @(Model.DocEnterNo ?? Model.DocDocNo) </title>
+    @if (!Request.IsAjaxRequest())
+    {
+        <link href="~/Content/bootstrap/bootstrap.min.css" rel="stylesheet" />
+        <link href="~/Content/fontawesome/css/all.min.css" rel="stylesheet" />
+        <link href="~/Content/common/style.css" rel="stylesheet" />
+        <script src="~/Scripts/jquery/jquery-3.3.1.min.js"></script>
+        <script src="~/Scripts/bootstrap/bootstrap.min.js"></script>
+        <script src="~/Scripts/jquery/jquery-blockUI.js"></script>
+        @GleamTechHelper.Head
+        @GleamTechHelper.Js
+    }
+
+</head>
+
+
+<style>
+    @@media print {
+        .btn {
+            display: none;
+        }
+    }
+
+    .center {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+<span id="spanToken" style="display: none">@ViewData["Token"]</span>
+<div id="view">
+    <div class="container-fluid" style="padding-left: 15px!important">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-12">
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="headingRow">
+                            <h3>
+                                @Model.OrgName
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mainView">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="viewHeading">
+                                <h3>Qeydiyyat nəzarət vərəqəsi</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="docContent" class="viewGroup appealing">
+
+                                <div class="col-12">
+                                    <h4 class="text-center align-content-center">
+                                        @Model.DocTypeName
+                                    </h4>
+
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            @if (!string.IsNullOrEmpty(Model.DocEnterNo))
+                                            {
+                                                <tr class="qnv">
+                                                    <th>Qeydiyyat nömrəsi</th>
+                                                    <td class="custom-table-cell">@Model.DocEnterNo</td>
+                                                    <th>Qeydiyyat tarixi</th>
+                                                    <td class="custom-table-cell">@(Model.DocEnterDate?.ToString("d"))</td>
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                <tr class="qnv">
+                                                    <th>Layihə nömrəsi</th>
+                                                    <td class="custom-table-cell">@Model.DocDocNo</td>
+                                                    <th>Layihə tarixi</th>
+                                                    <td class="custom-table-cell">@(Model.DocEnterDate?.ToString("d"))</td>
+                                                </tr>
+                                            }
+
+                                            <tr class="qnv">
+                                                <th>Göndərilən təşkilat</th>
+                                                <td class="custom-table-cell">
+                                                    @Model.SendTo
+                                                </td>
+                                                <th>Sənədin növü</th>
+                                                <td class="custom-table-cell">@Model.DocumentKind</td>
+                                            </tr>
+                                            <tr class="qnv">
+                                                <th>Göndərilən şəxs</th>
+                                                <td class="custom-table-cell">
+
+                                                    @Model.ConfirmPerson
+                                                </td>
+                                                <th>Göndərilmə forması</th>
+                                                <td class="custom-table-cell">@Model.SendForm</td>
+                                            </tr>
+                                            <tr class="qnv">
+                                                <th>İmzalayan şəxs</th>
+                                                <td class="custom-table-cell">@Model.Signer</td>
+                                                <th>Sənədin statusu</th>
+                                                <td class="custom-table-cell">@Model.DocumentStatusName</td>
+                                            </tr>
+                                            <tr class="qnv">
+                                                <th>Göndərilən ünvan</th>
+                                                <td class="custom-table-cell" colspan="3">@Model.SentAddress</td>
+                                            </tr>
+                                            <tr class="qnv">
+                                                <th>Kimə ünvanlanıb</th>
+                                                <td class="custom-table-cell" colspan="3">
+                                                    @Model.WhomAddress
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+
+                                <div class="col-12">
+                                    <h4 class="text-center">Sənədin qısa məzmunu</h4>
+                                    <table class="table table-bordered">
+                                        <tbody>
+                                            <tr>
+                                                <td>@Model.Description</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                @Html.Partial("~/Views/DocInfo/_DocFiles.cshtml", Model.DocFiles)
+
+                                @Html.Partial("~/Views/DocInfo/_AnswerDoc.cshtml", Model.AnswerDocs)
+
+                                @Html.Partial("~/Views/DocInfo/_EnteredDoc.cshtml", Model.EnteredDocs)
+
+                                @Html.Partial("~/Views/DocInfo/_RelatedDoc.cshtml", Model.RelatedDocs)
+
+                                @Html.Partial("~/Views/DocInfo/_DeletedFromViza.cshtml", Model.DeletedFromViza)
+
+                                @Html.Partial("~/Views/DocInfo/_DocHistory.cshtml", Model.DocHistory)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="#" class="circleBtn" style="position: fixed; top: 40px; right: 5%;" id="print"><i class="fas fa-print"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/common/printThis.min.js"></script>
+<script>
+     $('#print').click(function () {
+        hidden();
+        $('#view').printThis();
+    });
+
+    function fileShow(docInfoId) {
+        var spanToken = $('#spanToken').html();
+        var subPathName = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
+        if (subPathName == 'GetDocView') {
+   $.ajax({
+                type: 'GET',
+       url: '/@lang/outgoing/Document/DocumentDisplay',
+                data: { docInfoId: docInfoId },
+                beforeSend: function() {
+                    window.ShowLoading();
+
+                },
+                success: function (data1) {
+
+                    $.ajax({
+                        type: 'GET',
+                        url: `/@lang/Document/GetDocView?token=${spanToken}`,
+                        dataType: 'html',
+                        success: function (data) {
+                            $("#view").html(data);
+                            $("#docDisplay").html(data1);
+                            $('#trDocFileView').show();
+                        }
+                    });
+
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+
+            });
+
+        } else {
+
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/outgoing/Document/DocumentDisplay',
+                dataType: 'html',
+                data: { docInfoId: docInfoId },
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                success: function (response) {
+                    $("#DocViewer").html(response);
+                    $('#docElectronic').addClass('individual active');
+                    $('#docElectronic').removeClass('juridical');
+                    $('#ElectronicDocument').removeClass('d-none');
+
+                    $('#docDocInfo').removeClass('individual active');
+                    $('#docDocInfo').addClass('juridical');
+                    $('#DocInfo').addClass('d-none');
+
+                    $('#JsonFile').val(docInfoId);
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+
+            });
+        }
+    };
+
+    $('#closeDocViewer').click(function() {
+        hidden();
+    });
+
+    function hidden() {
+        $('#documentDisplay').css('display', 'none');
+        $('#closeButton').css('display', 'none');
+    }
+</script>

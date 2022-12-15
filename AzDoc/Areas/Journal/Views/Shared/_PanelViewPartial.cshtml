@@ -1,0 +1,78 @@
+﻿
+@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@using BLL.Common.Enums
+
+@{
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+
+    var permissions = Permissions.GetAll(RightType.CreateDoc);
+}
+
+<div class="row no-gutters mt-4">
+
+    @*<div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="\">Ana səhifə</a></li>
+                    <li class="breadcrumb-item"><a href="#">Göndərilən</a></li>
+
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Göndərilən sənədlərin qeydə alınması e-kitabı
+                    </li>
+
+                </ol>
+            </nav>
+        </div>*@
+
+    <div class="col-10">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="\">Ana səhifə</a></li>
+                @if (ViewData["docTypeGroupName"] != null)
+                {
+                    <li class="breadcrumb-item"><a href="#">@ViewData["docTypeGroupName"]</a></li>
+                }
+
+                <li class="breadcrumb-item active" aria-current="page">
+                    @ViewData["docTypeName"]
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+
+    <div class="col-2 text-right">
+        <select id="Period" class="selectpicker" data-width="100%">
+            @foreach (var item in SessionHelper.Period)
+            {
+                <option value="@item.PeriodId">@item.PeriodDescription</option>
+            }
+        </select>
+    </div>
+
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+        $('[data-toggle="popover"]').popover({
+            html: true,
+            content: function () {
+                return $('#popover-content').html();
+            }
+        });
+
+        $('.popover-dismiss').popover({
+            trigger: 'focus'
+        });
+
+
+
+    });
+</script>

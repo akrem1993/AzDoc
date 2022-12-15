@@ -1,0 +1,25 @@
+﻿
+@model Admin.Model.EntityModel.UserStatistics
+
+
+<div class="infoContent" style="">
+    <table class="table table-sm" id="userStatisticsTable">
+        <thead>
+            <tr>
+                <th style="color: blue" scope="col">Ümumi istidadəçi sayı :</th>
+                <th style="color: green" scope="col">Aktiv istifadəçi sayı :</th>
+                <th style="color: red" scope="col">Deaktiv istifadəçi sayı :</th>
+                <th style="color: orange" scope="col">Yolverilən maksimum istifadəçi sayı :</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="color: blue">@Model.TotalUsers</td>
+                <td style="color: green">@Model.ActiveUsers</td>
+                <td style="color: red">@Model.DeactiveUsers</td>
+                <td style="color: orange">@(@Model.MaxUserCount ?? "Təyin olunmayıb")</td>
+            </tr>
+
+        </tbody>
+    </table>
+</div>

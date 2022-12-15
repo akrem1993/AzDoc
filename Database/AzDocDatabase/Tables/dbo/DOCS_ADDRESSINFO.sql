@@ -1,0 +1,22 @@
+CREATE TABLE [dbo].[DOCS_ADDRESSINFO](
+	[AdrId] int identity NOT NULL,
+	[AdrDocId] int NOT NULL,
+	[AdrTypeId] int NOT NULL,
+	[AdrOrganizationId] int NULL,
+	[AdrAuthorId] int NULL,
+	[AdrAuthorDepartmentName] nvarchar(250) NULL,
+	[AdrPersonId] int NULL,
+	[AdrPositionId] int NULL,
+	[AdrUndercontrol] int NOT NULL CONSTRAINT [DF_DOCS_ADDRESSINFO_AdrUndercontrol]  DEFAULT 0,
+	[AdrUndercontrolDays] int NOT NULL CONSTRAINT [DF_DOCS_ADDRESSINFO_ArdUndercontrolDays]  DEFAULT 0,
+	[FullName] nvarchar(1000) NULL,
+	[AdrSendStatusId] int NULL,
+	[AdrUndercontrolDate] [datetime] NULL,
+	[AuthorPrevOrganization] nvarchar(max) NULL,
+    CONSTRAINT [PK_DOCS_ADDRESSINFO] PRIMARY KEY ([AdrId]),
+    CONSTRAINT [FK_DOCS_ADDRESSINFO_DC_ORGANIZATION] FOREIGN KEY([AdrOrganizationId]) REFERENCES [dbo].[DC_ORGANIZATION] ([OrganizationId]),
+    CONSTRAINT [FK_DOCS_ADDRESSINFO_DC_POSITION] FOREIGN KEY([AdrPositionId]) REFERENCES [dbo].[DC_POSITION] ([PositionId]),
+    CONSTRAINT [FK_DOCS_ADDRESSINFO_DOC_ADRTYPE] FOREIGN KEY([AdrTypeId]) REFERENCES [dbo].[DOC_ADRTYPE] ([AdrTypeId]),
+    CONSTRAINT [FK_DOCS_ADDRESSINFO_DOC_AUTHOR] FOREIGN KEY([AdrAuthorId]) REFERENCES [dbo].[DOC_AUTHOR] ([AuthorId]),
+    CONSTRAINT [FK_DOCS_ADDRESSINFO_doc_sendstatus] FOREIGN KEY([AdrSendStatusId]) REFERENCES [dbo].[DOC_SENDSTATUS] ([SendStatusId])
+)

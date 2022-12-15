@@ -1,0 +1,34 @@
+﻿<script>
+    function SendDocumnet() {
+        var token = $('input[name="__RequestVerificationToken"]').val();
+        var requestToken = $("#spanToken").html();
+
+        Swal.fire({
+            title: 'Sənədin göndərilməsinə əminsiniz?',
+            type: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'Ləğv et',
+            confirmButtonText: 'Təsdiqlə'
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    type: 'POST',
+                    url: `/az/DocOperation/SendDocument?token=${requestToken}`,
+                    beforeSend: function () {
+                        window.ShowLoading();
+                    },
+                    dataType: 'json',
+                    data: { __RequestVerificationToken: token, description: null },
+                    success: function () {
+                        var pageIndex = $('.jqx-grid').CachedGrid().config.params.pageIndex;
+                        $('.jqx-grid').bindgrid(pageIndex, undefined);
+                        $('#doubleClickModal').modal('hide');
+                    },
+                    complete: function () {
+                        window.CloseLoading();
+                    }
+                });
+            }
+        });
+    }
+</script>

@@ -1,0 +1,104 @@
+﻿
+
+
+@using Admin.Model.ViewModel
+
+@if (@Model != null)
+{
+    <div class="row">
+
+        <div class="col-sm-5">
+            <div class="form-group">
+                <label>Müəllif</label>
+                <select id="CreateRsl2" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                    <option value="-1">Seçin</option>
+                    @foreach (CreateResolutionRoleModel item in Model)
+                    {
+                        <option value="@item.WorkplaceId">@item.UserName</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-5" style="text-align:left;">
+            <div class="form-group">
+                <label>İcraçı</label>
+                <select id="RoleRsl2" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                    <option value="-1">Seçin</option>
+                    @foreach (CreateResolutionRoleModel item in Model)
+                    {
+                        <option value="@item.WorkplaceId">@item.UserName</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-sm-2" style="text-align:left;">
+            <div class="form-group">
+                <br />
+                <input type="radio" id="add" name="RadioButton" value="Add">
+                <label for="add">Əlavə et</label><br>
+                <input type="radio" id="delete" name="RadioButton" value="Delete">
+                <label for="delete">Sil</label><br>
+            </div>
+        </div>
+        <div class="col-sm-2" style="text-align:left;">
+            <div class="form-group">
+
+                <br />
+                <button type="button" class="mBtn mBtn-pr " id="btnAdd2">
+                    Təsdiqlə
+                </button>
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $(document).ready(function () {
+        $('.navbar').css('display', 'none');
+    });
+
+    $('#btnAdd2').click(function () {
+        var radios = document.getElementsByName('RadioButton');
+        var radiovalue;
+        for (var i = 0, length = radios.length; i < length; i++) {
+            if (radios[i].checked) {
+                // do whatever you want with the checked radio
+                //alert();
+                radiovalue = radios[i].value;
+                // only one radio can be logically checked, don't check the rest
+                break;
+            }
+        }
+        console.log(radiovalue);
+         $.ajax({
+          type: 'POST',
+         url: '@Url.Action("AddDeleteExecutorForDirection", "Documents", new { area = "AdminPanel" })',
+                        dataType: 'json',
+             data: {
+                 directionworkplaceid: $('#CreateRsl2').find('option:selected').val(),
+                 executorworkplaceid: $('#RoleRsl2').find('option:selected').val(),
+                 checkvalue: radiovalue,
+
+                 //checkvalue: document.getElementsByName('RadioButton').checked.value();
+
+            },
+                        beforeSend: function () {
+                            window.ShowLoading();
+                        },
+                        success: function () {
+
+
+                        },
+                        complete: function () {
+                            window.CloseLoading();
+                            Swal.fire({
+                                title: "Əməliyyat uğurla başa çatdı.",
+                                type: 'success'
+
+                            });
+                           
+                        }
+                    });
+    })
+</script>
+<script src="~/Scripts/widgets/jqxmin.min.js"></script>

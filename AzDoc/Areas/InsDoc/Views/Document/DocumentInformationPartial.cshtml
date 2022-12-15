@@ -1,0 +1,453 @@
+﻿@using InsDoc.Common.Enums
+@model InsDoc.Model.ViewModel.DocumentViewModel
+@{
+    Layout = null;
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+
+    var showTask = Model.TaskModels?.Count() > 0 ? "block" : "none";
+}
+
+<style>
+    .tr-header > th, #tr > th, .data-row > td, .edit-data-row > td {
+        border: #ccc solid 1px;
+        text-align: center !important;
+        vertical-align: middle;
+    }
+
+    #Task {
+        height: 150px !important;
+    }
+
+    input[type=date]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        display: none;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        background: transparent;
+        bottom: 0;
+        color: transparent;
+        cursor: pointer;
+        height: auto;
+        left: 0;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: auto;
+    }
+</style>
+
+<div class="editGroup" style=" border-bottom: inset">
+    <h4>
+        Tapşırıq əlavə et
+        <span style="color: red; font-weight: bold">*</span>
+    </h4>
+
+    <div class="row">
+        <div class="input-group">
+            <div class="col-7">
+                <div class="input-group">
+                    <div class="col-3">
+                        <label class="font-weight-bold">
+                            Tapşırıq növü
+                            <span style="color: red; font-weight: bold">*</span>
+                        </label>
+                        @Html.DropDownListFor(model => model.TypeOfAssignment.Id,
+                            new SelectList(Model.TypeOfAssignments, "Id", "Name"), "Seç", new
+                            {
+                                @class = "form-control",
+                                @id = "TypeOfAssignment",
+                                data_required2 = "data-required2"
+                            })
+                    </div>
+
+                    <div class="col-9" style="padding-left: 0;">
+                        <label class="font-weight-bold">
+                            Kimə ünvanlanıb
+                            <span style="color: red; font-weight: bold">*</span>
+                        </label>
+                        @Html.DropDownListFor(model => model.WhomAddress.Id,
+                            new SelectList(Model.RedirectPersons, "Id", "Name"), new
+                            {
+                                @class = "selectpicker",
+                                @data_live_search = "true",
+                                @data_width = "100%",
+                                id = "WhomAddressId",
+                                multiple = "multiple",
+                                @data_actions_box = "true",
+                                data_required2 = "data-requiredd"
+                            })
+                    </div>
+                </div>
+
+                <br />
+                <div class="col-12">
+                    @Html.TextAreaFor(model => model.Task, new
+                       {
+                           @type = "text",
+                           @class = "form-control",
+                           @id = "Task",
+                           @placeholder = "Tapşırıq məzmunu *",
+                           data_required2 = "data-requiredd"
+                       })
+                </div>
+            </div>
+
+            <div class="col-5">
+                <div class="row col-5">
+                    <label class="font-weight-bold">Tapşırıq dövrü</label>
+                    @Html.DropDownListFor(model => model.TaskCycle.Id,
+                        new SelectList(Model.TaskCycles, "Id", "Name"), "Seç", new
+                        {
+                            @class = "form-control",
+                            @id = "TaskCycle",
+                            @disabled = true,
+                            @onchange = "TaskCyclesOnChange()"
+                        })
+                </div>
+
+                <div class="row col-5">
+                    <label class="font-weight-bold">İcra dövrü</label>
+                    @Html.TextBoxFor(model => model.ExecutionPeriod, new
+               {
+                   type = "number",
+                   @class = "form-control",
+                   id = "ExecutionPeriod",
+                   maxlength = 3,
+                   disabled = true,
+                   min = 0
+               })
+                </div>
+                <div class="row col-5">
+                    <label class="font-weight-bold">Dövrün başlama tarixi(gün)</label>
+                    @Html.TextBoxFor(model => model.PeriodOfPerformance, new
+               {
+                   type = "number",
+                   max = "30",
+                   @class = "form-control",
+                   id = "PeriodOfPerformance",
+                   disabled = true,
+                   min = 0
+                    })
+                </div>
+
+                <div class="row col-5">
+                    <label class="font-weight-bold">İlkin icra tarixi </label>
+                    @Html.TextBoxFor(model => model.OriginalExecutionDate, "{0:yyyy-MM-dd}", new
+               {
+                   @type = "date",
+                   @class = "form-control",
+                   @id = "OriginalExecutionDate",
+                   @disabled = true,
+                   onkeydown = "return false;"
+               })
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-5">
+        <button id="btnAddTask" type="button" class="btn btn-light add-row-taskk">
+            <i class="fa fa-plus-circle" style="color: green"></i> Əlavə et
+        </button>
+    </div>
+    <br />
+</div>
+
+<div class="editGroup" style="display:@showTask" id="divTaskTable">
+    <h4>Tapşırıqlar<span style="color: red; font-weight: bold">*</span></h4>
+    <table class="table table-hover table-sm" id="taskTable">
+        <thead>
+            <tr>
+                @*<th scope="col" class="thead">Seç</th>*@
+                <th scope="col" class="thead">Tapşırıq növü</th>
+                @*<th scope="col" class="thead">Tapşırıq nömrəsi</th>*@
+                <th scope="col" class="thead">Tapşırıq məzmunu</th>
+                <th scope="col" class="thead">Tapşırıq dövrü</th>
+                <th scope="col" class="thead">İcra dövrü</th>
+                <th scope="col" class="thead">İcra müddəti</th>
+                <th scope="col" class="thead">İlkin icra tarixi</th>
+                <th scope="col" colspan="2" class="thead">Kimə ünvanlanıb</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.TaskModels)
+            {
+                <tr class="edit-data-row" data-TaskNo='@item.TaskGroup'>
+                    @*<td><input type='checkbox' name='record'></td>*@
+                    <td>@item.TypeOfAssignment</td>
+                    @*<td>@item.TaskNo</td>*@
+                    <td>@item.Task</td>
+                    <td>@item.TaskCycleName</td>
+                    <td>@item.ExecutionPeriod</td>
+                    <td>@item.PeriodOfPerformance</td>
+                    <td>@(item.OriginalExecutionDate?.ToString("d"))</td>
+                    <td>@item.WhomAddress</td>
+                    <td style='text-align: center !important'>
+                        <a href="javascript:void(0);" onclick="deleteRow(@item.TaskId, this)" id="deleteRowDataTable" class="btn btn-light remove">
+                            <span class='fas fa-trash-alt icon-size' style='color: red'></span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="row mb-5 pb-5 mt-4">
+    <div class="col-12 text-center">
+        <button id="prev-step-1" type="button" class="mBtn mBtn-sec mr-2 prev-step">
+            @RLang.PrevStep
+        </button>
+        <button id="next-step-3" type="button" class="mBtn mBtn-pr next-step">
+            @RLang.NextStep
+        </button>
+    </div>
+</div>
+
+<script>
+    var taskPersons = [];
+
+    $(document).ready(function () {
+        $('.bs-select-all').text('Hamisi').addClass('btn-info');
+        $('.bs-deselect-all').text('Sil').addClass('btn-danger');
+
+        var today = '@DateTime.Now.ToString("yyyy-MM-dd")';
+        $("#OriginalExecutionDate").attr('min', today);
+        $("#OriginalExecutionDate").val('');
+    });
+
+    $('#WhomAddressId').on("change",
+        function () {
+            taskPersons = $(this).val();
+            console.log(taskPersons);
+        });
+
+    function deleteRow(taskId,element) {
+
+        Swal.fire({
+            title: 'Bu sətir cədvəldən silinəcək',
+            type: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'Ləğv et',
+            confirmButtonText: 'Təsdiqlə'
+        }).then((result) => {
+            if (result.value) {
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/@_lang/InsDoc/Document/DeleteDocument',
+                    dataType: 'html',
+                    data: { rowId: taskId, formTypeId: 2},
+                    success: function (result) {
+                        if (result == @((int) Result.Success)) {
+                            $(element).parents("tr").remove();
+                            HideTaskTable();
+                            Swal.fire({
+                                type: 'success',
+                                title: 'Məlumat silindi',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        } else {
+                            Swal.fire({
+                                type: 'error',
+                                title: 'Məlumat silinməsi uğursuz oldu',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        }
+                    }
+                });
+            }
+            });
+    }
+
+    function HideTaskTable() {
+        var taskCount = $('#taskTable tbody tr').length;
+
+        if (taskCount == 0) $('#divTaskTable').hide();
+    }
+
+    function DeleteTask(e) {
+        Swal.fire({
+            title: 'Bu sətir cədvəldən silinəcək',
+            type: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'Ləğv et',
+            confirmButtonText: 'Təsdiqlə'
+        }).then((result) => {
+            if (result.value) {
+                $(e).closest('tr').remove();
+                HideTaskTable();
+
+                SAlert.deleteSuccess();
+            }
+        });
+    }
+
+    $('#TypeOfAssignment').on('change',
+        function() {
+            var typeOfAssignment = $(this).val();
+            console.log(typeOfAssignment);
+
+            if (typeOfAssignment == 1) {
+
+                $('#TaskCycle').attr('data-required2', '');
+                $('#ExecutionPeriod').attr('data-required2','');
+                $('#PeriodOfPerformance').attr('data-required2', '');
+                $('#OriginalExecutionDate').attr('data-required2', '');
+
+                $('#TaskCycle').removeAttr('disabled');
+                $('#ExecutionPeriod').removeAttr('disabled');
+                $('#PeriodOfPerformance').removeAttr('disabled');
+                $('#OriginalExecutionDate').removeAttr('disabled');
+            }
+            else {
+                document.getElementById('TaskCycle').selectedIndex = 0;
+                document.getElementById('ExecutionPeriod').value = 1;
+                document.getElementById('PeriodOfPerformance').value = 0;
+                document.getElementById('OriginalExecutionDate').value = 'mm/dd/yyyy';
+
+                $("#TaskCycle").css("border", "1px solid #ccc");
+                $("#ExecutionPeriod").css("border", "1px solid #ccc");
+                $("#PeriodOfPerformance").css("border", "1px solid #ccc");
+                $("#OriginalExecutionDate").css("border", "1px solid #ccc");
+
+                $('#TaskCycle').removeAttr('data-required2');
+                $('#ExecutionPeriod').removeAttr('data-required2');
+                $('#PeriodOfPerformance').removeAttr('data-required2');
+                $('#OriginalExecutionDate').removeAttr('data-required2');
+
+                $('#TaskCycle').attr('disabled', '');
+                $('#ExecutionPeriod').attr('disabled', '');
+                $('#PeriodOfPerformance').attr('disabled', '');
+                $('#OriginalExecutionDate').attr('disabled', '');
+            }
+        });
+
+    function GetMaxTaskNumber() {
+        var max = 0;
+        var rows = $('#taskTable tbody tr');
+        $.each(rows,function () {
+                var attrTaskNo = parseInt($(this).attr("data-TaskNo"));
+                if (attrTaskNo>max) {
+                    max = attrTaskNo;
+                }
+            });
+
+        return max+1;
+    }
+
+    function IsValid() {
+        var required = $("[data-required2]");
+
+        var count = 0;
+        $.each(required,
+            function () {
+                if ($(this).val() === "" || $(this).val().length==0) {
+                    if ($(this).hasClass("selectpicker")) {
+                        $(this).closest("div")
+                            .css("border", "1px solid red")
+                            .css("border-radius", ".25rem");
+                    } else {
+                        $(this).css("border", "1px solid red");
+                    }
+
+                    count++;
+                } else {
+                    if ($(this).hasClass("selectpicker")) {
+                        $(this).closest("div")
+                            .css("border", "1px solid transparent");
+                    } else {
+                        $(this).css("border", "1px solid #ced4da");
+                    }
+                }
+            });
+
+        if (count > 0) {
+            toastr.warning("Bütün məcburi xanaların doldurulduğuna əmin olun.");
+            return false;
+        }
+
+        return true;
+    }
+
+    function ClearControls() {
+        $("#WhomAddressId").selectpicker('deselectAll');
+        $("#WhomAddressId").val(-1);
+        $("#WhomAddressId").selectpicker('refresh');
+        $('#TypeOfAssignment').val('');
+        $('#TypeOfAssignment').change();
+
+        document.getElementById('TaskCycle').selectedIndex = 0;
+        $('#ExecutionPeriod').val(1);
+        $('#PeriodOfPerformance').val(0);
+        document.getElementById('OriginalExecutionDate').value = 'mm/dd/yyyy';
+        $('#Task').val('');
+    }
+
+    $('#btnAddTask').click(function () {
+        if (!IsValid()) return;
+
+        var taskNo = GetMaxTaskNumber();//get max from table to do
+        var taskDescription = $("#Task").val();
+        var typeOfAssignmentId = $('#TypeOfAssignment').val();
+        var typeOfAssignment = $("#TypeOfAssignment").find('option:selected').text();
+        var typeOfAssignmentValue = $("#TypeOfAssignment").val();
+        var taskCycle = $("#TaskCycle").find('option:selected').text();
+        var taskCycleValue = $("#TaskCycle").val();
+        var executionPeriod = $("#ExecutionPeriod").val();
+        var periodOfPerformance = $("#PeriodOfPerformance").val();
+        var originalExecutionDate = $("#OriginalExecutionDate").val();
+        var whomAddressed = taskPersons;
+
+        if (typeOfAssignmentId != 1) {//icra ucun deyilse
+            executionPeriod = '';
+            periodOfPerformance = '';
+            taskCycle = '';
+            originalExecutionDate = '';
+        }
+
+        if (taskCycleValue == 5) {
+            executionPeriod = '';
+            periodOfPerformance = '';
+        }
+
+        $.each(whomAddressed, function (index, value) {
+                var tableRow = "<tr class='data-row rowSelector'" +
+                    "data-TypeOfAssignment='" + typeOfAssignmentValue + "' " +
+                    "data-TaskNo='" + taskNo + "' " +
+                    "data-Task='" + taskDescription + "' " +
+                    "data-TaskCycle='" + taskCycleValue + "'" +
+                    "data-ExecutionPeriod='" + executionPeriod + "'" +
+                    "data-PeriodOfPerformance='" + periodOfPerformance + "'" +
+                    "data-OriginalExecutionDate='" + originalExecutionDate + "'" +
+                    "data-WhomAddressId='" + value + "'> " +
+                    "<td>" + typeOfAssignment + "</td>" +
+                    "<td>" + taskDescription + "</td>" +
+                    "<td >" + taskCycle + "</td>" +
+                    "<td>" + executionPeriod + "</td>" +
+                    "<td>" + periodOfPerformance + "</td>" +
+                    "<td>" + originalExecutionDate + "</td>" +
+                    "<td>" + $(`#WhomAddressId option[value="${value}"]`).text() + "</td>" +
+                    "<td style='text-align:center!important'>" +
+                    "<a href='javascript:void(0);' onclick='DeleteTask(this)' id='deleteTask' class='remove btn btn-light'>" +
+                    "<span class='fas fa-trash-alt icon-size' style='color:red'></span>" +
+                    "</a>" +
+                    "</td>" +
+                    "</tr>";
+            $('#taskTable tbody').append(tableRow);
+        });
+
+        $('#divTaskTable').show();
+        ClearControls();
+
+    });
+</script>

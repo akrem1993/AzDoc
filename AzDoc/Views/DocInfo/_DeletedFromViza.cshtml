@@ -1,0 +1,26 @@
+﻿@using BLL.Models.DocInfo
+@model IEnumerable<DeletedFromViza>
+<div class="col-md-12">
+    <h4 class="text-center">Vizadan silinənlər</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col" class="thead">Təsdiq edən şəxs</th>
+                <th scope="col" class="thead">Kim tərəfindən</th>
+                <th scope="col" class="thead">Tarix</th>
+             
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                    <tr>
+                        <td>@item.PersonDeleted</td>
+                        <td>@item.DeletedBy</td>
+                        <td>@item.DeletedDate</td>
+                    </tr>
+                
+            }
+        </tbody>
+    </table>
+</div>

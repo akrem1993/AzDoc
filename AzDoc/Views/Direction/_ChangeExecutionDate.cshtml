@@ -1,0 +1,98 @@
+﻿@using AzDoc.App_LocalResources
+@model BLL.Models.Direction.Direction.DocumentModel
+@{
+    ViewBag.Title = "_ChangeExecutionDate";
+    Layout = null;
+}
+
+<div class="mModal">
+    <div class="modal fade" id="changeExecutor" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="background: #ffffff">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>İcra müddətinin dəyişdirilməsi</span>
+                </div>
+
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+                        @using (Html.BeginForm("ChangeExecutionDate", "Direction", new { t = Request["t"] }, FormMethod.Post, new { id = "changeDateForm" }))
+                        {
+                            <div class="container-fluid">
+
+                                <div class="row">
+                                    <div class="col-5">
+                                        <label>Növbəti icra müddəti <span style="color:red;font-weight:bold">*</span></label>
+                                        @Html.TextBoxFor(model=>model.DocPlanneddate,"{0:yyyy-MM-dd}", new
+                                        {
+                                            @type = "date",
+                                            @class = "form-control",
+                                            @data_live_search = "true",
+                                            @id = "PlannedDate",
+                                            @data_required = "İcra müddətini daxil edin"
+                                        })
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <label for="comment">Qeyd:<span style="color:red;font-weight:bold">*</span></label>
+                                        @Html.TextArea(("ExecutorResolutionNote") , new
+                                        {
+                                            @placeholder = "",
+                                            @type = "text",
+                                            @class = "form-control",
+                                            @id = "ShortContent",
+                                            @data_required = "Qıza məzmunu daxil edin"
+                                        })
+                                    </div>
+
+                                </div>
+                                
+                            </div>
+                        }
+
+
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" style="width: 100%" data-dismiss="modal">Ləğv et</button>
+
+                    </div>
+                    <div class="col-3">
+                        <button type="button" name="DirectionSave"  onclick="saveChangeDate(this)" class="mBtn mBtn-pr defaultBtn" style="width: 100%">@RLang.Save</button>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var configdate = {
+        saveChangeDate: {
+            url:'@Url.Action("ChangeExecutionDate", "Direction")',
+        },
+    }
+    $(document).ready(function () {
+        $("#changeExecutor").modal();
+        $("#changeExecutor").draggable({
+            handle: ".modal-header"
+        });
+        var d = new Date();
+        var executiondate = d.getFullYear() + '-' +
+            ((d.getMonth() + 1) < 10 ? '0' : '') + (d.getMonth() + 1) + '-' +
+            (d.getDate() < 10 ? '0' : '') + d.getDate();
+
+        $("#PlannedDate").attr("min", executiondate);
+        $("#PlannedDate").val(" ");
+    });
+        
+
+  
+    
+</script>
+<script src="~/Scripts/direction/direction.js"></script>
+

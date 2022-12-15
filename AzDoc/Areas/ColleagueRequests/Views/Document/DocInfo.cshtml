@@ -1,0 +1,396 @@
+﻿@using AzDoc.Helpers
+@using ColleagueRequests.Model.ViewModel
+@model ColleagueRequests.Model.ViewModel.DocumentInfoViewModel
+@{
+    var itemCount = 0;
+}
+@{
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+
+}
+
+<head>
+    <title>Qeydiyyat vərəqəsi @(Model.RegisterNumber ?? string.Empty) </title>
+    @if (!Request.IsAjaxRequest())
+    {
+        <link href="~/Content/bootstrap/bootstrap.min.css" rel="stylesheet" />
+        <link href="~/Content/fontawesome/css/all.min.css" rel="stylesheet" />
+        <link href="~/Content/common/style.css" rel="stylesheet" />
+        <script src="~/Scripts/jquery/jquery-3.3.1.min.js"></script>
+        <script src="~/Scripts/bootstrap/bootstrap.min.js"></script>
+        <script src="~/Scripts/jquery/jquery-blockUI.js"></script>
+        @GleamTechHelper.Head
+        @GleamTechHelper.Js
+    }
+</head>
+
+
+<style>
+    @@media print {
+        .btn {
+            display: none;
+        }
+    }
+</style>
+<span id="spanToken" style="display: none">@ViewData["Token"]</span>
+<div id="view">
+    <div class="container-fluid" style="padding-left: 15px!important">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-12">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="headingRow">
+                            <h3>@Model.OrgName</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mainView">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="viewHeading">
+                                <h3>Qeydiyyat nəzarət vərəqəsi</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-12">
+
+                            <div id="docContent" class="viewGroup appealing">
+                                <div class="col-12">
+                                    @if (Model.SupervisionId == 1 || Model.ExecutionStatusId == 3)
+                                    {
+                                        <p class="text-left align-content-center" style="color: red">Nəzarətdədir</p>
+                                    }
+
+                                </div>
+
+                                <div class="col-12">
+
+                                    @Html.Partial("~/Areas/ColleagueRequests/Views/Document/_DocApplicants.cshtml", Model)
+
+
+                                    <div class="col-12">
+                                        <h4 class="text-center align-content-center">Qeydiyyat məlumatları</h4>
+                                        @if (@Model.DocDuplicateId == 1)
+                                        {
+                                            <p class="text-right align-content-center" style="color: red">Təkrar müraciət</p>
+                                        }
+                                        else if (@Model.DocDuplicateId == 2)
+                                        {
+                                            <p class="text-right align-content-center" style="color: red">Təkrar müraciət(müxtəlif mövzuda)</p>
+                                        }
+
+                                        else if (@Model.DocDuplicateId == 3)
+                                        {
+                                            <p class="text-right align-content-center" style="color: red">Eyni məzmunlu müraciət</p>
+                                        }
+
+
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Qeydiyyat nömrəsi</th>
+                                                    <td class="custom-table-cell">@Model.RegisterNumber</td>
+                                                    <th scope="col">Qeydiyyat tarixi</th>
+                                                    @if (@Model.RegisterDate.HasValue)
+                                                    {
+                                                        <td class="custom-table-cell">@Model.RegisterDate.Value.ToString("d")</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="custom-table-cell">@Model.RegisterDate</td>
+                                                    }
+                                                </tr>
+
+                                                <tr>
+                                                    <th scope="col">Sənədin nömrəsi</th>
+                                                    <td class="custom-table-cell">@Model.DocumentNumber</td>
+                                                    <th scope="col">Sənədin tarixi</th>
+                                                    @if (@Model.DocumentDate.HasValue)
+                                                    {
+                                                        <td class="custom-table-cell">@Model.DocumentDate.Value.ToString("d")</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="custom-table-cell">@Model.DocumentDate</td>
+                                                    }
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Müşayiət məktubunu göndərən</th>
+                                                    <td class="custom-table-cell">@Model.EntryFromWhere</td>
+                                                    <th scope="col">İcra qaydası</th>
+                                                    <td class="custom-table-cell">@Model.ExecuteRule</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Kimdən daxil olub</th>
+                                                    <td class="custom-table-cell">@Model.EntryFromWho</td>
+                                                    <th scope="col">İcra müddəti</th>
+
+                                                    @if (@Model.ExecDuration != null)
+                                                    {
+                                                        <td class="custom-table-cell">
+                                                            @Model.ExecDuration.Value.ToString("d")
+                                                            <br />
+                                                            @Html.Raw(HttpUtility.HtmlDecode(Model.NewPlanedDateHistory))
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="custom-table-cell">@Model.ExecDuration</td>
+                                                    }
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Müraciətin növü</th>
+                                                    <td class="custom-table-cell">@Model.DocumentKind</td>
+                                                    <th scope="col">Müraciətçilərin sayı</th>
+                                                    <td class="custom-table-cell">@Model.NumberOfApplicants</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Kimə ünvanlanıb</th>
+                                                    <td class="custom-table-cell">@Model.SendToWho</td>
+                                                    <th scope="col">Daxil olma forması</th>
+                                                    <td class="custom-table-cell">@Model.EntryForm</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Əvvəlki müraciətlər </th>
+                                                    <td class="custom-table-cell">
+                                                        @foreach (var item in Model.PreviosRequests ?? Enumerable.Empty<PreviosRequests>())
+                                                        {
+
+                                                            if (Model.PreviosRequests.Count() == 1)
+                                                            {
+                                                                <a href="/az/Document/GetDocView?token=@TokenHelper.CreateToken(item.DocId)" target="_blank">@item.DocEnterno </a>
+                                                            }
+                                                            else if (Model.PreviosRequests.Count() > 1)
+                                                            {
+                                                                itemCount++;
+                                                                if (itemCount == Model.PreviosRequests.Count())
+                                                                {
+                                                                    <a href="/az/Document/GetDocView?token=@TokenHelper.CreateToken(item.DocId)" target="_blank">@item.DocEnterno </a>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <a href="/az/Document/GetDocView?token=@TokenHelper.CreateToken(item.DocId)" target="_blank">@item.DocEnterno ,</a>
+                                                                }
+
+                                                            }
+
+                                                        }
+                                                    </td>
+                                                    <th scope="col">Müraciətlərin sayı</th>
+                                                    <td class="custom-table-cell">@((Model.PreviosRequests ?? Enumerable.Empty<PreviosRequests>()).Count() + 1)</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Mövzu / Alt mövzu</th>
+                                                    <td class="custom-table-cell">@Model.Subject</td>
+                                                    <th scope="col">Korrupsiya ilə bağlı</th>
+                                                    <td class="custom-table-cell">@Model.Corruption</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="col">Şikayət olan qurumun adı</th>
+                                                    <td class="custom-table-cell">@Model.Organization</td>
+                                                    <th scope="col">Sənədin statusu</th>
+                                                    <td class="custom-table-cell">@Model.DocumentStatus</td>
+                                                </tr>
+                                                @if (Model.DocExecutedDate.HasValue && Model.DocExecutedDate != DateTime.MinValue)
+                                                {
+                                                    <tr>
+                                                        <td style="border-right:none"></td>
+                                                        <td style="border-left:none"></td>
+                                                        <th>Sənədin icra olunma tarixi</th>
+                                                        <td class="custom-table-cell">@(Model.DocExecutedDate?.ToString("d"))</td>
+                                                    </tr>
+                                                }
+                                            </thead>
+                                        </table>
+
+                                    </div>
+
+                                    <div class="col-12">
+
+                                        <h4 class="text-center">Sənədin qısa məzmunu</h4>
+                                        <table class="table table-bordered">
+                                            <tbody>
+                                                <tr>
+                                                    <td>@Model.ShortContent</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+
+                                    @Html.Partial("~/Views/DocInfo/_DocFiles.cshtml", Model.DocFiles)
+
+                                    @Html.Partial("~/Views/DocInfo/_AnswerDoc.cshtml", Model.AnswerDocs)
+
+                                    @Html.Partial("~/Views/DocInfo/_EnteredDoc.cshtml", Model.EnteredDocs)
+
+                                    @Html.Partial("~/Views/DocInfo/_RelatedDoc.cshtml", Model.RelatedDocs)
+
+
+                                    @if (Model.SupervisionId == 1 || Model.ExecutionStatusId == 3)
+                                    {
+                                        <h4 class="text-center">Nəzarət</h4>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col" class="thead left">Nəzarətə götürən</th>
+                                                    <th scope="col" class="thead left">Nəzarətə götürülmə tarixi</th>
+                                                    <th scope="col" class="thead left">İcra muddəti</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (Model.SupervisionId == 1 && Model.ExecutionStatusId == 3)
+                                                {
+                                                    <tr>
+                                                        <td align='left' style="color: red">@Model.EntryFromWhere</td>
+                                                        <td align='left'>@Model.RegisterDate.Value.ToString("d")</td>
+                                                        <td align='left'>
+                                                            @if (@Model.ExecDuration != null)
+                                                            {
+                                                                @Model.ExecDuration.Value.ToString("d")
+                                                            }
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td align='left' style="color: red">@Model.SendToWhere</td>
+                                                        <td align='left'>@Model.RegisterDate.Value.ToString("d")</td>
+                                                        <td align='left'>
+                                                            @if (@Model.ExecDuration != null)
+                                                            {
+                                                                @Model.ExecDuration.Value.ToString("d")
+                                                            }
+                                                        </td>
+                                                    </tr>
+
+                                                }
+                                                else if (Model.SupervisionId == 1 && Model.ExecutionStatusId != 3)
+                                                {
+                                                    <tr>
+                                                        <td align='left' style="color: red">@Model.EntryFromWhere</td>
+                                                        <td align='left'>@Model.RegisterDate.Value.ToString("d")</td>
+                                                        <td align='left'>
+                                                            @if (@Model.ExecDuration != null)
+                                                            {
+                                                                @Model.ExecDuration.Value.ToString("d")
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td align='left' style="color: red">@Model.SendToWhere</td>
+                                                        <td align='left'>@Model.RegisterDate.Value.ToString("d")</td>
+                                                        <td align='left'>
+                                                            @if (@Model.ExecDuration != null)
+                                                            {
+                                                                @Model.ExecDuration.Value.ToString("d")
+                                                            }
+                                                        </td>
+                                                    </tr>
+
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }
+
+                                    @Html.Partial("~/Views/DocInfo/_DocDirectionHistory.cshtml", Model.DocHistory)
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a href="#" class="circleBtn" style="position: fixed; top: 40px; right: 5%;" id="print"><i class="fas fa-print"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/common/printThis.min.js"></script>
+<script>
+     $('#print').click(function () {
+        hidden();
+        $('#view').printThis();
+    });
+
+    function fileShow(docInfoId) {
+        var spanToken = $('#spanToken').html();
+        var subPathName = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
+        if (subPathName == 'GetDocView') {
+         $.ajax({
+                type: 'GET',
+                url: '/@lang/ColleagueRequests/Document/DocumentDisplay',
+                data: { docInfoId: docInfoId },
+                beforeSend: function() {
+                    window.ShowLoading();
+
+                },
+                success: function (data1) {
+
+                    $.ajax({
+                        type: 'GET',
+                        url: `/@lang/Document/GetDocView?token=${spanToken}`,
+                        dataType: 'html',
+                        success: function (data) {
+                            $("#view").html(data);
+                            $("#docDisplay").html(data1);
+                            $('#trDocFileView').show();
+                        }
+                    });
+
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+
+            });
+
+        } else {
+
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/ColleagueRequests/Document/DocumentDisplay',
+                dataType: 'html',
+                data: { docInfoId: docInfoId },
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                success: function (response) {
+
+                    $("#DocViewer").html(response);
+                    $('#docElectronic').addClass('individual active');
+                    $('#docElectronic').removeClass('juridical');
+                    $('#ElectronicDocument').removeClass('d-none');
+
+                    $('#docDocInfo').removeClass('individual active');
+                    $('#docDocInfo').addClass('juridical');
+                    $('#DocInfo').addClass('d-none');
+
+                    $('#JsonFile').val(docInfoId);
+                },
+                complete: function() {
+                    window.CloseLoading();
+                }
+
+            });
+        }
+    };
+
+    $('#closeDocViewer').click(function() {
+        hidden();
+    });
+
+    function hidden() {
+        $('#documentDisplay').css('display', 'none');
+        $('#closeButton').css('display', 'none');
+    }
+</script>

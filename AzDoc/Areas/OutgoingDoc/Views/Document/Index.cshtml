@@ -1,0 +1,263 @@
+﻿@using BLL.Common.Enums
+
+@{
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+    var docType = SessionHelper.DocTypeId;
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var _lang = routeValueDictionary["lang"] ?? "az";
+
+}
+
+
+@Html.Partial("_BreadCrumbPartial")
+
+
+@Html.AntiForgeryToken()
+
+<div class="col-md-12" id="DocGrid" style="padding-top: 10px; height: 86vh">
+    @Html.Action("GetGridView")
+</div>
+
+<link href="~/Content/fontawesome/css/all.min.css?v=@AppVersion.Version" rel="stylesheet" />
+<link href="~/Content/fontawesome/css/v4-shims.min.css?v=@AppVersion.Version" rel="stylesheet" />
+
+<div id="popover-content-ActionName">
+</div>
+
+@Html.Partial("/Views/Modals/_SendDocumentModal.cshtml")
+@Html.Partial("/Views/Modals/_SendForInformationModal.cshtml")
+
+<style>
+    /*.modal-dialog {
+        max-width: 75% !important;
+    }*/
+</style>
+<!-- Modal -->
+<div class="mModal">
+    <div class="modal fade" id="doubleClickModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"  data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-lg" role="document" style="max-width: 75% !important">
+            <div class="modal-content" style="background: #ffffff">
+
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>@ViewData["DocTypeName"]</span>
+                </div>
+                <div class="modal-header3">
+                    <div class="row no-gutters" style="border-bottom:1px solid #8080805e; margin: 0 1rem">
+                        <div class="col-6">
+                            <a href="#ElectronicDocument" class="individual active" id="docElectronic">
+                                @RLang.EDocumentsView
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a href="#DocInfo" class="juridical" id="docDocInfo">
+                                @RLang.RegistrationForm
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+                    <form class="indForm" id="ElectronicDocument"></form>
+
+                    <form class="jurForm d-none" id="DocInfo"></form>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn" data-dismiss="modal">@RLang.Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mModal">
+    <div class="modal fade" id="postDialogModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document" style="max-width: 30% !important">
+            <div class="modal-content" style="background: #ffffff">
+
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span></span>
+                </div>
+
+                <div class="modal-body" style="max-height: 70vh;overflow-y: auto">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <div class="col-12">
+                                    <textarea class="form-control" id="notsentNote"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" id="notsentButton" style="width: 100%">Göndərmə</button>
+
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-pr defaultBtn" id="postButton" style="width: 100%">Göndər</button>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts{
+    <script>
+        var config = {
+            actionOperation: {
+                url:
+                    '@Url.Action("ActionOperation", "Document", routeValues: new {lang = _lang, area = "OutgoingDoc"})'
+            },
+            directionOperation: {
+                url: '@Url.Action("DirectionModal", "Document", routeValues: new {lang = _lang, area = ""})?docId='
+            },
+            blankOperation: {
+                url: '@Url.Action("BlankModal", "BlankNumber", routeValues: new {lang = _lang, area = ""})'
+            },
+            editOperation: {
+                url:
+                    '@Url.Action("EditDocument", "Document", routeValues: new {lang = _lang, area = "OutgoingDoc", docType = docType})'
+            },
+            indexOperation: {
+                url:
+                    '@Url.Action("Index", "Document", routeValues: new {lang = _lang, area = "OutgoingDoc", docType = docType})'
+            },
+            electronicDoc: {
+                url:
+                    '@Url.Action("ElectronicDocument", "Document", new {area = "OutgoingDoc", lang = _lang, docType = docType})',
+                data: {}
+            },
+            infoOperation: {
+                url: '@Url.Action("DocInfo", "Document", new {area = "", lang = _lang})',
+                data: {}
+            },
+            actnameOperation: {
+                url:
+                    '@Url.Action("ActionName", "Document", new {area = "OutgoingDoc", lang = _lang, docType = docType})'
+            },
+            sendforinfoOperation: {
+                url:
+                    '@Url.Action("SendForInformation", "Document", new {area = "", lang = _lang})'
+            },
+            message: { sftpwarning: '@RLang.SftpWarning' }
+        };
+
+        $(document).ready(function () {
+            $('#doubleClickModal').on('hidden.bs.modal', function (e) {
+                e.stopPropagation();
+                $('#ElectronicDocument').html('');
+                $('#DocInfo').html('');
+            });
+        });
+
+        $("#notsentButton").click(function() {
+            var description = $("#notsentNote").val();
+
+            if (description == '') {
+                toastr.warning('Qeydinizi daxil edin.');
+                return;
+            }
+
+            var requestToken =  $("#spanToken").html();
+
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ActionOperation", "Document", new {area = "OutgoingDoc", lang = _lang})'
+                    .buildUrl({token:requestToken}),
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                dataType: 'json',
+                data: { actionId: @((int) ActionType.NotSent), description: description },
+                success: function(actionOperation) {
+                    if (actionOperation == @((int) ActionType.NotSent)) {
+                        var nameOfObject = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
+
+                    if (nameOfObject == 'UnreadDocuments') {
+                        var pageIndex = $('#gridDMS').CachedGrid().config.params.pageIndex;
+                        $('#gridDMS').bindgrid(pageIndex, undefined);
+                        $('#postDialogModal').modal('hide');
+
+                    }
+                    else {
+                        var pageIndex = $('#gridOutgoingDoc').CachedGrid().config.params.pageIndex;
+                        $('#gridOutgoingDoc').bindgrid(pageIndex, undefined);
+                        $('#postDialogModal').modal('hide');
+
+                    }
+                    }
+                },
+                complete: function () {
+                    window.CloseLoading();
+                }
+            });
+        });
+
+        $("#postButton").click(function () {
+            var requestToken =  $("#spanToken").html();
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ActionOperation", "Document", new {area = "OutgoingDoc", lang = _lang})'.buildUrl({ token: requestToken }),
+                beforeSend: function() {
+                    window.ShowLoading();
+                },
+                dataType: 'json',
+                data: { actionId: @((int) ActionType.Post), description: $('#acceptNote').val() },
+                success: function(actionOperation) {
+                    if (actionOperation == @((int) ActionType.Post)) {
+                        var nameOfObject = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1);
+
+                    if (nameOfObject == 'UnreadDocuments') {
+                        var pageIndex = $('#gridDMS').CachedGrid().config.params.pageIndex;
+                        $('#gridDMS').bindgrid(pageIndex, undefined);
+                        $('#postDialogModal').modal('hide');
+
+                    }
+                    else {
+                        var pageIndex = $('#gridOutgoingDoc').CachedGrid().config.params.pageIndex;
+                        $('#gridOutgoingDoc').bindgrid(pageIndex, undefined);
+                        $('#postDialogModal').modal('hide');
+
+                    }
+                    }
+                },
+                complete: function () {
+                    window.CloseLoading();
+                }
+            });
+        });
+
+        function onFilter(sender, args, query) {
+            $('#gridOutgoingDoc').bindgrid(1);
+        }
+
+        $("#Period").change(function() {
+
+            $('#gridOutgoingDoc').setRouteValue({ 'periodId': $(this).val() });
+            $('#gridOutgoingDoc').bindgrid(1);
+
+        });
+
+        function RefreshPage() {
+            location.reload();
+        }
+
+
+    </script>
+    <script src="~/Scripts/outgoingdoc/outgoingdoc.js?v=@AppVersion.Version"></script>
+
+}
+

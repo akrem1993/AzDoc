@@ -1,0 +1,162 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@using BLL.Common.Enums.DMSEnums
+@using BLL.Models.Document
+@using BLL.Models.Document.ViewModel
+@model BLL.Models.Document.ViewModel.ElectronicDocumentViewModel
+@{
+    Layout = null;
+    var docType = SessionHelper.DocTypeId;
+    RouteData routeData = ViewContext.RouteData;
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+
+<style>
+    .col-md-1 {
+        flex: 0 0 4.333333% !important;
+        width: 3.5% !important;
+    }
+
+    .accept-modal-dialog {
+        width: 30%;
+        /* margin: 48px auto; */
+        margin: 15% auto;
+    }
+
+    .signature-modal-dialog {
+        width: 20%;
+        /* margin: 48px auto; */
+        margin: 20% auto;
+    }
+
+    .operation-history-modal-dialog {
+        width: 50%;
+        /* margin: 48px auto; */
+        margin: 10% auto;
+    }
+
+    .operationIcons {
+        font-size: 1.7em;
+    }
+</style>
+
+<div style="height: 100%">
+    <div class="col-12">
+        <div class="form-group">
+            <div class="input-group input-group-sm">
+                <div class="col-md-1">
+                    <button type="button" id="infoButton" class="btn btn-default btn-sm">
+                        <i class="fas fa-chevron-circle-down operationIcons" style="color: #005487"></i>
+                    </button>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" id="operationHistoryButton" class="btn btn-default btn-sm" title="Əməliyyat tarixçəsi">
+                        <i class="fas fa-history operationIcons" style="color: #005487"></i>
+                    </button>
+                </div>
+
+                <div class="col-md-5">
+                    @Html.DropDownListFor(model => Model.FileInfoModel.FileInfoId,
+                        new SelectList(Model.JsonFileInfoSelected, "FileInfoId", "FileInfoName"), new
+                        {
+                            @class = "form-control",
+                            @id = "JsonFile"
+                        })
+                </div>
+         
+            </div>
+
+            <div class="col-12">
+                <div class="form-group">
+                    <div class="alert alert-light alert-dismissible" id="alertInfo">
+                        <table class="table table-bordered table-sm mTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Sənədin adı</th>
+                                    <th scope="col">Sənədin nömrəsi</th>
+                                    <th scope="col">Sənədin Tarixi</th>
+                                    <th scope="col">Sənədin qısa məzmunu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td>@Model.DocTypeName</td>
+                                    @if (!new[] { (int)DocumentStatus.Draft, (int)DocumentStatus.IsViza, (int)DocumentStatus.Signing }.Contains(Model.DocDocumentStatusId))
+                                    {
+                                        <td>@Model.DocEnterNo</td>
+                                        <td>@Model.DocEnterDate</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@Model.DocDocNo</td>
+                                        <td>@Model.DocDocDate</td>
+                                    }
+
+                                    <td>@Model.Description</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-light alert-dismissible col-5" style="font-size: smaller" id="alertOperationHistory">
+
+                        <table class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                    <th scope="col">№</th>
+                                    <th scope="col">Kimə</th>
+                                    <th scope="col">Əməliyyatın növü</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.JsonOperationHistory ?? Enumerable.Empty<OperationalHistory>())
+                                {
+                                    <tr>
+                                        <td>@item.OrderIndex</td>
+                                        <td>@item.PersonTo</td>
+                                        <td>@item.ExecutorMain</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12" id="DocViewer">
+        <div class="form-group">
+            @Html.Partial("DocumentDisplay")
+        </div>
+    </div>
+</div>
+
+<script>
+
+
+   
+    $(".closeBtn").click(function () {
+        $(".modalBtn").modal("hide");
+    });
+
+    $(document).ready(function () {      
+
+        $("#JsonFile").change(function () {
+            var id = $(this).val();
+            console.log(id);
+            $.ajax({
+                type: 'POST',
+                url: '/@lang/ServiceLetters/Document/DocumentDisplay',
+                dataType: 'html',
+                data: { docInfoId: id},
+                success: function (response) {
+                    $("#DocViewer").html(response);
+                }
+            });
+        });
+
+    });
+</script>

@@ -1,0 +1,21 @@
+CREATE TABLE [dbo].[DOCS_DIRECTIONCHANGE](
+	[DirectionChangeId] int identity NOT NULL,
+	[DirectionId] int NOT NULL,
+	[DocId] int NOT NULL,
+	[OldExecutorWorkplaceId] int NULL,
+	[NewExecutorWorkplaceId] int NULL,
+	[OldDirectionPlannedDate] [date] NULL,
+	[NewDirectionPlannedDate] [date] NULL,
+	[DirectionChangeNote] nvarchar(max) NULL,
+	[DirectionChangeInsertDate] [datetime] NULL,
+	[DirectionChangeStatus] int NULL,
+	[JointExecutor] bit NULL,
+	[ChangeType] int NULL,
+	[DirectionChangeConfirmNote] nvarchar(max) NULL,
+	[OperationId] int NULL,
+    CONSTRAINT [PK_DOCS_DIRECTIONCHANGE] PRIMARY KEY ([DirectionChangeId]),
+	CONSTRAINT [FK_DOCS_DIRECTIONCHANGE_DC_WORKPLACE] FOREIGN KEY([OldExecutorWorkplaceId]) REFERENCES [dbo].[DC_WORKPLACE] ([WorkplaceId]),
+	CONSTRAINT [FK_DOCS_DIRECTIONCHANGE_DC_WORKPLACE1] FOREIGN KEY([NewExecutorWorkplaceId]) REFERENCES [dbo].[DC_WORKPLACE] ([WorkplaceId]),
+	CONSTRAINT [FK_DOCS_DIRECTIONCHANGE_DOCS] FOREIGN KEY([DocId]) REFERENCES [dbo].[DOCS] ([DocId]),
+	CONSTRAINT [FK_DOCS_DIRECTIONCHANGE_DOCS_DIRECTIONS] FOREIGN KEY([DirectionId]) REFERENCES [dbo].[DOCS_DIRECTIONS] ([DirectionId])
+)

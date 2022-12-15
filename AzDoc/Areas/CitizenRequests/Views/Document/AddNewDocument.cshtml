@@ -1,0 +1,342 @@
+﻿@using AzDoc.App_LocalResources
+@using AzDoc.Helpers
+@{
+    ViewBag.Title = "AddNewDocument";
+    Layout = "~/Views/Shared/_LeftMenuLayout.cshtml";
+
+    RouteData routeData = ViewContext.RouteData;
+
+    var routeValueDictionary = new RouteValueDictionary(routeData.Values);
+
+    var lang = routeValueDictionary["lang"] ?? "az";
+}
+<link href="~/Content/common/style.css" rel="stylesheet" />
+<style>
+    .card-header-custom {
+        background-color: #4f6870 !important;
+        padding: 0.4em 1.25rem !important;
+    }
+
+    .icon-size {
+        font-size: 1.2em;
+    }
+</style>
+
+<div class="col-12">
+    <div class="row breadCrumbRow mt-5">
+        <div class="col-6 text-center" id="basicInformation">
+            <a href="#step1" class="brActive" data-brcrumb="1">
+                @RLang.BasicInfo
+            </a>
+        </div>
+
+        <div class="col-6 text-center" id="attachmentDocuments">
+            <a href="#step2" data-brcrumb="2">@RLang.EDocuments</a>
+        </div>
+    </div>
+</div>
+@using (Html.BeginForm("CreateDocument", "Operation", FormMethod.Post, new { id = "AddNewDocument" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="col-12 mainContent">
+        <div class="mainEdit contentItem" id="step1" style="padding-top:1px" data-brnum="1">
+            @Html.Partial("BasicInformationPartial")
+        </div>
+
+        <div class="connectDoc contentItem d-none" id="step2" style="padding-top:1px" data-brnum="2">
+            @Html.Partial("~/Views/Document/AttachmentDocumentsPartial.cshtml")
+        </div>
+    </div>
+
+}
+
+@section scripts{
+    <script>
+
+        $("#ParentButton").click(function() {
+
+            if ($(".table-custom").find("tr.rowSelector").length === 0) {
+                return toastr.warning(" Qoşma sənədi daxil edin.");
+            }
+
+            var isMainCount = 0;
+            var pageCopyCount = 0;
+
+            $.each($("input[name='isMain']"),
+                function() {
+                    if ($(this).attr('checked') === 'checked') {
+                        ++isMainCount;
+                    }
+                });
+
+            $.each($("i[name='icon']"),
+                function() {
+                    if ($.trim($(this).text()) === "") {
+                        $(this).closest("span").css('border', '1px solid red');
+                        ++pageCopyCount;
+                    }
+                });
+
+            if (isMainCount === 0) {
+                $.each($("input[name='isMain']"),
+                    function() {
+                        $(this.parentElement).css('border', 'solid red 1px');
+                    });
+                toastr.warning("Bütün məcburi xanaların doldurulduğuna əmin olun.");
+            }
+
+            if (isMainCount !== 0 && pageCopyCount === 0) {
+                var fileInfoId = $('#fileInfoId').val();
+                var formData = $('#AddNewDocument').getFormData();
+                formData.RelatedDocModels = $('#relatedDocTable').tableToJsonList();
+                formData.AuthorModels = $('#dataTableOrgAuthor').tableToJsonList();
+                formData.ApplicationModels = $('#citizenApply').tableToJsonList();
+                var token = $('input[name="__RequestVerificationToken"]').val();
+                $.ajax({
+                    type: 'POST',
+                    url: '/@lang/CitizenRequests/Operation/CreateDocument',
+                    dataType: 'json',
+                    data: { __RequestVerificationToken: token, model: formData,fileInfoId:fileInfoId },
+                    beforeSend: function () {
+                        window.ShowLoading();
+                    },
+                    success: function(response) {
+                        if (response) {
+                            window.location = '/@lang/CitizenRequests';
+                        }
+                    },
+                    complete: function () {
+                        window.CloseLoading();
+                    }
+                });
+            }
+
+        });
+
+        $('#TopicTypeName').on('change', function () {
+            //var topicIdHidden = $("#topicIdHidden").val();
+            var topicId;
+            if (this.value > 0) {
+                topicId = this.value;
+            } else {
+                topicId = -1;
+            }
+            console.log(topicId);
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/CitizenRequests/Document/GetSubtitle',
+                data: { topicTypeId:topicId},
+                success: function (data) {
+                    var s = '<option value="-1">Seç</option>';
+                    for (var i = 0; i < data.length; i++) {
+
+                        s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                    }
+                    $("#Subtitle").html(s);
+                    //if (topicIdHidden) {
+                    //    $("#Subtitle option[value=" + topicIdHidden + "]").attr('disabled',true);
+                    //}
+
+                    $('.selectpicker').selectpicker('refresh');
+                }
+            });
+        });
+
+        //Resid
+        $('#Subtitle').on('change', function () {
+            //var topicIdHidden = $("#topicIdHidden").val();
+            var topicIdd;
+            if (this.value > 0) {
+                topicIdd = this.value;
+            } else {
+                topicIdd = -1;
+            }
+            console.log(topicIdd);
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/CitizenRequests/Document/GetSubtitleOrgan',
+                data: { topicId:topicIdd},
+                success: function (data) {
+                    var s = '<option value="-1">Seç</option>';
+                    for (var i = 0; i < data.length; i++) {
+
+                        s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                    }
+                    $("#Organization").html(s);
+                    //if (topicIdHidden) {
+                    //    $("#Subtitle option[value=" + topicIdHidden + "]").attr('disabled',true);
+                    //}
+
+                    $('.selectpicker').selectpicker('refresh');
+                }
+            });
+        });
+
+        $('#Subtitle').on('change', function () {
+            var selectedTopicType = $("#TopicTypeName option:selected").text();
+            var selectedSubtitle = $("#Subtitle option:selected").text();
+
+            Swal.fire({
+                title: 'Mövzünün qısa məzmuna əlavə edilməsi',
+                type: 'warning',
+                showCancelButton: true,
+                cancelButtonText: 'Ləğv et',
+                confirmButtonText: 'Təsdiqlə'
+            }).then((result) => {
+                if (result.value) {
+                    $('#ShortContent').val(selectedTopicType + ' /' + selectedSubtitle);
+
+                    Swal.fire({
+                        type: 'success',
+                        title: 'Məlumat əlavə olundu',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                }
+            });
+
+        });
+
+        $('#Organization').on('change', function () {
+            var orgId;
+            if (this.value > 0) {
+                orgId = this.value;
+            } else {
+                orgId = -1;
+            }
+            var docTopicTypeId = $('#TopicTypeName').val();
+
+            if (docTopicTypeId == "" || docTopicTypeId == undefined) {
+                this.value = "";
+                return toastr.warning("Əvvəlcə mövzu seçiminizi edin.");
+            }
+
+            console.log(docTopicTypeId);
+                $.ajax({
+                    type: 'GET',
+                    url: '/@lang/CitizenRequests/Document/GetSubordinate',
+                    data: { organizationId: orgId, docTopicId: docTopicTypeId},
+                    success: function (data) {
+                        var s = '<option value="-1">Seç</option>';
+                        for (var i = 0; i < data.length; i++) {
+                            s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                        }
+                        $("#Subordinate").html(s);
+
+                        $('.selectpicker').selectpicker('refresh');
+                    }
+                });
+
+        });
+
+        
+
+
+
+        $('.individual-select').on('click',
+            function() {
+                $("#individualSaveBtn").removeClass('display-none');
+                $("#individualSaveBtn").addClass('display-block');
+                $("#individualEditBtn").removeClass('display-block');
+                $("#individualEditBtn").addClass('display-none');
+
+                $('#individualModal').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                $("#individualCountry").val(31);
+                $('.selectpicker').selectpicker('refresh');
+
+                $.ajax({
+                    type: 'GET',
+                    url: '/@lang/CitizenRequests/Document/GetRegion',
+                    data: { countryId:31},
+                    success: function (data) {
+                        var s = '<option value="-1">Seç</option>';
+                        for (var i = 0; i < data.length; i++) {
+
+                            s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                        }
+                        $("#individualRegion").html(s);
+
+                        $('.selectpicker').selectpicker('refresh');
+                    }
+                });
+            });
+
+        $(document).ready(function () {
+            $('#applyAgainModal').modal({
+                backdrop: 'static',
+                keyboard: false,
+                show:true
+            });
+            $("#individualEditBtn").addClass('display-none');
+            $("#Country").val(931);
+            $('.selectpicker').selectpicker('refresh');
+
+            $.ajax({
+                type: 'GET',
+                url: '/@lang/CitizenRequests/Document/GetRegion',
+                data: { countryId:931},
+                success: function (data) {
+                    var s = '<option value="-1">Seç</option>';
+                    for (var i = 0; i < data.length; i++) {
+
+                        s += '<option value="' + data[i].Id + '">' + data[i].Name + '</option>';
+                    }
+                    $("#Region").html(s);
+
+                    $('.selectpicker').selectpicker('refresh');
+                }
+            });
+
+            $('.close').click(function() {
+                fnIndivdualInputClear();
+            });
+
+            $('#individualModal').modal({
+                backdrop: 'static',
+                keyboard: false ,
+                show:false
+            });
+
+            //$('input').on('keyup', function (event) {
+            //    //var val = $(event.currentTarget).val();
+            //    //var firstLetter = val.charAt(0);
+            //    //switch (firstLetter) {
+            //    //    case 'ə':
+            //    //    case 'Ə':
+            //    //        firstLetter = 'Ə';
+            //    //        break;
+
+            //    //    default:
+            //    //        firstLetter = val.charAt(0).toUpperCase();
+            //    //        break;
+            //    //}
+
+            //    //val = firstLetter + val.slice(1);
+            //    //console.log(val);
+            //    //$(event.currentTarget).val(val);
+            //    //return val;
+
+            //    $(this).val(function(i, v) {
+            //        return v.replace(/[a-zA-zəƏğĞöÖçÇiİıIşŞüÜ]/,
+            //            function (c) {
+            //                console.log(c);
+            //                return c.toUpperCase();
+            //            });
+            //    });
+            //});
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('DocEnterDate').value = today;
+            document.getElementsByName("DocumentModel.DocEnterDate")[0].setAttribute('min', today);
+            document.getElementsByName("DocumentModel.PlannedDate")[0].setAttribute('min', today);
+        });
+    </script>
+
+    <script src="~/Scripts/citizen/form-wizard.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/sweetalert.min.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/citizen/citizenrequests.js?v=@AppVersion.Version"></script>
+    <script src="~/Scripts/common/AttachmentFile.js?v=@AppVersion.Version"></script>
+}

@@ -1,0 +1,176 @@
+﻿@using BLL.Models.Document
+@using BLL.Common.Enums
+@using AzDoc.Helpers
+
+@model  IEnumerable<ChooseModel>
+
+@{
+    var data = Model ?? Enumerable.Empty<ChooseModel>();
+    var permissions = Permissions.GetAll(RightType.SignerNotEImza);
+}
+
+<style>
+    .operationIcons {
+        font-size: 1.3em;
+    }
+
+    .operationBtn {
+        background-color: antiquewhite
+    }
+</style>
+
+@foreach (var item in data)
+{
+    switch (item.Id)
+    {
+        case 1:
+            {
+                <div class="col-md-1">
+                    <button type="button" id="sendButton" onclick="SendDocumnet();" class="btn btn-light btn-sm operationBtn" title="Göndər">
+                        <i class="fas fa-paper-plane operationIcons" style="color: green"></i>
+                    </button>
+                </div>
+            }
+            break;
+        case 2:
+            {
+                <div class="col-md-1">
+                    <button type="button" id="editButton" class="btn btn-light btn-sm operationBtn" title="Redaktə et">
+                        <i class="fas fa-edit operationIcons" style="color: #005487"></i>
+                    </button>
+                </div>
+            }
+            break;
+        case 3:
+            {
+                <div class="col-md-1">
+                    <button type="button" id="recognizedButton" class="btn btn-light btn-sm operationBtn" title="Tanış oldum">
+                        <i class="fas fa-check-double operationIcons" style="color: #005487"></i>
+                    </button>
+                </div>
+            }
+            break;
+        case 4:
+            {
+                <div class="col-md-1">
+                    <button type="button" id="sendForInformationButton" class="btn btn-light btn-sm operationBtn" title="Məlumat üçün göndərmək">
+                        <i class="fas fa-share-alt operationIcons" style="color: #005487"></i>
+                    </button>
+                </div>
+            }
+            break;
+        case 5: // vizanin tesdiq olunmasi paneli
+            {
+                <div class="col-md-1">
+                    <button type="button" id="vizaConfirmButton" class="btn btn-light btn-sm operationBtn" title="Təsdiq et" data-toggle="modal" data-target="#acceptModal">
+                        <i class="fas fa-check-square operationIcons" style="color: #4e9a46"></i>
+                    </button>
+                </div>
+            }
+            break;
+        case 6:
+            {
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-light btn-sm operationBtn" title="Imtina" data-toggle="modal" data-target="#cancelDialogModal">
+                        <i class="fa fa-times operationIcons" style="color: #de4f4f"></i>
+                    </button>
+                </div>
+            }
+            break;
+        case 7:
+            {
+                <div class="col-md-1">
+                    <button type="button" id="sign" class="btn btn-light btn-sm operationBtn" title="İmzala" data-toggle="modal">
+                        @*data-target="#signatureDialogModal"*@
+                        <i class="fas fa-fingerprint operationIcons" style="color: #4e9a46"></i>
+                    </button>
+                </div>
+            }
+            break;
+        case 8:
+            {
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-light btn-sm  operationBtn" title="Dərkənar" id="resolution">
+                        <i class="fas fa-code-branch operationIcons" style="color: #4e9a46"></i>
+                    </button>
+                </div>
+            }
+            break;
+        case 9:
+            {
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-light btn-sm  operationBtn" title="Geri qaytar" data-toggle="modal" data-target="#returnDialogModal">
+                        <i class="fas fa-angle-double-left operationIcons" style="color: #de4f4f"></i>
+                    </button>
+                </div>
+            }
+            break;
+
+        case 20:
+            {
+                <div class="col-md-1">
+                    <button type="button" id="disposeDocConfirmation" class="btn btn-light btn-sm" title="@item.Name" data-toggle="modal" data-target="#removeDialogModal">
+                        <i class="fas fa-minus-circle operationIcons" style="color: #de4f4f"></i>
+                    </button>
+                </div>
+            }
+            break;
+
+        case 24: // approver
+            {
+                <div class="col-md-1">
+                    <button type="button" id="approveDialog" class="btn btn-light btn-sm  operationBtn" title="@item.Name" data-toggle="modal" data-target="#approveDialogModal">
+                        <i class="fas fa-check-square operationIcons" style="color: #4e9a46"></i>
+                    </button>
+                </div>
+            }
+            break;
+    }
+}
+
+@if (!permissions.Has(RightType.SignerNotEImza))
+{
+    <div class="col-md-1" id="signedFile" style="display: none">
+        <button type="button" class="btn btn-light btn-sm operationBtn" title="İmzalanmış faylı(.edoc) yüklə">
+            <i class="fas fa-file-download operationIcons" style="color: blue"></i>
+        </button>
+    </div>
+}
+
+<script>
+    $("#fileSignStatus").attr("data-signStatus") == 2 ? $("#signedFile").show() : $("#signedFile").hide();
+
+    $("#signedFile").on("click",
+        function () {
+            var tokenDocId = $("#spanToken").html();
+            var token = $('input[name="__RequestVerificationToken"]').val();
+            $.post(`/az/ESign/GetSignedFile?token=${tokenDocId}`, { __RequestVerificationToken: token }).done(function (data) {
+                saveData(data.Base64, data.FileName);
+            });
+        });
+
+    var saveData = (function () {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        return function (data, fileName) {
+            var blob = new Blob([base64ToArrayBuffer(data)], { type: "octet/stream" }),
+                url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+    }());
+
+    function base64ToArrayBuffer(base64) {
+        var binaryString = window.atob(base64);
+        var binaryLen = binaryString.length;
+        var bytes = new Uint8Array(binaryLen);
+        for (var i = 0; i < binaryLen; i++) {
+            var ascii = binaryString.charCodeAt(i);
+            bytes[i] = ascii;
+        }
+        return bytes;
+    }
+</script>

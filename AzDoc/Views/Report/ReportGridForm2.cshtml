@@ -1,0 +1,82 @@
+﻿@model BLL.Models.Report.ReportsViewModel
+
+<div class="excelTable">
+    <table class="table mTable" id="tbForm2">
+        <thead>
+            <tr>
+                <th colspan="16" style="text-align: right">2 nömrəli forma</th>
+            </tr>
+            <tr>
+                <th colspan="16">
+                    Daxil olmuş vətəndaş müraciətlərinə baxılması barədə
+                </th>
+            </tr>
+            <tr>
+                <th colspan="16">
+                    ÜMUMİLƏŞDİRİLMİŞ MƏLUMAT
+                </th>
+            </tr>
+            <tr>
+                <th colspan="16" style="text-align: right">@ViewData["ReportsSelect"]</th>
+            </tr>
+            <tr>
+                <th scope="col">Sıra N-si</th>
+                <th scope="col">Əsas göstəriciləri</th>
+                <th>Ümumi sayı</th>
+                <th>Ərizə</th>
+                <th>Şikayət</th>
+                <th>Təklif</th>
+                <th>Nəzarət</th>
+                <th>İlkin müraciət</th>
+                <th>Təkrar müraciət</th>
+                <th>Təkrar müraciət </br>
+                (müxtəlif mövzuda)</th>
+                <th>Dublikat müraciət</th>
+                <th>Kollektiv müraciət</th>
+            </tr>
+            <tr></tr>
+            <tr class="noExl">
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+                <td>7</td>
+                <td>8</td>
+                <td>9</td>
+                <td>10</td>
+                <td>11</td>
+                <td>12</td>
+            </tr>
+        </thead>
+        <tbody>
+
+            @if (Model.ReportForm2Models != null)
+            {
+                foreach (var item in Model.ReportForm2Models)
+                {
+                    <tr>
+                        <td>@item.Line</td>
+                        <td>
+                            @item.Name
+                        </td>
+                        <td>@item.Total1</td>
+                        <td>@item.Total2</td>
+                        <td>@item.Total3</td>
+                        <td>@item.Total4</td>
+                        <td>@item.Total5</td>
+                        <td>@item.Total8</td>
+                        <td>@item.Total9</td>
+                        <td>@item.Total10</td>
+                        <td>@item.Total11</td>
+                        <td>@item.Total12</td>
+
+                    </tr>
+                }
+
+
+            }
+        </tbody>
+    </table>
+</div>

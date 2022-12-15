@@ -1,0 +1,56 @@
+﻿
+<div class="row">
+
+    <div class="col-sm-5">
+        <div class="form-group">
+            <br />
+            <select id="TypeNo" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                <option value=0 selected="selected">Qeydiyyat nömrəsi</option>
+                <option value=1>Layihə nömrəsi</option>
+
+            </select>
+        </div>
+    </div>
+
+    <div class="col-sm-5" style="text-align:left;">
+        <div class="form-group">
+            <br />
+            <input type="text" class="form-control" id="txtDocNo" />
+        </div>
+    </div>
+    <div class="col-sm-2" style="text-align:left;"> 
+        <div class="form-group">
+
+            <br />
+            <button type="button" class="mBtn mBtn-pr " id="btnSrch" >
+                Axtar
+            </button>
+        </div>
+    </div>
+</div>
+<div style="display:none;" id="divhidden">
+    @*@Html.Action("GetExecutor", new { doctype = 0})*@
+</div>
+<script>
+        $(document).ready(function () {
+            $('.navbar').css('display', 'none');
+        });
+
+        $('#btnSrch').click(function () {
+            $('#divhidden').css('display', 'block');
+                 $.ajax({
+                    url: '@Url.Action("GetExecutor", "Documents", new { area = "AdminPanel" })',
+                     data: {
+                         doctype: $("#TypeNo").val(),
+                         docno: $("#txtDocNo").val()
+                     }
+                 }).done(function (response) { 
+                     $('#divhidden').html(response);
+                    $('.selectpicker').selectpicker('refresh');
+                    window.CloseLoading();
+                    $('#loader').remove();
+                })
+           
+        })
+</script>
+<script src="~/Scripts/widgets/jqxmin.min.js"></script>

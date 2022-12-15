@@ -1,0 +1,250 @@
+﻿@using BLL.Common.Enums
+@using AzDoc.Helpers
+@using Widgets
+
+@{
+    Layout = null;
+
+    var grid = Html.MhmGrid("gridVillages", "GetVillages", "Region", routeValues: new { area = "AdminPanel" })
+        .Columns(cols =>
+        {
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.SetRenderer("<a><i class='fas fa-plus'></i></a>", htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    fn_onclick = "AddNewVillage",
+                    title = "Yeni kənd"
+                });
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetWidth(35);
+                c.SetRenderer("<a><i class='far fa-edit'></i></a>", htmlAttributes: new
+                {
+                    @class = "operation-button",
+                    fn_onclick = "EditVillage",
+                    title = "Mövcud kəndin redaktə olunması"
+                });
+            });
+
+            cols.Column(c =>
+            {
+                c.SetDataField("VillageId");
+                c.SetHidden();
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Kənd adı</b>");
+                c.SetDataField("VillageName");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable(Filtertype.TextBox);
+                c.SetMaxWidth(200);
+            });
+            cols.Column(c =>
+            {
+                c.SetText("<b>Kənd kodu</b>");
+                c.SetDataField("VillageCode");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable(Filtertype.TextBox);
+                c.SetMaxWidth(200);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Şəhər(rayon)</b>");
+                c.SetDataField("RegionName");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable(Filtertype.TextBox);
+                c.SetWidth(150);
+            });
+
+            cols.Column(c =>
+            {
+                c.SetText("<b>Kəndin statusu</b>");
+                c.SetDataField("VillageStatus");
+                c.SetHeaderAlign(TextAlign.Center);
+                c.SetCellsAlign(TextAlign.Left);
+                c.IsFilterable(Filtertype.CheckedList, filterItems: "[{\"text\": \"Aktiv\", \"value\":\"1\"}, {\"text\": \"Deaktiv\", \"value\":\"0\"}]", filterField: "VillageStatus");
+                c.SetWidth(250);
+            });
+
+        })
+
+.AllowSorting(true)
+.AllowTooltips(true)
+.AllowPaging(true)
+.AllowFiltering(true)
+.AllowFilterRow(true)
+.AllowColumnOrdering(true)
+.AllowColumnResizing(true)
+.ColumnCustomizer(false)
+.SetOnFilter("onFilterVillage")
+.SetPageSize(35)
+.SetWidth("1334px")
+.SetHeight("500px");
+}
+
+@grid.GetHtml()
+
+<div class="modal fade" id="villageModal" tabindex="-1" role="dialog" aria-labelledby="villageModalLabel" aria-hidden="true" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title" id="villageModalLabel">Yeni Kənd yarat</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="/az/AdminPanel/Region/AddVillageAsync" id="AddVillageForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <input type="hidden" id="villageId" name="VillageId" />
+                    <div class="form-group">
+                        <label for="villageCountry">Ölkəni seçin <span style="font-weight:bold; color:red">*</span></label>
+                        <select class="form-control selectpicker" name="VillageCountry" id="villageCountries" data-live-search="true" data-width="100%"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="villageCountry">Şəhəri(rayon) seçin <span style="font-weight:bold; color:red">*</span></label>
+                        <select class="form-control selectpicker" name="RegionCode" id="villageRegions" data-live-search="true" data-width="100%"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="villageName">Kəndin adı <span style="font-weight:bold; color:red">*</span></label>
+                        <input type="text" class="form-control" id="villageName" data-required="adı daxil edin" name="VillageName" placeholder="Kəndin adını daxil edin">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="checkbox" id="villageStatus" name="VillageStatus" checked="checked">
+                        <label for="villageStatus">Şəhərin(rayon) statusu</label><br>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 d-flex justify-content-center">
+                    <button type="submit" class="btn btn-success">Yadda saxla</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-danger">Bağla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function appendCountriesToSelect(selected) {
+        var countries = $.parseJSON('@Html.Raw(CacheHelper.GetFilter(DocFilter.AdminCountries))');
+        var select = $('#villageCountries').empty();
+        var isEqual = false;
+        $(countries).each(function (index, element) {
+            isEqual = (element.value == selected);
+            $(select).append(new Option(element.text, element.value, isEqual, isEqual));
+
+            if (isEqual) {
+                $(select).selectpicker('refresh');
+            }
+        });
+
+        $(select).selectpicker('refresh');
+    }
+
+    $('#villageCountries').on("change", function () {
+        var countryCode = $(this).find('option:selected').val();
+        appendRegionsToSelect(countryCode, undefined);
+    });
+
+    function appendRegionsToSelect(countryId, selected) {
+
+        $.ajax({
+            type: 'GET',
+            url: '/az/AdminPanel/Region/GetRegionsForVillage',
+            dataType: 'json',
+            data: { countryCode: countryId },
+            //processData: false,
+            contentType: false,
+            success: function (data) {
+                var regions = $.parseJSON(JSON.stringify(data));
+                var select = $('#villageRegions').empty();
+                var isEqual = false;
+                $(regions).each(function (index, element) {
+                    isEqual = (element.RegionCode == selected);
+                    $(select).append(new Option(element.RegionName, element.RegionCode, isEqual, isEqual));
+
+                    if (isEqual) {
+                        $(select).selectpicker('refresh');
+                    }
+                });
+
+                $(select).selectpicker('refresh');
+            }
+        });
+    }
+
+    function AddNewVillage(item, data) {
+        appendCountriesToSelect(931);
+        appendRegionsToSelect(931,undefined);
+        $('#villageModal').modal('show');
+    }
+
+    $('#AddVillageForm').submit(function (e) {
+        e.preventDefault(); // varsayilan eventleri engellemek
+
+        var form = new FormData(this);
+        var villageName = form.get('VillageName');
+        var villageStatus = $(this).find("input[name='VillageStatus']").prop('checked');
+
+        form.set('VillageStatus', villageStatus);
+
+        if (villageName == '' || villageName == undefined) {
+            return toastr.warning('Kəndin adını daxil edin');
+        }
+
+        var villageId = $('#villageId').val();
+        var url = `/az/AdminPanel/Region/${villageId == '' || villageId == undefined ? 'AddVillageAsync' : 'EditVillageAsync'}`;
+        $.ajax({
+            type: 'POST',
+            url: url,
+            data: form,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                toastr.success('Məlumat uğurla əlavə olundu');
+                $('#villageModal').modal('hide');
+                $('#gridVillages').bindgrid(1);
+            }
+        });
+
+    });
+
+    $('#villageModal').on('hidden.bs.modal', function (e) {
+        $('#AddVillageForm').trigger('reset');
+        $('#villageRegions').empty();
+        $('#villageId').val('');
+    })
+
+    function EditVillage(item, data) {
+        $.ajax({
+            type: 'GET',
+            url: '/az/AdminPanel/Region/EditVillageAsync',
+            data: { villageId: data.VillageId },
+            //processData: false,
+            contentType: false,
+            success: function (data) {
+                appendCountriesToSelect(data.CountryCode);
+                appendRegionsToSelect(data.CountryCode, data.RegionCode);
+                $('#villageId').val(data.VillageId);
+                $('#villageName').val(data.VillageName);
+                $('#villageStatus').prop('checked', data.VillageStatus ? true : false);
+                $('#villageModal').modal('show');
+            }
+        });
+    }
+</script>

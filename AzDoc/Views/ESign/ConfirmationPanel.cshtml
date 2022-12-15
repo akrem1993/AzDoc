@@ -1,0 +1,306 @@
+﻿@using AzDoc.Helpers
+@* senedi tesdiqleme paneli *@
+<div class="mModal">
+    <div class="modal fade modalBtn" id="docConfirmationDialogModal" tabindex="-1" role="dialog" aria-labelledby="prAddModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header"></div>
+                <div class="modal-header2">
+                    <span>Sənədi təsdiq etməyə əminsiniz ?</span>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group" style="text-align: left!important">
+                                <label for="ctlDocConfirmCertificates">Sertifikatınızı seçin:</label>
+                                <select class="form-control" name="" id="ctlDocConfirmCertificates"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <textarea class="form-control" id="docConfirmNote"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div id="docConfirmProgressBarContainer" class="container">
+                                <p id="docConfirmProgressStatus"></p>
+                                <div class="progress">
+                                    <div id="docConfirmProgressBar"
+                                         class="progress-bar progress-bar-striped active"
+                                         role="progressbar"
+                                         aria-valuenow="0"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100"
+                                         style="width:0">
+                                        1
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <div class="col-3">
+                        <button type="button" id="docConfirmDocBtn" class="mBtn mBtn-pr defaultBtn" style="width: 100%" disabled>Təsdiqlə</button>
+                        <button type="button" class="btn btn-secondary" id="getDocConfirmCerts" hidden></button>
+                        <input type="file" class="custom-file-input" id="confirmFiles" multiple hidden>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="mBtn mBtn-sec mr-5 defaultBtn closeBtn" style="width: 100%">Bağla</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button type="button" id="docConfirmation" hidden="hidden"></button>
+
+<script>
+    var filesarray = [];
+    var eimza = eimzaLib();
+    var tokenDocId = $("#spanToken").html();;
+
+    $("#docConfirmation").on("click",
+        function () {
+            eimza.isSigningServiceWorking().then(onDocConfirminingWorking, onDocConfirminingDown);
+            //imzanin melumatlarini getirir
+            $("button#getDocConfirmCerts").click(function () {
+                docConfirmReset();
+                $("#docConfirmProgressBarContainer").hide();
+                eimza.readCertificates().then(onDocConfirmSuccessReadCertificates, onError);
+            });
+        });
+
+    function onDocConfirminingWorking() {
+        // enable all
+        $("#failinfo").hide();
+        var formData = new FormData();
+        var token = $('input[name="__RequestVerificationToken"]').val();
+
+        $.ajax({
+            type: 'POST',
+            url: `/az/ESign/GetSignedFile?token=${tokenDocId}`,
+            data: { __RequestVerificationToken: token },
+            beforeSend: window.ShowLoading(),
+            success: function (data) {
+                console.log(data);
+                $("#docConfirmDocBtn").removeAttr("disabled");
+
+                var blob = new Blob([base64ToArrayBuffer(data.Base64)], { type: "octet/stream" }); //, url = window.URL.createObjectURL(blob);
+
+                //tesdiqleme
+                $("#docConfirmDocBtn").click(function () {
+                    var select = document.getElementById("ctlDocConfirmCertificates");
+                    var certSerialNumber = select.options[select.selectedIndex].value;
+                    var certDetails = select.options[select.selectedIndex].text;
+
+                    var jsonString = `{"${certDetails.split(',').join('", "').split('=').join('": "')}"}`;
+                    var object = JSON.parse(jsonString);
+                    console.log(object);
+
+                    var serialNumber = $.trim(object.SERIALNUMBER);
+
+                    if (serialNumber !== '@SessionHelper.UserFIN' && ($.inArray(serialNumber, exceptFin) === -1)) {
+                        return toastr.warning("Seçdiyiniz sertifikat mövcud istifadəçiyə aid deyil.");
+                    }
+
+                    docConfirmReset();
+                    changeDocConfirmProgressBar(1, "Təsdiqləmə prosesi başlayıb ....");
+                    formData.append("AuthCertificateSerialNumber", certSerialNumber);
+                    formData.append("file0", blob, data.FileName);
+
+                    eimza.checkEdoc(data.Base64, data.FileName).then(onDocConfirmSuccess, onError);
+
+                    progressInterval = setInterval(function () {
+                        eimza.getProgress().then(onDocConfirmProgressSuccess);
+                    },
+                        500);
+                });
+            },
+            complete: function() {
+                window.CloseLoading();
+            }
+        });
+
+        $("button#getDocConfirmCerts").click();
+    }
+
+    function base64ToArrayBuffer(base64) {
+        var binaryString = window.atob(base64);
+        var binaryLen = binaryString.length;
+        var bytes = new Uint8Array(binaryLen);
+        for (var i = 0; i < binaryLen; i++) {
+            var ascii = binaryString.charCodeAt(i);
+            bytes[i] = ascii;
+        }
+        return bytes;
+    }
+
+    var saveData = (function () {
+        var a = document.createElement("a");
+        document.body.appendChild(a);
+        a.style = "display: none";
+        return function (data, fileName) {
+            var blob = new Blob([base64ToArrayBuffer(data)], { type: "octet/stream" }),
+                url = window.URL.createObjectURL(blob);
+            a.href = url;
+            a.download = fileName;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        };
+    }());
+
+    function onDocConfirminingDown() {
+        // hide everything
+        // show error message
+        $("#mainContainer").hide();
+        $("#failinfo").show();
+        $("#failinfo").html(
+            "Yeni Online Imzalayici proqrami yazılmayıb və ya işləmir. Zəhmət olmasa yükləyin."
+        );
+    }
+
+    function docConfirmReset() {
+        console.log("reset");
+        $("#docConfirmProgressBarContainer").show();
+        $("#failinfo").hide();
+    }
+
+    function changeDocConfirmProgressBar(percentage, status) {
+        console.log("changeProgressBar");
+        $("#docConfirmProgressBar").css("width", percentage + "%");
+        $("#docConfirmProgressBar").html(percentage + "%");
+
+        $("#docConfirmProgressStatus").html(status);
+    }
+
+    function onDocConfirmSuccessReadCertificates(data, status) {
+        console.log("onSuccessReadCertificates");
+        console.log(data);
+
+        if (data.errorCode !== 0) {
+            toastr.warning(data.errorDetails);
+            $("#docConfirmProgressBarContainer").hide();
+            $("#failedMessage").show();
+            $("#failedMessage").html(data.errorDetails);
+        }
+
+        if (data.certificates) {
+            var options = "";
+            for (var i = 0; i < data.certificates.length; i++) {
+                options +=
+                    '<option value="' +
+                    data.certificates[i].serialNumber +
+                    '">' +
+                    data.certificates[i].subject +
+                    "</option>";
+            }
+            $("#certificatesDiv").show();
+            $("select#ctlDocConfirmCertificates").html(options);
+        }
+    }
+
+    function onDocConfirmSuccess(data, status) {
+
+        if (data.statusCode === 0) {
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            $.ajax({
+                url: `/az/DocOperation/ConfirmDocument?token=${tokenDocId}`,
+                type: 'POST',
+                dataType: 'json',
+                data: { __RequestVerificationToken: token, note: $('#docConfirmNote').val() },
+                success: function (data) {
+                    if (data) {
+                        $("#docConfirmationDialogModal").modal("hide");
+
+                        setTimeout(function () {
+                            location.reload();
+                        },
+                            2000);
+
+                        Swal.fire({
+                            type: 'success',
+                            title: 'Sənədin təsdiqlənməsi uğurla başa çatdı.',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+
+                    } else {
+                        toastr.warning("Sənədin təsdiqlənməsi uğursuz oldu.");
+                    }
+                },
+                error: function (response) {
+                    console.log('error', response);
+                }
+            });
+        } else {
+            toastr.error(data.message);
+            progressInterval = undefined;
+        }
+
+        if (data.errorCode !== 0) {
+            $("#docConfirmProgressBarContainer").hide();
+            $("#failinfo").show();
+            $("#failinfo").html(data.errorDetails);
+        } else if (
+            data.authCertificateSubject !== undefined &&
+            data.signCertificateSubject !== undefined
+        ) {
+            var certificateData = "";
+            certificateData =
+                certificateData + "<p>" + data.authCertificateSerialNumber + "</p>";
+            certificateData =
+                certificateData + "<p>" + data.authCertificateSubject + "</p>";
+            certificateData =
+                certificateData + "<p>" + data.signCertificateSerialNumber + "</p>";
+            certificateData =
+                certificateData + "<p>" + data.signCertificateSubject + "</p>";
+
+            $("#certSubject").html(certificateData);
+        } else if (data.edocFile !== undefined) {
+            if (data.edocFile.rawData != undefined) {
+                $("#rawData").html(data.edocFile.rawData);
+            } else {
+                $("#rawData").html(data.edocFile);
+            }
+
+            changeDocConfirmProgressBar(100, "Sənəd müvəffəqiyyətlə təsdiqləndi !");
+        }
+
+        if (progressInterval !== undefined) {
+            console.log("clear interval");
+            window.clearInterval(progressInterval);
+        }
+    }
+
+    function onError(err) {
+        toastr.error("Sənədin təsdiqlənməsi uğursuz oldu." + err);
+        console.log("onError", err);
+    }
+
+    function onDocConfirmProgressSuccess(data, status) {
+        console.log('onProgressSuccess >> ', data);
+        if (data.progress === null) {
+            changeDocConfirmProgressBar(100, 'Təsdiqləmə prosesi uğurla bitib !');
+        } else if (data.progress.status === true) {
+            changeDocConfirmProgressBar(data.progress.percentage, data.progress.state);
+        }
+    }
+
+    function dataURLtoFile(dataurl, filename) {
+        var parts = dataurl.split(',');
+        bstr = atob(parts[1]), n = bstr.length, fileBuffer = new Uint8Array(n);
+        while (n--) {
+            fileBuffer[n] = bstr.charCodeAt(n);
+        }
+        return new File([fileBuffer], filename, { type: 'edoc' });
+    }
+</script>

@@ -1,0 +1,52 @@
+﻿@using AzDoc.Helpers
+@model IEnumerable<BLL.Models.DocInfo.DocTask>
+
+@if (Model?.Count() > 0)
+{
+    <div class="col-md-12">
+        <h4 class="text-center">Tapşırıqlar</h4>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col" class="thead">Tapşırıq nömrəsi</th>
+                    <th scope="col" class="thead">Kimə ünvanlanıb</th>
+                    <th scope="col" class="thead">Tapşırıq məzmunu</th>
+                    <th scope="col" class="thead">Tapşırıq dövrü</th>
+                    <th scope="col" class="thead">İcra dövrü</th>
+                    <th scope="col" class="thead">İcra müddəti</th>
+                    <th scope="col" class="thead">İlkin icra tarixi</th>
+                    <th scope="col" class="thead">Tapşırığın statusu</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td align='center'>
+                            @if (item.TaskRelatedDocId.HasValue && item.TaskRelatedDocId.Value != default(int))
+                            {
+                                <a href="/az/Document/GetDocView?token=@TokenHelper.CreateToken(item.TaskRelatedDocId)"
+                                   target="_blank">
+                                    @item.TaskDocNo
+                                </a>
+                            }
+                            else
+                            {
+                                @item.TaskDocNo
+                            }
+
+                        </td>
+                        <td align='left'><i style="font-weight: bold;">@item.TypeOfAssignment :</i> @item.WhomAddress</td>
+                        <td align='left'>@item.Task</td>
+                        <td align='center'>@item.TaskCycleName</td>
+                        <td align='center'>@item.ExecutionPeriod</td>
+                        <td align='center'>@(item.NextPeriodDate?.ToString("d"))</td>
+                        <td align='center'>@(item.OriginalExecutionDate?.ToString("d"))</td>
+                        <td align='center'>@item.TaskRelatedDocStatus</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

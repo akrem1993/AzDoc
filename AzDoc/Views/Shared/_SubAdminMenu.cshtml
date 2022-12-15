@@ -1,0 +1,83 @@
+﻿
+@using AzDoc.Helpers
+
+<li class="drop">
+    <a href="#">
+        <i class="fas fa-cog"></i>
+        <span>Admin</span>
+    </a>
+    <div class="down">
+        <ul>
+            @*<li>
+                <a href="~/az/AdminPanel/OrganizationStructure/EditDocumentIndex">
+                    <span>Sənəd üzrə əməliyyatlar</span>
+                </a>
+            </li>*@
+            <li>
+                <a href="~/az/OrganizationStructure">
+                    <span>İstifadəçilər</span>
+                </a>
+            </li>
+            <li>
+                <a href="~/az/AdminPanel/OrganizationStructure/OrganisationsIndex">
+                    <span>Qurumlar</span>
+                </a>
+            </li>
+            <li>
+                <a href="~/az/AdminPanel/OrganizationStructure/PositionIndex">
+                    <span>Vəzifələr</span>
+                </a>
+            </li>
+            @*<li>
+            <a href="~/az/AdminPanel/OrganizationStructure/RoleIndex">
+                <span>Rollar</span>
+            </a>
+        </li>*@
+            @*<li>
+                <a href="~/az/AdminPanel/OrganizationStructure/TopicTypeIndex">
+                    <span>Mövzular</span>
+                </a>
+            </li>*@
+            @*<li>
+                <a href="~/az/AdminPanel/OrganizationStructure/TopicIndex">
+                    <span>Alt Mövzular</span>
+                </a>
+            </li>*@
+
+            @*<li>
+            <a href="~/az/AdminPanel/OrganizationStructure/OrganisationForRenderingIndex">
+                <span>Sənədə bağlı qurumlar</span>
+            </a>
+        </li>*@
+            <li>
+                <a href="~/az/AdminPanel/OrganizationStructure/AuthorityTransferIndex">
+                    <span>Səlahiyyətlərin ötürülməsi</span>
+                </a>
+            </li>
+            <li>
+                <a href="~/az/AdminPanel/OrganizationStructure/TransferUserProfileIndex">
+                    <span>Profilin köçürülməsi</span>
+                </a>
+            </li>
+            @*<li>
+            <a href="~/az/AdminPanel/Documents/Index">
+                <span>Mövcud sənəd üzrə dəyişiklik</span>
+            </a>
+        </li>
+        <li>
+            <a href="~/az/AdminPanel/Region/Index">
+                <span>Şəhərlər, rayonlar, kəndlər</span>
+            </a>
+        </li>
+        @if (SessionHelper.SuperAdminPermission == 1)
+        {
+            <li>
+                <a href="~/az/AdminPanel/OrganizationStructure/UserLimitationLogs">
+                    <span>İstifadəçi limiti tarixcəsi</span>
+                </a>
+            </li>
+        }*@
+
+        </ul>
+    </div>
+</li>

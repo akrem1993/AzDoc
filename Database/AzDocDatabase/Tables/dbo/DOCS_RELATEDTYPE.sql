@@ -1,0 +1,5 @@
+CREATE TABLE [dbo].[DOCS_RELATEDTYPE](
+	[RelatedTypeId] int NOT NULL,
+	[Name] nvarchar(50) NULL,
+ CONSTRAINT [PK_DOCS_RELATEDTYPE] PRIMARY KEY ([RelatedTypeId])
+)

@@ -1,0 +1,73 @@
+﻿
+@using Admin.Model.ViewModel
+@*@model Admin.Model.ViewModel.CreateResolutionRoleModel*@
+
+@if (@Model != null)
+{
+<div class="row">
+
+    <div class="col-sm-5">
+        <div class="form-group">
+            <label>Dərkənar yaratmaq hüququ</label>
+            <select id="CreateRsl" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                <option value="-1">Seçin</option>
+                @foreach (CreateResolutionRoleModel item in Model)
+                {
+                    <option value="@item.WorkplaceId">@item.UserName</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="col-sm-5" style="text-align:left;">
+        <div class="form-group">
+            <label>Kimdən</label>
+            <select id="RoleRsl" class="form-control selectpicker" data-live-search="true" data-width="100%">
+                <option value="-1">Seçin</option>
+                @foreach (CreateResolutionRoleModel item in Model)
+                {
+                    <option value="@item.WorkplaceId">@item.UserName</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="col-sm-2" style="text-align:left;">
+        <div class="form-group">
+
+            <br />
+            <button type="button" class="mBtn mBtn-pr " id="btnAdd">
+                Təsdiqlə
+            </button>
+        </div>
+    </div>
+</div>
+}
+<script>
+    $(document).ready(function () {
+        $('.navbar').css('display', 'none');
+    });
+
+    $('#btnAdd').click(function () {
+         $.ajax({
+          type: 'POST',
+         url: '@Url.Action("AddResolutionRole", "Documents", new { area = "AdminPanel" })',
+                        dataType: 'json',
+             data: {
+                 workplaceid1: $('#CreateRsl').find('option:selected').val(),
+                 workplaceid2: $('#RoleRsl').find('option:selected').val()
+            },
+                        beforeSend: function () {
+                            window.ShowLoading();
+                        },
+                        success: function () {
+                            
+
+                        },
+                        complete: function () {
+                            window.CloseLoading();
+                            alert("Əməliyyat uğurla başa çatdı.");
+                        }
+                    });
+    })
+</script>
+<script src="~/Scripts/widgets/jqxmin.min.js"></script>
